@@ -1,0 +1,157 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using AddInView;
+using GraphEditor.GraphDeclaration;
+using System.Diagnostics;
+using System.Drawing;
+using System.Collections;
+
+namespace Plugin
+{
+    public partial class GraphEmbeddingPolynom : IPozitioning
+    {
+        class SphereEmbeder
+        {
+            struct VertexProperities : IComparable<VertexProperities>
+            {
+                public int Enter;
+                public int Ancestor;
+                public int LowPoint;
+                public int Close;
+                public int Index;
+                public State State;
+
+                public int CompareTo(VertexProperities other)
+                {
+                    return (-1) * Enter.CompareTo(other.Enter);
+                }
+            }
+            //http://mj.ucw.cz/vyuka/ga/11-planar.pdf
+            VertexProperities[] vertexs;
+
+            int time;
+
+            Embeding embeding;
+
+            int Count
+            {
+                get
+                {
+                    return embeding.neighbors.Count;
+                }
+            }
+
+            public SphereEmbeder(Embeding embeding)
+            {
+                this.embeding = embeding;
+                vertexs = new VertexProperities[Count];
+                for (int i = Count - 1; i >= 0; i--)
+                {
+                    vertexs[i].Enter = 0;
+                    vertexs[i].Ancestor = int.MaxValue;
+                    vertexs[i].LowPoint = int.MaxValue;
+                    vertexs[i].State = State.UNKNOWN;
+                    vertexs[i].Index = i;
+                }
+                time = 0;
+            }
+
+            public Embeding GetEmbeding()
+            {
+                countEnterAncestorLowPoint();
+                // sort by enter desc
+                Array.Sort(vertexs);
+                foreach (VertexProperities v in vertexs)
+                {
+
+                }
+                return null;
+            }
+
+            private void countEnterAncestorLowPoint()
+            {
+                Visit(0);
+                for (int i = Count - 1; i >= 0; i--)
+                {
+                    vertexs[i].State = State.UNKNOWN;
+                }
+                CountLowPoint(0);
+            }
+
+            private void CountLowPoint(int u)
+            {
+                vertexs[u].State = State.OPEN;
+                int min = vertexs[u].Ancestor;//ancestor[u];
+                foreach (int v in embeding.neighbors[u])
+                {
+                    switch (vertexs[v].State)
+                    {
+                        case State.UNKNOWN:
+                            if (vertexs[v].Ancestor < min)
+                            {
+                                min = vertexs[v].Ancestor;
+                            }
+                            CountLowPoint(v);
+
+                            break;
+                        case State.OPEN:
+
+                            break;
+                        case State.CLOSE:
+
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                vertexs[u].LowPoint = min;
+            }
+
+            private void Visit(int u)
+            {
+                vertexs[u].State = State.OPEN;
+                vertexs[u].Enter = ++time;
+                foreach (int v in embeding.neighbors[u])
+                {
+                    switch (vertexs[v].State)
+                    {
+                        case State.UNKNOWN:
+                            // tree edge
+                            Visit(v);
+                            break;
+                        case State.OPEN:
+                            // back edge
+                            //if (enter[v] < ancestor[u])
+                            if (vertexs[v].Enter < vertexs[u].Ancestor)
+                            {
+                                vertexs[u].Ancestor = vertexs[v].Enter;
+                            }
+                            break;
+                        case State.CLOSE:
+                            if (vertexs[v].Close < vertexs[u].Enter)
+                            {
+                                //cross edge
+                            }
+                            else
+                            {
+                                // forward edge
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                vertexs[u].Close = ++time;
+                vertexs[u].State = State.CLOSE;
+            }
+            enum State
+            {
+                UNKNOWN,
+                OPEN,
+                CLOSE
+            }
+        }
+    }
+}

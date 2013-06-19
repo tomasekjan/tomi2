@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="GraphEditor.GraphDeclaration.Edge">
+    <Position X="0.5" Y="3.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAIABBCIAAABACAAAQAAAQAAIAIAEACAAACAAAAAAAA=</HashCode>
+      <FileName>GraphDeclaration\Edge.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GraphEditor.GraphDeclaration.GraphDefinition">
+    <Position X="4" Y="0.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAIAAAAABAAAAAAAAAAAQAAAAAAAAAAAEAAA=</HashCode>
+      <FileName>GraphDeclaration\GraphDefinition.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GraphEditor.GraphDeclaration.Line2D">
+    <Position X="2.25" Y="3.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Properties" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>IAAAACEACAABBggAgAYAAAAAABAAAACAAAAAgAAAAAA=</HashCode>
+      <FileName>GraphDeclaration\Line2D.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GraphEditor.GraphDeclaration.SubPoint">
+    <Position X="4" Y="3.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Properties" Collapsed="true" />
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAigAkgIAAIAAAAAAAAICAAAAAAAAAAAA=</HashCode>
+      <FileName>GraphDeclaration\SubPoint.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GraphEditor.GraphDeclaration.Vertex">
+    <Position X="5.75" Y="3.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAgAAAAAA=</HashCode>
+      <FileName>GraphDeclaration\Vertex.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="GraphEditor.GraphDeclaration.SurfaceTypeEnum">
+    <Position X="7.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAIAAAAAAQAAAAAAQAAAAAAAAAAAAAAAAAgAAAAAA=</HashCode>
+      <FileName>GraphDeclaration\SurfaceTypeEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Tahoma" Size="8.25" />
+</ClassDiagram>

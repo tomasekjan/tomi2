@@ -1,0 +1,214 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using AddInView;
+using GraphEditor.GraphDeclaration;
+using System.Diagnostics;
+using System.Drawing;
+using System.Collections;
+
+namespace Plugin
+{
+    public class GraphEmbeddingExponentioal : IPozitioning
+    {
+
+        public override GraphDefinition Pozitioning(GraphDefinition sourceDefinition)
+        {
+            Embeding embeding = new Embeding(sourceDefinition);
+            switch (sourceDefinition.suraceType)
+            {
+                case SurfaceTypeEnum.Sphere:
+                    return GetSpherePozitioning(embeding);
+                case SurfaceTypeEnum.Torus:
+                    return GetTorusPozitioning(embeding);
+                default:
+                    throw new ArgumentException();
+            }
+        }
+
+        private GraphDefinition GetTorusPozitioning(Embeding embeding)
+        {
+            embeding = GetTorusEmbeding(embeding);
+            
+            return null;
+        }
+
+        private Embeding GetTorusEmbeding(Embeding embeding)
+        {
+            Embeding sphereEmbeding = GetSphereEmbeding(embeding);
+            if (sphereEmbeding != null)
+            {
+                // planar embedding is also torus embeding
+                return sphereEmbeding;
+            }
+            Embeding h = SubgrafHomoomorphicToK5K3_3(embeding);
+            if (h.IsK5())
+            {                
+                foreach (Embeding e in Embeding.GetK5Embedings())
+                {
+                    var tmp = ExtedEmgeddingTorus(embeding, e);
+                    if (tmp != null)
+                    {
+                        return tmp;
+                    }
+                }
+                // no embeding found
+                return null;
+            }
+            if (h.IsK3_3())
+            {
+                foreach (Embeding e in Embeding.GetK3_3Embedings())
+                {
+                    var tmp = ExtedEmgeddingTorus(embeding, e);
+                    if (tmp != null)
+                    {
+                        return tmp;
+                    }
+                }
+                // no embeding found
+                return null;
+            }
+            throw new EmbeddingException("there schould be k5 or k3_3");
+        }
+
+        private List<List<Tuple<int, int>>> FaceWalk(Embeding h)
+        {
+            // algoritm 2.2.
+            // faceWalk
+            // page 14
+            Dictionary<Tuple<int, int>, bool> record = new Dictionary<Tuple<int, int>, bool>();
+            int faceCount = 0;
+            foreach (Tuple<int, int> edge in h)
+            {
+                record.Add(edge, false);
+                record.Add(new Tuple<int, int>(edge.Item2, edge.Item1), false);
+            }
+            h.makeAsymmetric();
+
+            List<List<Tuple<int, int>>> faces = new List<List<Tuple<int, int>>>();
+            foreach (Tuple<int, int> edge in h)
+            {
+                if (record[edge] == false)
+                {
+                    faceCount++;
+                    int a = edge.Item1;
+                    int b = edge.Item2;
+                    List<Tuple<int, int>> face = new List<Tuple<int, int>>();
+                    while (record[new Tuple<int, int>(a, b)] == false)
+                    {
+                        record[new Tuple<int, int>(a, b)] = true;
+                        face.Add(new Tuple<int, int>(a, b));
+                        int index = h.neighbors[b].IndexOf(a);
+                        int count = h.neighbors[b].Count;
+                        int c = h.neighbors[b][(index + 1) % count];
+                        a = b;
+                        b = c;
+                    }
+                    faces.Add(face);
+                }
+            }
+            return faces;
+        }
+
+        class Bridge : IComparable<Bridge>
+        {
+            int penalty = -1;
+            public int GetPenalty()
+            {
+                //caching reasons
+                if (penalty != -1)
+                {
+                    return penalty;
+                }
+                // TODO implement this
+                return 0;
+            }
+            public static List<Bridge> GetBridges(Embeding g, Embeding h)
+            {
+                return null;
+            }
+
+            public int CompareTo(Bridge other)
+            {
+                return GetPenalty().CompareTo(other.GetPenalty());
+            }
+
+            internal bool isAdmissible(List<Tuple<int, int>> face)
+            {
+                throw new NotImplementedException();
+            }
+
+            internal List<int> GetBisectingPath()
+            {
+                throw new NotImplementedException();
+            }
+        }
+        
+        // add some better return type
+        private Embeding ExtedEmgeddingTorus(Embeding g, Embeding h)
+        {
+            List<List<Tuple<int, int>>> faces = FaceWalk(h);
+            List<Bridge> bridges = Bridge.GetBridges(g, h);
+            if (bridges.Count == 0)
+            {
+                return h;
+            }
+            bridges.Sort();
+            if (bridges[0].GetPenalty() == 0)
+            {
+                return null;
+            }
+            Bridge b = bridges[0];
+            foreach (List<Tuple<int, int>> face in faces)
+            {
+                if (b.isAdmissible(face))
+                {
+                    List<int> bisectingPath = b.GetBisectingPath();
+                    for (int i = 0; i < 2; i++)
+                    {
+                        for (int j = 0; j < 2; j++)
+                        {
+                            h.addPath(bisectingPath, (VertexState)i, (VertexState)j);
+                            var partialEmbedding = ExtedEmgeddingTorus(g, h);
+                            if (partialEmbedding != null)
+                            {
+                                return partialEmbedding;
+                            }
+                            h.RemoveEdge(bisectingPath, (VertexState)i, (VertexState)j);
+                        }
+                    }                   
+                }
+            }
+            return null;
+        }        
+
+        private Embeding SubgrafHomoomorphicToK5K3_3(Embeding embeding)
+        {
+            Embeding h = new Embeding(embeding);
+            h.makeAsymmetric();
+            foreach (Tuple<int, int> edge in h)
+            {                
+                h.RemoveEdge(edge);
+                if (GetSphereEmbeding(h) != null)
+                {
+                    h.AddEdge(edge);
+                } 
+            }            
+            return h;
+        }
+
+        private GraphDefinition GetSpherePozitioning(Embeding embeding)
+        {
+            embeding = GetSphereEmbeding(embeding);
+
+            return null;
+        }
+
+        //returns null if not planar
+        private Embeding GetSphereEmbeding(Embeding embeding)
+        {
+            throw new NotImplementedException();
+        }        
+    }
+}

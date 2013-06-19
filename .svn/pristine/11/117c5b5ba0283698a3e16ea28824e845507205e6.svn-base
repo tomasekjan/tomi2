@@ -1,0 +1,213 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using AddInView;
+using GraphEditor.GraphDeclaration;
+using System.Diagnostics;
+using System.Drawing;
+using System.Collections;
+
+namespace Plugin
+{
+    public partial class GraphEmbedding : IPozitioning
+    {
+        class ThereConnectedComponentGetter :IComponentGetter
+        {
+            Embeding embeding;
+            List<Embeding> returnList = new List<Embeding>();
+            bool[] visited;
+            public ThereConnectedComponentGetter(Embeding embeding)
+            {
+                this.embeding = embeding;
+            }
+
+            public List<Embeding> GetComponents()
+            {
+                int[] componentNumber = new int[embeding.VertexCount];
+                for (int i = 0; i < embeding.VertexCount; i++)
+                {
+                    componentNumber[i] = i;
+                }
+                for (int u = 0; u < embeding.VertexCount; u++)
+                {
+                    for (int v = u; v < embeding.VertexCount; v++)
+                    {                        
+                        Embeding e = embeding.Copy();                        
+                        for (int i = 0; i < 3; i++)
+                        {                            
+                            visited  = new bool[embeding.VertexCount];
+                            Stack<int> path = new Stack<int>();
+                            if (visit(e, u, v, path))
+                            {
+                                componentNumber[v] = componentNumber[u];
+                                int last = path.Pop();
+                                Debug.Assert(last == v);
+                                foreach (int n in path)
+                                {
+                                    e.neighbors[n].Remove(last);
+                                    last = n;
+                                }
+                                Debug.Assert(u != last);
+                                e.neighbors[u].Remove(last);
+                            }
+                            else
+                            {
+                                componentNumber[v] = v;
+                                break;
+                            }
+                        }
+                    }
+                }               
+                
+                IEnumerable<int> components  = (from int i in componentNumber select i).Distinct();
+                foreach (int c in components)
+                {
+                    Embeding embed = new Embeding();
+                    IEnumerable<int> neiber = (from int i in componentNumber where (i == c) select i).ToArray();                    
+                    Dictionary<int, int> names = new Dictionary<int, int>();
+                    foreach (int uName in neiber)
+                    {
+                        foreach (int vName in neiber)
+                        {
+                            if (!names.ContainsKey(uName))
+                            {
+                                names.Add(uName, names.Count);
+                                embed.neighbors.Add(new List<int>());
+                            }
+
+                            if (!names.ContainsKey(vName))
+                            {
+                                names.Add(vName, names.Count);
+                                embed.neighbors.Add(new List<int>());
+                            }
+
+                            int u = names[uName];
+                            int v = names[vName];
+
+                            embed.neighbors[u].Add(v);
+                            embed.neighbors[v].Add(u);
+                        }                        
+                    }
+                }
+                return returnList;
+            }
+
+            private bool visit(Embeding e, int u, int v, Stack<int> path)
+            {
+                visited[u] = true;
+                if (u == v) return true;
+                foreach (int n in e.neighbors[u])
+                {
+                    if (!visited[n])
+                    {
+                        path.Push(n);
+                        if (visit(e, n, v, path))
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            path.Pop();
+                        }
+                    }
+                }
+                return false;
+            }
+        }
+    }
+
+    public partial class GraphEmbedding : IPozitioning
+    {
+        private interface IComponentGetter
+        {
+            List<Embeding> GetComponents();
+        }
+        class TwoConnectedComponentGetter : IComponentGetter
+        {
+            //http://www.cs.umd.edu/class/fall2005/cmsc451/biconcomps.pdf
+            VertexProperities[] vertexs;            
+            int count = 0;
+            Stack<Tuple<int, int>> stack = new Stack<Tuple<int, int>>();
+            Embeding embeding;
+            List<Embeding> returnList = new List<Embeding>();
+
+            public TwoConnectedComponentGetter(Embeding embeding)
+            {
+                this.embeding = embeding;
+                vertexs = new VertexProperities[embeding.neighbors.Count];
+                for (int i = 0; i < embeding.neighbors.Count; i++)
+                {
+                    vertexs[i].visited = false;
+                    vertexs[i].parrent = -1;
+                    vertexs[i].d = -1;
+                    vertexs[i].low = -1;                    
+                }
+            }
+
+            public List<Embeding> GetComponents()
+            {
+
+                for (int i = 0; i < vertexs.Length; i++)
+                {
+                    if (!vertexs[i].visited)
+                    {
+                        visit(i);
+                    }
+                }
+
+                return returnList;
+            }
+
+            private void visit(int u)
+            {
+
+                vertexs[u].visited = true;
+                count++;
+                vertexs[u].d = count;
+                vertexs[u].low = vertexs[u].d;
+                foreach (int v in embeding.neighbors[u])
+                {
+                    if (!vertexs[v].visited)
+                    {
+                        Push(u, v);
+                        vertexs[v].parrent = u;
+                        visit(v);
+                        if (vertexs[v].low >= vertexs[u].d)
+                        {
+                            returnList.Add(GetComponent(u, v));
+                        }
+                        vertexs[u].low = vertexs[u].low < vertexs[v].low ? vertexs[u].low : vertexs[v].low;
+
+                    }
+                    else
+                    {
+                        if (!(vertexs[u].parrent == v) && (vertexs[v].d < vertexs[u].d))
+                        {
+                            Push(u, v);
+                            vertexs[u].low = vertexs[u].low < vertexs[v].d ? vertexs[u].low : vertexs[v].d;
+                        }
+                    }
+                }
+            }
+
+            private Embeding GetComponent(int u, int v)
+            {
+                return new Embeding(stack, u, v);
+            }
+
+            private void Push(int u, int v)
+            {
+                stack.Push(new Tuple<int, int>(u, v));
+            }
+
+            struct VertexProperities
+            {
+                public bool visited;
+                public int parrent;
+                public int d;
+                public int low;
+            }
+        }
+    }
+}

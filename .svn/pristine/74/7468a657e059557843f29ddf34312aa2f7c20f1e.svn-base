@@ -1,0 +1,28 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Xna= Microsoft.Xna.Framework;
+using System.Runtime.Serialization;
+
+namespace GraphEditor.GraphDeclaration
+{
+    /// <summary>
+    /// Main class of Graph content 
+    /// contains vertices and edges description
+    /// </summary>
+    [Serializable]
+    public sealed class GraphDefinition
+    {
+        public List<Vertex> vertices;
+        public List<Edge> edges;
+        public Xna.Color surfaceColor;
+        public SurfaceTypeEnum suraceType;
+
+        public GraphDefinition()
+        {
+            vertices = new List<Vertex>();
+            edges = new List<Edge>();
+        }
+
+    }
+}

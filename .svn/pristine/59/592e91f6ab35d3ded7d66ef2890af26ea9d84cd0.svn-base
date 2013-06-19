@@ -1,0 +1,30 @@
+pouzite zdroje
+http://www.hamilton.ie/ollie/Downloads/Graph.pdf
+
+http://en.wikipedia.org/wiki/Surface#Closed_surfaces
+
+[1]J. Boyer and W. Myrvold. On the cutting edge: Simplified O(n) planarity by edge
+addition. Journal of Graph Algorithms and Applications, 8(3):241–273, 2004.
+
+[2]I. S. Filotti, G. L. Miller, J. Reif, On determining the genus of a graph in O(vO(g))
+steps, in “Proc. 11th Ann. ACM STOC,” Atlanta, Georgia (1979) pp. 27–37.
+
+[3]H. Djidjev, J. H. Reif, An efficient algorithm for the genus problem with explicit
+construction of forbidden subgraphs, 23rd Annual ACM Symposium on Theory of
+Computing, New Orleans, LA, May 1991, pp. 337–347.
+
+[4]Bojan Mohar: A Linear Time Algorithm for Embedding Graphs in an Arbitrary Surface, SIAM J. Discrete Math. 12 (1999), 6-26. 
+
+[5] Graph minors. XIII. The disjoint paths problem, J. Combin. Theory,EMBEDDING GRAPHS IN AN ARBITRARY SURFACE 21 Ser. B 63 (1995) 65–110.
+
+[6] Embedding a graph into the torus in linear time, Martin Juvan, Joze Marincek, Bojan Mohar
+
+[7] An algorithm for embedding graphs in the torus Martin Juvan and Bojan Mohar
+
+[8] J. R. F iedler, J. P. Huneke, R. B. Richter, N. Robertson, s, J. Graph Theory 20 (1995) 297–308.
+
+[9] William Kocay, Daniel Neilson, Ryan Szypowski: Drawing Graphs on the Torus. Ars Comb. 59 (2001)
+
+[10]Jennifer Roselynn Woodcock: A Faster Algorithm for Torus Embedding. B.Sc. University of Victoria (2004)
+
+[11] E. Neufeld. Practical toroidality testing. Master’s thesis, Department of Computer Science, University of Victoria, Victoria, B.C., 1993.

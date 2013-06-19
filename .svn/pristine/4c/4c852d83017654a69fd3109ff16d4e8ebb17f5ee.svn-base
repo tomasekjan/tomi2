@@ -1,0 +1,323 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Collections;
+using System.Drawing;
+using GraphEditor.GraphDeclaration;
+
+namespace Plugin
+{
+    class EmbedingMultiGraph : IEnumerable<EdgeMultiGraph>
+    {
+        int newEdgeid = 0;
+        public Dictionary<int, CircularListEdge> incidenceEdges;
+        Dictionary<int, PointF> pozition;        
+
+        public IEnumerator<EdgeMultiGraph> GetEnumerator()
+        {
+            foreach (KeyValuePair<int, CircularListEdge> pair in incidenceEdges)
+            {
+                foreach (EdgeMultiGraph edge in pair.Value)
+                {
+                    yield return edge;
+                }
+            }
+        }
+                
+        public EmbedingMultiGraph(Embeding embeding)
+        {
+            incidenceEdges = new Dictionary<int, CircularListEdge>();
+            foreach (int u in embeding.neighbors.Keys)
+            {
+                incidenceEdges.Add(u, new CircularListEdge());
+                foreach (int v in embeding.neighbors[u])
+                {
+                    incidenceEdges[u].Add(new EdgeMultiGraph(u, v, newEdgeid));
+                    newEdgeid++;
+                }
+            }
+            foreach (int u in embeding.neighbors.Keys)
+            {                
+                foreach (int v in embeding.neighbors[u])
+                {
+                    int indexuv = embeding.neighbors[u].IndexOf(v);
+                    int indexvu = embeding.neighbors[v].IndexOf(u);
+                    incidenceEdges[u][indexuv].symetricEdge = incidenceEdges[v][indexvu];
+                }
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (EdgeMultiGraph edge in this)
+            {
+                sb.Append(edge.ToString());
+                sb.AppendLine(", ");
+            }
+            return sb.ToString();
+        }
+
+        public List<CircularListEdge> GetFaces()
+        {
+            Dictionary<EdgeMultiGraph, bool> record = new Dictionary<EdgeMultiGraph, bool>();
+            int faceCount = 0;
+            foreach (EdgeMultiGraph edge in this)
+            {
+                record.Add(edge, false);
+            }
+            //h.makeAsymmetric();
+            List<CircularListEdge> faces = new List<CircularListEdge>();
+            foreach (EdgeMultiGraph e in this)
+            {               
+                if (record[e] == false)
+                {
+                    faceCount++;
+                    EdgeMultiGraph edge = e;
+                    CircularListEdge face = new CircularListEdge();
+                    while (record[edge] == false)
+                    {
+                        record[edge] = true;
+                        int a = edge.u;
+                        int b = edge.v;
+                        face.Add(edge);
+                        int index = incidenceEdges[b].IndexOf(edge.symetricEdge);
+                        int count = incidenceEdges[b].Count;
+                        edge = incidenceEdges[b][(index + 1) % count];
+                        
+                    }
+                    faces.Add(face);
+                }
+            }
+            return faces;
+        }
+
+        public Dictionary<int, PointF> GetPositions()
+        {
+            Triangulate();
+            var faces = GetFaces();
+            foreach (var face in faces)
+            {
+                if (face.Count != 3)
+                {
+                    throw new ArgumentException();
+                }
+            }
+            foreach (int i in incidenceEdges.Keys)
+            {
+                if (incidenceEdges[i].Count == 2)
+                {
+                    throw new ArgumentException();
+                }
+            }
+            RemoveLoops();            
+            var stack = Reduce();
+            SetPosition();
+            Reinsert(stack);
+            RestoreLoops();
+            RemoveTriangulation();
+
+            return pozition;
+        }
+
+        private void Reinsert(Stack<VertexDegree> stack)
+        {
+            while (stack.Count != 0)
+            {
+                VertexDegree v = stack.Pop();
+                v.Add(this);
+            }
+        }
+
+        private void Triangulate()
+        {
+            bool run = true;
+            while (run)
+            {
+                run = false;
+                List<CircularListEdge> faces = GetFaces();
+                foreach (CircularListEdge face in faces)
+                {
+
+                    if (face.Count > 3)
+                    {
+                        run = true;
+                        var vertexes = from t in face where incidenceEdges[t.u].Count == 2 select face.IndexOf(t);
+                        
+                        int startIndex = 0;
+                        if (vertexes.Count() != 0)
+                        {
+                            startIndex = vertexes.First();
+                        }
+                        
+                        int a = face[startIndex].u;
+                        int b = face[(startIndex + 2) % face.Count].u;
+                        EdgeMultiGraph first = GetNewEdge(a, b);
+                        EdgeMultiGraph second = GetNewEdge(b, a);
+                        first.symetricEdge = second;
+                        second.symetricEdge = first;
+                        incidenceEdges[a].InserBeintwen(first, face[(startIndex - 1 + face.Count) % face.Count].symetricEdge, face[startIndex]);
+                        incidenceEdges[b].InserBeintwen(second, face[(startIndex + 1) % face.Count].symetricEdge, face[(startIndex + 2) % face.Count]);                        
+                    }
+                    if (face.Count < 3)
+                    {
+                        throw new NotImplementedException();
+                    }
+                }
+            }
+
+        }
+
+        private EdgeMultiGraph GetNewEdge(int u, int v)
+        {
+            var tmp = new EdgeMultiGraph(u, v, newEdgeid);
+            newEdgeid++;
+            return tmp;
+        }
+
+        private void AddEdge(Tuple<int, int> tuple, CircularListInt face)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void RemoveEdgeSym(EdgeMultiGraph edge)
+        {
+            incidenceEdges[edge.u].Remove(edge);
+            incidenceEdges[edge.v].Remove(edge);
+            if (incidenceEdges[edge.u].Count == 0)
+            {
+                incidenceEdges.Remove(edge.u);
+            }
+            if (incidenceEdges[edge.v].Count == 0)
+            {
+                incidenceEdges.Remove(edge.v);
+            }
+        }
+
+        internal void AddPath(List<int> path, CircularListInt face)
+        {
+            
+            return;
+        }
+
+        private void RemoveLoops()
+        {
+            foreach (CircularListEdge face in GetFaces())
+            {
+                var vertexes = (from v in face select v.u).Distinct();
+                if (vertexes.Count() == 2)
+                {
+                    throw new NotImplementedException();
+                }
+                if (vertexes.Count() == 1)
+                {
+                    throw new NotImplementedException();
+                }
+            }
+        }
+
+        private Stack<VertexDegree> Reduce()
+        {
+            Stack<VertexDegree> stack = new Stack<VertexDegree>();
+            bool run = true;
+            List<int> vertices = new List<int>();
+            foreach (int vertex in incidenceEdges.Keys)
+            {
+                vertices.Add(vertex);
+            }
+            while (run)
+            {
+                run = false;
+                foreach (int vertex in vertices)
+                {
+                    switch (incidenceEdges[vertex].Count)
+                    {
+                        case 3:
+                            run = true;
+                            VertexDegree3 vertex3 = new VertexDegree3();
+                            vertex3.Remove(this, vertex);
+                            stack.Push(vertex3);
+                            break;
+                        case 4:
+                            run = true;
+                            VertexDegree4 vertex4 = new VertexDegree4();
+                            vertex4.Remove(this, vertex);
+                            stack.Push(vertex4);
+                            break;
+                        case 5:
+                            run = true;
+                            VertexDegree5 vertex5 = new VertexDegree5();
+                            vertex5.Remove(this, vertex);
+                            stack.Push(vertex5);
+                            break;
+
+                    }
+                }
+
+            }
+            return stack;
+        }
+
+        private void SetPosition()
+        {
+            throw new NotImplementedException();
+        }
+
+        
+
+        private void RestoreLoops()
+        {
+            throw new NotImplementedException();
+        }
+
+        private void RemoveTriangulation()
+        {
+            throw new NotImplementedException();
+        }        
+    }
+    abstract class VertexDegree
+    {
+        public abstract void Remove(EmbedingMultiGraph embedding, int vertex);
+
+        public abstract void Add(EmbedingMultiGraph embedding);        
+    }
+    class VertexDegree3 : VertexDegree
+    {
+        public override void Add(EmbedingMultiGraph embedding)
+        {
+            throw new NotImplementedException();
+        }
+        public override void Remove(EmbedingMultiGraph embedding, int vertex)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    class VertexDegree4 : VertexDegree
+    {
+        public override void Add(EmbedingMultiGraph embedding)
+        {
+            throw new NotImplementedException();
+        }
+        public override void Remove(EmbedingMultiGraph embedding, int vertex)
+        {
+            throw new NotImplementedException();
+        }
+    }
+    class VertexDegree5 : VertexDegree
+    {
+        public override void Add(EmbedingMultiGraph e)
+        {
+            throw new NotImplementedException();
+        }
+        public override void Remove(EmbedingMultiGraph embedding, int vertex)
+        {
+            throw new NotImplementedException();
+        }
+    }
+}

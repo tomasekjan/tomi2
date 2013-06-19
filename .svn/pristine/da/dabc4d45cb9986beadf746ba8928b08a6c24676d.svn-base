@@ -1,0 +1,165 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using xna = Microsoft.Xna.Framework;
+using System.Collections;
+
+namespace GraphEditor.GraphDeclaration
+{
+    [Serializable]
+    public sealed class Line2D
+    {
+        SubPoint pointBegin;
+        SubPoint pointEnd;
+        xna.Color color;
+
+        /// <summary>
+        ///  0 if no wrap
+        /// +1 if wrap right
+        /// -1 if wrap left
+        /// </summary>
+        int wrapedHorizontal;
+
+        /// <summary>
+        ///  0 if no wrap
+        /// +1 if wrap down
+        /// -1 if wrap up
+        /// </summary>
+        int wrapedVertical;
+        
+        /// <summary>
+        /// if true line is not strait, but goes around torus x join
+        /// </summary>
+        //bool useXJoin;
+        /// <summary>
+        /// if true line is not strait, but goes around using y join
+        /// </summary>
+        //bool useYJoin;       
+        
+        SurfaceTypeEnum readyForSurface;
+
+        #region Geters        
+        public xna.Color Color
+        {
+            get
+            {
+                return color;
+            }
+        }
+        public SubPoint PointBegin
+        {
+            get
+            {
+                return pointBegin;
+            }
+        }
+
+        public SubPoint PointEnd
+        {
+            get
+            {
+                return pointEnd;
+            }
+        }
+        public SurfaceTypeEnum ReadyForSurface
+        {
+            get
+            {
+                return readyForSurface;
+            }
+            set
+            {
+                readyForSurface = value;
+            }
+        }
+
+        public int WrapedHorizontal
+        {
+            get
+            {
+                return wrapedHorizontal;
+            }
+            set
+            {
+                if (value == 0)
+                {
+                    wrapedHorizontal = 0;
+                }
+                if (value < 0)
+                {
+                    wrapedHorizontal = -1;
+                }
+                if (value > 0)
+                {
+                    wrapedHorizontal = 1;
+                }
+            }
+        }
+
+        public int WrapedVertical
+        {
+            get
+            {
+                return wrapedVertical;
+            }
+            set
+            {
+                if (value == 0)
+                {
+                    wrapedVertical = 0;
+                }
+                if (value < 0)
+                {
+                    wrapedVertical = -1;
+                }
+                if (value > 0)
+                {
+                    wrapedVertical = 1;
+                }
+            }
+        }
+        #endregion
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pointBegin">begin point</param>
+        /// <param name="pointEnd">end point</param>
+        /// <param name="color">line color</param>        
+        public Line2D(SubPoint pointBegin, SubPoint pointEnd, xna.Color color, int wrapedHorizontal, int wrapedVertical)
+        {
+            this.pointBegin = pointBegin;
+            this.pointEnd = pointEnd;
+            this.color = color;
+            this.wrapedHorizontal = wrapedHorizontal;
+            this.wrapedVertical = wrapedVertical;
+        }
+        
+
+        internal System.Drawing.PointF getMiddle()
+        {
+            return new System.Drawing.PointF((PointBegin.Pozition.X + PointEnd.Pozition.X) / 2, (PointBegin.Pozition.Y + PointEnd.Pozition.Y) / 2);
+        }
+
+        public override bool Equals(object obj)
+        {
+            Line2D line = obj as Line2D;
+            return (line.PointBegin.Pozition.X == PointBegin.Pozition.X) && (line.PointBegin.Pozition.Y == PointBegin.Pozition.Y) && (line.PointEnd.Pozition.X == PointEnd.Pozition.X) && (line.PointEnd.Pozition.Y == PointEnd.Pozition.Y);
+        }
+
+        public override int GetHashCode()
+        {
+            return (int) (pointBegin.Pozition.X + pointBegin.Pozition.Y * 127 + pointEnd.Pozition.X * 983 + pointEnd.Pozition.Y * 4937);
+        }
+
+        /// <summary>
+        /// Change line color
+        /// </summary>
+        /// <param name="color">new color</param>
+        public void ChangeColor(System.Drawing.Color color)
+        {
+            this.color = new xna.Color(color.R, color.G, color.B, color.A);
+        }
+    }
+}
+    

@@ -1,0 +1,228 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using GraphEditor.GraphDeclaration;
+
+namespace Plugin
+{
+    class Embeding : IEnumerable<Tuple<int,int>>
+    {
+        public SurfaceTypeEnum surface;
+        public int VertexCount
+        {
+            get
+            {
+                return neighbors.Count;
+            }
+        }
+        public int edgeCount;
+        public int EdgeCount
+        {
+            get
+            {
+                return edgeCount;
+            }
+        }
+        
+        public List<bool> agreeOrientation;
+        public List<List<int>> neighbors;
+        
+        
+
+
+        public Embeding(GraphDefinition sourceDefinition)
+        {
+            agreeOrientation = new List<bool>();
+            neighbors = new List<List<int>>();
+            int i = 0;
+            foreach (Vertex vertice in sourceDefinition.vertices)
+            {
+                agreeOrientation.Add(true);
+                neighbors.Add(new List<int>());                
+                i = i + 1;
+            }
+            edgeCount = sourceDefinition.edges.Count;
+            foreach (Edge edge in sourceDefinition.edges)
+            {
+                int first = sourceDefinition.vertices.IndexOf(edge.Begin as Vertex);
+                int last = sourceDefinition.vertices.IndexOf(edge.End as Vertex);
+                neighbors[first].Add(last);
+                neighbors[last].Add(first);
+            }
+            surface = sourceDefinition.suraceType;
+        }
+
+        public Embeding(Stack<Tuple<int, int>> stack, int a, int b)
+        {
+            agreeOrientation = new List<bool>();
+            neighbors = new List<List<int>>();
+            Dictionary<int, int> names = new Dictionary<int, int>();
+            foreach (Tuple<int, int> pair in stack)
+            {
+                int uName = pair.Item1;
+                int vName = pair.Item2;
+                if (uName == a && vName == b)
+                {
+                    break;
+                }
+                
+                if (! names.ContainsKey(uName))
+                {
+                    names.Add(uName, names.Count);
+                    neighbors.Add(new List<int>());
+                }
+
+                if (!names.ContainsKey(vName))
+                {
+                    names.Add(vName, names.Count);
+                    neighbors.Add(new List<int>());
+                }
+                
+                int u = names[uName];
+                int v = names[vName];
+
+                neighbors[u].Add(v);
+                neighbors[v].Add(u);
+            }
+        }
+
+        public Embeding(Embeding embeding)
+        {
+            surface = embeding.surface;
+            neighbors = new List<List<int>>();
+            int index = 0;
+            agreeOrientation = new List<bool>();
+            foreach (List<int> v in embeding.neighbors)
+            {
+                agreeOrientation.Add(true);
+                neighbors.Add(new List<int>());
+                foreach (int i in embeding.neighbors[index])
+                {
+                    neighbors[index].Add(i);
+                }
+                index++;
+            }
+        }
+
+        public Embeding()
+        {
+            surface = SurfaceTypeEnum.Torus;
+            neighbors = new List<List<int>>();
+            agreeOrientation = new List<bool>();
+        }
+
+        public void makeAsymmetric()
+        {
+            for (int i = 0; i < neighbors.Count; i++)
+            {
+                for (int j = 0; j < neighbors[i].Count; j++)
+                {
+                    if (neighbors[j].Contains(i))
+                    {
+                        neighbors[j].Remove(i);
+                    }
+                }
+            }
+        }
+
+        public Embeding Copy()
+        {
+            return new Embeding(this);
+        }
+
+        public static Embeding Union(Embeding a, Embeding b)
+        {
+            // TODO implement
+            // just for geting obstruction
+            throw new NotImplementedException();
+        }
+
+        public IEnumerator<Tuple<int, int>> GetEnumerator()
+        {
+            for (int u = 0; u < neighbors.Count; u++)
+            {
+                foreach (int v in neighbors[u])
+                {
+                    yield return new Tuple<int, int>(u, v);
+                }
+            }
+        }
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        internal void RemoveEdge(Tuple<int, int> edge)
+        {
+            neighbors[edge.Item1].Remove(edge.Item2);
+        }
+
+        internal void AddEdge(Tuple<int, int> edge)
+        {
+            neighbors[edge.Item1].Add(edge.Item2);
+        }
+
+        internal IEnumerable<Embeding> getAllEmbedings()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal bool IsK5()
+        {
+            RemoveEmpty();
+            return neighbors.Count == 5;
+        }
+
+        internal bool IsK3_3()
+        {
+            RemoveEmpty();
+            return neighbors.Count == 6;
+        }
+
+        public void RemoveEmpty()
+        {
+            List<List<int>> tmp = new List<List<int>>();
+            foreach (List<int> item in neighbors)
+            {
+                if (item.Count == 0)
+                {
+                    tmp.Add(item);
+                }
+            }
+            foreach (List<int> item in tmp)
+            {
+                neighbors.Remove(item);
+            }
+        }
+
+        internal static IEnumerable<Embeding> GetK5Embedings()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal static IEnumerable<Embeding> GetK3_3Embedings()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal void makeSymmetric()
+        {
+            for (int i = 0; i < neighbors.Count; i++)
+            {
+                for (int j = 0; j < neighbors[i].Count; j++)
+                {
+                    if (neighbors[j].Contains(i))
+                    {
+                        if (neighbors[i].Contains(j))
+                        {
+                            neighbors[i].Add(j);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+}

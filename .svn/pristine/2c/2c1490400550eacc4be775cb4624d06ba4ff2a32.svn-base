@@ -1,0 +1,15 @@
+﻿<Window x:Class="GraphEditor.EmbeddingWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="EmbeddingWindow" Height="443" Width="602"
+        Background="LightGray">
+    <Grid>
+        <TextBlock Height="23" HorizontalAlignment="Left" Margin="84,16,0,0" Name="textBlock1" Text="Number of threads: " VerticalAlignment="Top" />
+        <RadioButton Content="1 thread" Height="16" HorizontalAlignment="Left" Margin="114,43,0,0" Name="radioButton1" VerticalAlignment="Top" />
+        <RadioButton Content="2 threads" Height="16" HorizontalAlignment="Left" Margin="114,65,0,0" Name="radioButton3" VerticalAlignment="Top" />
+        <RadioButton Content="4 threads" Height="16" HorizontalAlignment="Left" Margin="114,87,0,0" Name="radioButton4" VerticalAlignment="Top" />
+        <CheckBox Content="Step by step" Margin="97,109,389,277" IsEnabled="False"/>
+        <CheckBox Content="Long path heuristic" Margin="97,133,389,253" IsEnabled="False" />
+        <Button Content="Run" Margin="101,157,389,221" />
+    </Grid>
+</Window>

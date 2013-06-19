@@ -1,0 +1,124 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Threading;
+using System.Collections;
+using GraphEditor.Exceptions;
+
+namespace GraphEditor.GraphDeclaration
+{
+    public sealed class UndoRedeSerializer
+    {
+        const int StackSize = 20;
+        int currentIndex;
+        int UndoCout;
+        int ActionCout;
+        MemoryStream[] stack;        
+        BinaryFormatter binaryFormater;
+        object locker;
+
+        public UndoRedeSerializer()
+        {
+            
+            currentIndex = 0;
+            UndoCout = 0;
+            stack = new MemoryStream[StackSize];
+            binaryFormater = new BinaryFormatter();
+            for (int i = 0; i < StackSize; i++)
+            {
+                stack[i] = new MemoryStream();
+            }
+            locker = new object();
+        }
+
+        /// <summary>
+        /// Stores current graph configuration to memory stream on stack
+        /// </summary>
+        /// <param name="graphDeclaration">current graph configuration</param>
+        public void Action(GraphDefinition graphDeclaration)
+        {
+            lock (locker)
+            {
+                stack[currentIndex % StackSize] = new MemoryStream();
+                binaryFormater.Serialize(stack[currentIndex % StackSize], graphDeclaration);
+                stack[currentIndex % StackSize].Flush();
+                ActionCout++;
+                currentIndex++;
+            }
+        }
+
+        /// <summary>
+        /// returns last saved configuration from stack
+        /// </summary>
+        /// <returns></returns>
+        public GraphDefinition Undo()
+        {
+            lock (locker)
+            {
+                GraphDefinition graphDeclaration = null;
+                if ((ActionCout - UndoCout > 0) && (UndoCout < ActionCout))
+                {
+                    stack[(currentIndex + StackSize - 2) % StackSize].Seek(0, SeekOrigin.Begin);
+                    graphDeclaration = (GraphDefinition)binaryFormater.Deserialize(stack[(currentIndex + StackSize - 2) % StackSize]);
+                    UndoCout++;
+                    currentIndex -= 2;
+                }                
+                return graphDeclaration;
+            }
+        }
+
+        /// <summary>
+        /// return of return :D
+        /// </summary>
+        /// <returns></returns>
+        public GraphDefinition Redo()
+        {
+            lock (locker)
+            {
+                GraphDefinition graphDeclaration = null;
+
+                if (stack[(currentIndex + 1) % StackSize].Length != 0)
+                {
+                    stack[(currentIndex + 1) % StackSize].Seek(0, SeekOrigin.Begin);
+                    graphDeclaration = (GraphDefinition)binaryFormater.Deserialize(stack[(currentIndex + 1) % StackSize]);
+                    UndoCout--;
+                    currentIndex++;
+                }
+                return graphDeclaration;
+            }
+        }
+
+        // graph serialization 
+        public static void Serialize(string fileName, Graph graph)
+        {
+            try
+            {
+                Stream stream = File.Open(fileName, FileMode.Create);
+                BinaryFormatter binaryFormater = new BinaryFormatter();
+                binaryFormater.Serialize(stream, graph.graphDeclaration);
+            }
+            catch (Exception exception)
+            {
+                throw new SerializationException("Error by serializing", exception);
+            }
+        }
+
+        //graph deserialization
+        public static GraphDefinition Deserialize(string fileName)
+        {
+            try
+            {
+                Stream stream = File.Open(fileName, FileMode.Open);
+                BinaryFormatter binaryFormater = new BinaryFormatter();
+                return (GraphDefinition)binaryFormater.Deserialize(stream);
+            }
+            catch (Exception exception)
+            {
+                throw new SerializationException("Error by serializing", exception);
+            }
+        }
+    }
+}

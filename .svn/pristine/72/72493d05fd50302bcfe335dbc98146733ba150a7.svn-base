@@ -1,0 +1,189 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using AddInView;
+using GraphEditor.GraphDeclaration;
+using System.Diagnostics;
+using System.Drawing;
+//using Plugin.EmbeddingPlugin;
+using System.Collections;
+
+namespace Plugin
+{
+    public partial class GraphEmbeddingPolynom : IPozitioning
+    {
+        public override GraphDefinition Pozitioning(GraphDefinition sourceDefinition)
+        {
+            EmbedingList embeding = ConvertToEmbeding(sourceDefinition);
+            switch (sourceDefinition.suraceType)
+            {
+                case SurfaceTypeEnum.Sphere:
+                    return PozitioningSphere(embeding);
+                case SurfaceTypeEnum.Torus:
+                    return PozitioningTorus(embeding);
+                default:
+                    throw new ArgumentException();
+            }
+        }
+
+        private GraphDefinition PozitioningSphere(EmbedingList embeding)
+        {
+            //TODO use ComponentGetter first GetSphereEmbeding needs 2- connected components only
+            embeding = GetSphereEmbeding(embeding);
+
+            return null;
+        }
+
+        private GraphDefinition PozitioningTorus(EmbedingList embeding)
+        {
+            embeding = GetTorusEmbeding(embeding);
+            //TODO embeding 2 positioning
+            return null;
+        }
+
+        private EmbedingList ConvertToEmbeding(GraphDefinition sourceDefinition)
+        {
+            return new EmbedingList(sourceDefinition);
+        }
+
+        private EmbedingList GetTorusEmbeding(EmbedingList sourceDefinition)
+        {
+            List<EmbedingList> components = Get2ConnectedComponents(sourceDefinition);
+            List<EmbedingList> nonPlanarComponents = new List<EmbedingList>();
+
+            int p = components.Count;
+            int s = 0; //nonPlanaComponentsCount
+            int t = -1;
+            for (int i = 0; i < p; i++)
+            {
+                if (!IsPlanar(components[i]))
+                {
+                    s++;
+                    t = i;
+                    nonPlanarComponents.Add(components[i]);
+                }
+            }
+            if (s == 0)
+            {
+                return GetSphereEmbeding(sourceDefinition);
+            }
+            if (s > 2)
+            {
+                //can not find embeding
+                return null;
+                //return Embeding.Union(nonPlanarComponents[1], nonPlanarComponents[0]);
+            }
+            EmbedingList q = nonPlanarComponents[0];
+            List<EmbedingList> components3Connected = Get3ConnectedComponents(q);
+            int nonPlanarCount = 0;
+            EmbedingList nonPlanarComponent = null;
+            foreach (EmbedingList embeding in components3Connected)
+            {
+                if (!IsPlanar(embeding))
+                {
+                    nonPlanarCount++;
+                    nonPlanarComponent = embeding;
+                }
+            }
+            Debug.Assert(nonPlanarCount > 0);
+
+            if (nonPlanarCount > 1)
+            {
+                return SeparanleEmneding(sourceDefinition);
+            }
+
+            EmbedingList partialEmbeding = null;
+            if (!isProjectivePlanar(nonPlanarComponent))
+            {
+                partialEmbeding = GetProjectiveEmbeding(nonPlanarComponent);
+                if (CountFaceWidth(nonPlanarComponent, partialEmbeding) > 4)
+                {
+                    //can not find embeding
+                    return null;
+                }
+            }
+            else
+            {
+                EmbedingList obstruction = GetProjectiveEmbedingObstruction(nonPlanarComponent);
+                foreach (EmbedingList embeding in obstruction.getAllEmbedings())
+                {
+                    partialEmbeding = ExtendEmbeding(sourceDefinition, obstruction);
+                }
+                if (partialEmbeding == null)
+                {
+                    return null;
+                }
+
+            }
+            return combinate(partialEmbeding, components3Connected, components);
+
+        }
+
+        private EmbedingList combinate(EmbedingList partialEmbeding, List<EmbedingList> components3Connected, List<EmbedingList> components)
+        {
+            throw new NotImplementedException();
+        }
+
+        private EmbedingList ExtendEmbeding(EmbedingList sourceDefinition, EmbedingList obstruction)
+        {
+            throw new NotImplementedException();
+        }
+
+        private EmbedingList GetProjectiveEmbedingObstruction(EmbedingList nonPlanarComponent)
+        {
+            throw new NotImplementedException();
+        }
+
+        private int CountFaceWidth(EmbedingList nonPlanarComponent, EmbedingList partialEmbeding)
+        {
+            throw new NotImplementedException();
+        }
+
+        private EmbedingList GetProjectiveEmbeding(EmbedingList nonPlanarComponent)
+        {
+            throw new NotImplementedException();
+        }
+
+        private bool isProjectivePlanar(EmbedingList nonPlanarComponent)
+        {
+            throw new NotImplementedException();
+        }
+
+        private EmbedingList SeparanleEmneding(EmbedingList sourceDefinition)
+        {
+            throw new NotImplementedException();
+        }
+
+        private List<EmbedingList> Get3ConnectedComponents(EmbedingList embeding)
+        {
+            ThereConnectedComponentGetter componentGetter = new ThereConnectedComponentGetter(embeding);
+            return componentGetter.GetComponents();
+        }
+
+        private EmbedingList GetSphereEmbeding(EmbedingList embeding)
+        {
+            SphereEmbeder sphereEmbeder = new SphereEmbeder(embeding);
+
+            return null;
+        }
+
+        private EmbedingList GetKuratiwskiSubGraf(EmbedingList graphDefinition)
+        {
+            // TODO changeThis.
+            // Just debuging value.
+            return graphDefinition;
+        }
+
+        private bool IsPlanar(EmbedingList graphDefinition)
+        {
+            throw new NotImplementedException();
+        }
+
+        private List<EmbedingList> Get2ConnectedComponents(EmbedingList embeding)
+        {
+            TwoConnectedComponentGetter componentGeter = new TwoConnectedComponentGetter(embeding);
+            return componentGeter.GetComponents();
+        }        
+    }
+}

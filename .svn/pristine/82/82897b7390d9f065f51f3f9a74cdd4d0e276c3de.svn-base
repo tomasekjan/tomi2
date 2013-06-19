@@ -1,0 +1,44 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Collections;
+using System.Drawing;
+using GraphEditor.GraphDeclaration;
+
+namespace Plugin
+{
+    class EdgeMultiGraph
+    {
+        //opozite edge
+        public EdgeMultiGraph symetricEdge;
+        public int index;
+        public int u;
+        public int v;
+        public int wrapHorizontal;
+        public int wrapVertical;
+        
+        public EdgeMultiGraph(int u, int v, int index)            
+        {
+            this.u = u;
+            this.v = v;
+            this.index = index;
+        }
+        
+        public override bool Equals(object obj)
+        {
+            EdgeMultiGraph other = obj as EdgeMultiGraph;
+            return (u == other.u) && (v == other.v) && (index == other.index);
+        }
+        
+        public override int GetHashCode()
+        {
+            return index;
+        }
+
+        public override string ToString()
+        {
+            return String.Format("({0},{1},{2})", u, v, index);
+        }
+    }
+}

@@ -1,0 +1,339 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using AddInView;
+using GraphEditor.GraphDeclaration;
+using System.Diagnostics;
+using System.Drawing;
+using System.Collections;
+using System.Windows.Forms;
+
+namespace Plugin
+{
+    public class GraphEmbeddingExponentioal : IPozitioning
+    {
+
+        public override GraphDefinition Pozitioning(GraphDefinition sourceDefinition)
+        {
+            Embeding embeding = new Embeding(sourceDefinition);
+            switch (sourceDefinition.suraceType)
+            {
+                case SurfaceTypeEnum.Sphere:
+                    return GetSpherePozitioning(embeding);
+                case SurfaceTypeEnum.Torus:
+                    return GetTorusPozitioning(embeding);
+                default:
+                    throw new ArgumentException();
+            }
+        }
+
+        private GraphDefinition GetTorusPozitioning(Embeding embeding)
+        {
+            embeding = GetTorusEmbeding(embeding);
+            
+            return null;
+        }
+
+        private Embeding GetTorusEmbeding(Embeding embeding)
+        {
+            Embeding sphereEmbeding = GetSphereEmbeding(embeding);
+            if (sphereEmbeding != null)
+            {
+                // planar embedding is also torus embeding
+                return sphereEmbeding;
+            }
+            Embeding h = SubgrafHomoomorphicToK5K3_3(embeding);
+            if (h.IsK5())
+            {                
+                foreach (Embeding e in Embeding.GetK5Embedings())
+                {
+                    var tmp = ExtedEmgeddingTorus(embeding, e);
+                    if (tmp != null)
+                    {
+                        return tmp;
+                    }
+                }
+                // no embeding found
+                return null;
+            }
+            if (h.IsK3_3())
+            {
+                foreach (Embeding e in Embeding.GetK3_3Embedings())
+                {
+                    var tmp = ExtedEmgeddingTorus(embeding, e);
+                    if (tmp != null)
+                    {
+                        return tmp;
+                    }
+                }
+                // no embeding found
+                return null;
+            }
+            throw new EmbeddingException("there schould be k5 or k3_3");
+        }
+
+        private List<List<int>> FaceWalk(Embeding h)
+        {
+            // algoritm 2.2.
+            // faceWalk
+            // page 14
+            Dictionary<Tuple<int, int>, bool> record = new Dictionary<Tuple<int, int>, bool>();
+            int faceCount = 0;
+            foreach (Tuple<int, int> edge in h)
+            {
+                record.Add(edge, false);                
+            }
+            //h.makeAsymmetric();
+            List<List<int>> faces = new List<List<int>>();
+            foreach (Tuple<int, int> edge in h)
+            {
+                if (record[edge] == false)
+                {
+                    faceCount++;
+                    int a = edge.Item1;
+                    int b = edge.Item2;
+                    List<int> face = new List<int>();
+                    while (record[new Tuple<int, int>(a, b)] == false)
+                    {
+                        record[new Tuple<int, int>(a, b)] = true;
+                        face.Add(a);
+                        int index = h.neighbors[b].IndexOf(a);
+                        int count = h.neighbors[b].Count;
+                        int c = h.neighbors[b][(index + 1) % count];
+                        a = b;
+                        b = c;
+                    }
+                    faces.Add(face);
+                }
+            }
+            return faces;
+        }
+
+        class Bridge : IComparable<Bridge>
+        {
+            int penalty = -1;
+            public int GetPenalty()
+            {
+                //caching reasons
+                if (penalty != -1)
+                {
+                    return penalty;
+                }
+                // TODO implement this
+                return 0;
+            }
+            public static List<Bridge> GetBridges(Embeding g, Embeding h)
+            {
+                return null;
+            }
+
+            public int CompareTo(Bridge other)
+            {
+                return GetPenalty().CompareTo(other.GetPenalty());
+            }
+
+            internal bool isAdmissible(List<Tuple<int, int>> face)
+            {
+                throw new NotImplementedException();
+            }
+
+            internal List<int> GetBisectingPath()
+            {
+                throw new NotImplementedException();
+            }
+
+            internal bool isAdmissible(List<int> face)
+            {
+                throw new NotImplementedException();
+            }
+        }
+        
+        // add some better return type
+        private Embeding ExtedEmgeddingTorus(Embeding g, Embeding h)
+        {
+            List<List<int>> faces = FaceWalk(h);
+            List<Bridge> bridges = Bridge.GetBridges(g, h);
+            if (bridges.Count == 0)
+            {
+                return h;
+            }
+            bridges.Sort();
+            if (bridges[0].GetPenalty() == 0)
+            {
+                return null;
+            }
+            Bridge b = bridges[0];
+            foreach (List<int> face in faces)
+            {
+                if (b.isAdmissible(face))
+                {
+                    List<int> bisectingPath = b.GetBisectingPath();
+                    for (int i = 0; i < 2; i++)
+                    {
+                        for (int j = 0; j < 2; j++)
+                        {
+                            h.AddPath(bisectingPath, (VertexState)i, (VertexState)j);
+                            var partialEmbedding = ExtedEmgeddingTorus(g, h);
+                            if (partialEmbedding != null)
+                            {
+                                return partialEmbedding;
+                            }
+                            h.RemovePath(bisectingPath, (VertexState)i, (VertexState)j);
+                        }
+                    }                   
+                }
+            }
+            return null;
+        }        
+
+        private Embeding SubgrafHomoomorphicToK5K3_3(Embeding embeding)
+        {
+            Embeding h = new Embeding(embeding);
+            //h.makeAsymmetric();
+            foreach (Tuple<int, int> edge in h)
+            {                
+                h.RemoveEdgeSym(edge);
+                if (GetSphereEmbeding(h) != null)
+                {
+                    h.AddEdgeSym(edge);
+                } 
+            }            
+            return h;
+        }
+
+        private GraphDefinition GetSpherePozitioning(Embeding embeding)
+        {
+            embeding = GetSphereEmbeding(embeding);
+
+            return null;
+        }
+
+        //returns null if not planar
+        private Embeding GetSphereEmbeding(Embeding g)
+        {
+            List<int> cycle = GetCycle(g);
+            if (cycle == null)
+            {
+                // no cycle in g so each embedding is valid
+                return g;
+            }
+            Embeding h = new Embeding(cycle);
+            Embeding i = new Embeding(g);
+            i.Minus(h);
+            return ExtedEmgeddingPlanar(g, h, i);
+        }
+
+        Dictionary<int, bool> visited;
+        int start;
+        List<int> cycle;
+        private List<int> GetCycle(Embeding g)
+        {
+            cycle = new List<int>();
+            visited = new Dictionary<int, bool>();
+            foreach (var v in g.neighbors.Keys)
+            {
+                visited.Add(v, false);
+            }
+            start = g.neighbors.Keys.First();
+            visit(start,g);
+            return cycle;
+        }
+
+        private void visit(int u, Embeding g)
+        {
+            visited[u] = true;
+            foreach (var v in g.neighbors[u])
+            {
+                if (!visited[v])
+                {
+                    cycle.Add(v);
+                    visit(v, g);
+                }
+            }
+        }
+
+        private Embeding ExtedEmgeddingPlanar(Embeding g, Embeding h, Embeding i)
+        {
+            if (h.Count() == g.Count())
+            {
+                return h;
+            }
+            List<BridgeWithRespectTo> brigdesWithRespect = GerBridgesWithRespect(g, h, i);
+            List<List<int>> faces = FaceWalk(h);
+            foreach (BridgeWithRespectTo bridge in brigdesWithRespect)
+            {
+                foreach (List<int> face in faces)
+                {
+                    bool isValid = true;
+                    foreach (var v in bridge.AttachmentVertexes)
+                    {
+                        if (!face.Contains(v))
+                        {
+                            isValid = false;
+                        }
+                    }
+                    if (isValid)
+                    {
+                        bridge.NumberOfAdmisibleFaces++;
+                        bridge.Face = face;
+                    }
+                    //if (bridge.AttachmentVertexes.TrueForAll(x => face.Contains(x)))
+                    //{
+                    //    bridge.NumberOfAdmisibleFaces++;
+                    //    bridge.Face = face;
+                    //}
+                }
+            }
+            brigdesWithRespect.Sort();
+            if (brigdesWithRespect[0].NumberOfAdmisibleFaces == 0)
+            {
+                //this graph canot be embeded.
+                return null;
+            }
+            List<int> path = brigdesWithRespect[0].GetPath();
+            h.AddPath(path, brigdesWithRespect[0].Face);
+            //this can be done better
+            i = new Embeding(g);
+            i.Minus(h);
+            //MessageBox.Show(h.ToString());
+            return ExtedEmgeddingPlanar(g, h, i);            
+        }
+
+        
+        private static List<BridgeWithRespectTo> GerBridgesWithRespect(Embeding g, Embeding h, Embeding i)
+        {
+            ConnectedComponentGetter compenetGetter = new ConnectedComponentGetter(i);
+            List<Embeding> components = compenetGetter.GetComponents();
+            List<BridgeWithRespectTo> bridgesWithRespectTo = new List<BridgeWithRespectTo>();
+            components.ForEach(x => bridgesWithRespectTo.Add(new BridgeWithRespectTo(x)));
+
+            
+            foreach (var bridge in bridgesWithRespectTo)
+            {
+                List<Tuple<int, int>> tmp = new List<Tuple<int, int>>();
+                foreach (Tuple<int, int> edge in g)
+                {
+                    if (bridge.Embeding.ConteintsVertex(edge.Item1) && h.ConteintsVertex(edge.Item2))
+                    {
+                        tmp.Add(edge);                        
+                    }
+                }
+                foreach (Tuple<int, int> edge in tmp)
+                {
+                    bridge.AddEdgeSym(edge);
+                    bridge.AttachmentVertexes.Add(edge.Item2);
+                }
+            }
+            foreach (Tuple<int, int> edge in g)
+            {
+                if (h.ConteintsVertex(edge.Item1) && h.ConteintsVertex(edge.Item2) && !h.ContaintsEdgeAsym(edge))
+                {
+                    //components.Add(new Embeding(edge));
+                    bridgesWithRespectTo.Add(new BridgeWithRespectTo(new Embeding(edge),edge));                    
+                }
+            }
+            return bridgesWithRespectTo;
+        }
+    }
+}

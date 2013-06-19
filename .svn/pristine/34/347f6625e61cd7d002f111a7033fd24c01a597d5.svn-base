@@ -1,0 +1,119 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using AddInView;
+using GraphEditor.GraphDeclaration;
+using System.Diagnostics;
+using System.Drawing;
+using System.Collections;
+
+namespace Plugin
+{
+    class BridgeWithRespectTo : IComparable<BridgeWithRespectTo>
+    {
+        Embeding embeding;
+        List<int> attachmentVertexes;
+        List<int> face;
+        public List<int> Face
+        {
+            get
+            {
+                return face;
+            }
+            set
+            {
+                face = value;
+            }
+        }
+        int numberOfAdmisibleFaces = 0;
+        public int NumberOfAdmisibleFaces
+        {
+            get
+            {
+                return numberOfAdmisibleFaces;
+            }
+            set
+            {
+                numberOfAdmisibleFaces = value;
+            }
+        }
+        public Embeding Embeding
+        {
+            get
+            {
+                return embeding;
+            }
+            set
+            {
+                embeding = value;
+            }
+        }
+        public List<int> AttachmentVertexes
+        {
+            get
+            {
+                return attachmentVertexes;
+            }
+            set
+            {
+                attachmentVertexes = value;
+            }
+        }
+        public BridgeWithRespectTo(Embeding embeding)
+        {
+            this.embeding = embeding;
+            this.attachmentVertexes = new List<int>();
+        }
+
+        public BridgeWithRespectTo(Embeding embeding, Tuple<int, int> edge)
+        {
+            this.embeding = embeding;
+            attachmentVertexes.Add(edge.Item1);
+            attachmentVertexes.Add(edge.Item2);
+        }
+        public void AddEdge(Tuple<int, int> edge)
+        {
+            embeding.AddEdge(edge);
+        }
+
+        public int CompareTo(BridgeWithRespectTo other)
+        {
+            return numberOfAdmisibleFaces.CompareTo(other);
+        }
+
+        internal List<int> GetPath()
+        {
+            if (attachmentVertexes.Count < 2)
+            {
+                //what to do in this case ? can it hapend ? 
+                throw new NotImplementedException();
+            }
+            path = new List<int>();
+            //this can be done better with some heuristic chose of start an end.
+            int start = attachmentVertexes[0];
+            visited = new Dictionary<int, bool>();
+            foreach (var v in embeding.neighbors.Keys)
+            {
+                visited.Add(v, false);
+            }
+            visit(start);
+            return path;
+        }
+        List<int> path;
+        Dictionary<int, bool> visited;
+        private void visit(int u)
+        {
+            if (attachmentVertexes.Contains(u)) return;
+            visited[u] = true;
+            foreach (var v in embeding.neighbors[u])
+            {
+                if (!visited[v])
+                {
+                    path.Add(v);
+                    visit(v);
+                }
+            }
+        }
+    }
+}

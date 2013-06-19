@@ -1,0 +1,25 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using xna= Microsoft.Xna.Framework;
+using GraphEditor.GraphDeclaration;
+
+namespace GraphEditor.Drawing
+{
+    /// <summary>
+    /// basic factory interface
+    /// </summary>
+    interface IDrawer
+    {
+        /// <summary>
+        /// Basic 3D draw method
+        /// </summary>
+        /// <param name="graphicsDevice">device to draw on</param>
+        /// <param name="world">world matrix</param>
+        /// <param name="view">view matrix</param>
+        /// <param name="projection">projection matrix</param>
+        /// <param name="surfaceType">surface to be projected on</param>
+        void Draw3D(xna.Graphics.GraphicsDevice graphicsDevice, xna.Matrix world, xna.Matrix view, xna.Matrix projection, SurfaceTypeEnum surfaceType);
+    }
+}

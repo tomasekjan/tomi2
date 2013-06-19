@@ -1,0 +1,454 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using GraphEditor.GraphDeclaration;
+
+namespace Plugin
+{
+    class Embeding : IEnumerable<Tuple<int, int>>
+    {
+        public SurfaceTypeEnum minimalEmbedebleSurface;
+        public Dictionary<int, List<int>> neighbors;
+
+        public Embeding(GraphDefinition sourceDefinition)
+        {
+            neighbors = new Dictionary<int, List<int>>();
+            
+            foreach (Edge edge in sourceDefinition.edges)
+            {
+                int first = sourceDefinition.vertices.IndexOf(edge.Begin as Vertex);
+                int last = sourceDefinition.vertices.IndexOf(edge.End as Vertex);
+                AddEdgeSym(new Tuple<int, int>(first, last));
+            }
+        }
+
+        public Embeding(Stack<Tuple<int, int>> stack, int u, int v)
+        {
+            //agreeOrientation = new List<bool>();
+            neighbors = new Dictionary<int, List<int>>();            
+            foreach (Tuple<int, int> pair in stack)
+            {
+                AddEdgeSym(pair);
+                if (pair.Item1 == u && pair.Item2 == v)
+                {
+                    break;
+                }
+            }            
+        }
+
+        public Embeding(Embeding embedding)
+        {
+            neighbors = new Dictionary<int, List<int>>();
+            foreach (KeyValuePair<int, List<int>> v in embedding.neighbors)
+            {
+                List<int> l = new List<int>(v.Value);
+                neighbors.Add(v.Key, l);
+            }
+        }
+
+        public Embeding()
+        {
+            neighbors = new Dictionary<int, List<int>>();
+        }
+
+        public Embeding(List<int> cycle)
+        {
+            neighbors = new Dictionary<int, List<int>>();
+            for (int j = 0; j < cycle.Count; j++)
+            {
+                AddEdgeSym(new Tuple<int,int>(cycle[j],cycle[(j+1) % cycle.Count]));
+            }
+        }
+
+        public Embeding(Tuple<int, int> edge)
+        {
+            neighbors = new Dictionary<int, List<int>>();
+            AddEdgeSym(edge);
+        }
+
+        public Embeding(List<int> comp, Embeding embeding)
+        {
+            neighbors = new Dictionary<int, List<int>>();
+            foreach (var v in embeding.neighbors.Keys)
+            {
+                if (embeding.neighbors[v].Count == 0)
+                {
+                    neighbors.Add(v, new List<int>());
+                }
+            }
+            foreach (Tuple<int, int> edge in embeding)
+            {
+                if (comp.Contains(edge.Item1) && comp.Contains(edge.Item2))
+                {
+                    AddEdgeAsym(edge);
+                }
+            }
+        }
+
+        internal static IEnumerable<Embeding> GetK5Embedings()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal static IEnumerable<Embeding> GetK3_3Embedings()
+        {
+            throw new NotImplementedException();
+        }
+
+        internal bool IsK5()
+        {
+            throw new NotImplementedException();
+            // wrong
+            
+            return neighbors.Count == 5;
+        }
+
+        internal bool IsK3_3()
+        {
+            //wrong
+            throw new NotImplementedException();
+            return neighbors.Count == 6;
+        }
+
+
+        //public void makeAsymmetric()
+        //{
+        //    for (int i = 0; i < neighbors.Count; i++)
+        //    {
+        //        for (int j = 0; j < neighbors[i].Count; j++)
+        //        {
+        //            if (neighbors[j].Contains(i))
+        //            {
+        //                neighbors[j].Remove(i);
+        //            }
+        //        }
+        //    }
+        //}
+
+        //internal void makeSymmetric()
+        //{
+        //    for (int i = 0; i < neighbors.Count; i++)
+        //    {
+        //        for (int j = 0; j < neighbors[i].Count; j++)
+        //        {
+        //            if (neighbors[j].Contains(i))
+        //            {
+        //                if (!neighbors[i].Contains(j))
+        //                {
+        //                    neighbors[i].Add(j);
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
+                
+
+        internal void AddPath(List<int> bisectingPath, VertexState vertexStateFirst, VertexState vertexStateSeccond)
+        {
+            switch (vertexStateFirst)
+            {
+                case VertexState.ORRIGINAL:
+
+                    break;
+                case VertexState.COPPY:
+
+                    break;
+            }
+
+            switch (vertexStateSeccond)
+            {
+                case VertexState.ORRIGINAL:
+
+                    break;
+                case VertexState.COPPY:
+
+                    break;
+            }
+        }
+
+        internal void RemovePath(List<int> bisectingPath, VertexState vertexStateFirst, VertexState vertexStateSeccond)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerator<Tuple<int, int>> GetEnumerator()
+        {
+            foreach (int u in neighbors.Keys)
+            {
+                foreach (int v in neighbors[u])
+                {
+                    //if (u < v)
+                    //{
+                        yield return new Tuple<int, int>(u, v);
+                    //}
+                }
+            }
+        }
+
+        internal void RemoveEdgeASym(Tuple<int, int> edge)
+        {
+            neighbors[edge.Item1].Remove(edge.Item2);   
+        }
+
+        internal void RemoveEdgeSym(Tuple<int, int> edge)
+        {
+            neighbors[edge.Item1].Remove(edge.Item2);
+            neighbors[edge.Item2].Remove(edge.Item1);
+            if (neighbors[edge.Item1].Count == 0)
+            {
+                neighbors.Remove(edge.Item1);
+            }
+            if (neighbors[edge.Item2].Count == 0)
+            {
+                neighbors.Remove(edge.Item1);
+            }
+        }
+
+        internal void AddEdgeSym(Tuple<int, int> edge)
+        {
+
+            if (!neighbors.ContainsKey(edge.Item1))
+            {
+                neighbors.Add(edge.Item1, new List<int>());
+            }
+            if (!neighbors.ContainsKey(edge.Item2))
+            {
+                neighbors.Add(edge.Item2, new List<int>());
+            }
+            if (!ContaintsEdgeAsym(edge))
+            {
+                neighbors[edge.Item1].Add(edge.Item2);
+                neighbors[edge.Item2].Add(edge.Item1);
+            }
+
+        }
+
+        internal void AddEdgeAsym(Tuple<int, int> edge)
+        {
+            if (!neighbors.ContainsKey(edge.Item1))
+            {
+                neighbors.Add(edge.Item1, new List<int>());
+            }            
+            neighbors[edge.Item1].Add(edge.Item2);            
+        }
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            throw new NotImplementedException();
+        }
+
+
+        internal void Minus(Embeding h)
+        {
+            List<Tuple<int, int>> toRemove = new List<Tuple<int, int>>();
+            foreach (Tuple<int, int> edge in this)
+            {
+                if (h.neighbors.ContainsKey(edge.Item1) || h.neighbors.ContainsKey(edge.Item2))
+                {
+                    toRemove.Add(new Tuple<int, int>(edge.Item1, edge.Item2));
+                }
+            }
+            foreach (Tuple<int, int> edge in toRemove)
+            {
+                RemoveEdgeASym(edge);
+            }
+            foreach (var v in h.neighbors.Keys)
+            {
+                neighbors.Remove(v);
+            }
+        }
+
+        public bool ContaintsEdgeAsym(Tuple<int, int> edge)
+        {
+            return neighbors[edge.Item1].Contains(edge.Item2);
+        }
+
+        internal bool isEmpty()
+        {
+            //RemoveEmpty();
+            return neighbors.Keys.Count == 0;
+        }
+
+        private void RemoveEmpty()
+        {
+            List<int> toRemove = new List<int>();
+            foreach (var v in neighbors.Keys)
+            {
+                if (neighbors[v].Count == 0)
+                {
+                    toRemove.Add(v);
+                }
+            }
+            foreach (var v in toRemove)
+            {
+                neighbors.Remove(v);
+            }
+        }
+
+        internal bool ConteintsVertex(int vertex)
+        {
+            return neighbors.ContainsKey(vertex);
+        }
+
+        internal void AddPath(List<int> path, List<int> face)
+        {
+            for (int i = 0; i < face.Count; i++)
+            {
+                for (int j = i + 1; j < face.Count; j++)
+                {
+                    if (face[i] == face[j])
+                    {
+                        throw new NotImplementedException();
+                    }
+                }
+            }
+            //TODO reimplement
+#region old
+                //int start = path[0];
+                //int index = face.IndexOf(start);
+                //int beforeIndex = neighbors[start].IndexOf(face[(index - 1 + face.Count) % face.Count]);
+                //int afterIndex = neighbors[start].IndexOf(face[(index + 1) % face.Count]);
+                //int n = neighbors[start].Count;
+                //if (beforeIndex > afterIndex)
+                //{
+                //    beforeIndex ^= afterIndex;
+                //    afterIndex ^= beforeIndex;
+                //    beforeIndex ^= afterIndex;
+                //}
+                //int startInsertIndex = -1;
+                //if (beforeIndex == 0 && afterIndex == n - 1)
+                //{
+                //    if (n == 2)
+                //    {
+                //        startInsertIndex = 0;
+                //        int u = neighbors[start][0];
+                //        int v = neighbors[start][1];
+                //        int m = face.Count;
+                //        for (int i = 0; i < face.Count; i++)
+                //        {
+                //            if (face[i] == u && face[(i + 1) % m] == start && face[(i + 2) % m] == v)
+                //            {
+                //                startInsertIndex = 1;
+                //                break;
+                //            }
+                //        }
+                //    }
+                //    else
+                //    {
+                //        startInsertIndex = 0;
+                //    }
+                //}
+                //else
+                //{
+                //    startInsertIndex = afterIndex;
+                //}
+
+                //for (int i = 1; i < path.Count - 2; i++)
+                //{
+                //    AddEdgeSym(new Tuple<int, int>(path[i], path[i + 1]));
+                //}
+                //int endInsertIndex = -1;
+                //int end = path[path.Count - 1];
+                //if (!neighbors.ContainsKey(end))
+                //{
+                //    neighbors.Add(end, new List<int>());
+                //    endInsertIndex = 0;
+                //}
+                //else
+                //{
+                //    index = face.IndexOf(end);
+                //    beforeIndex = neighbors[end].IndexOf(face[(index - 1 + face.Count) % face.Count]);
+                //    afterIndex = neighbors[end].IndexOf(face[(index + 1) % face.Count]);
+                //    n = neighbors[end].Count;
+                //    if (beforeIndex > afterIndex)
+                //    {
+                //        beforeIndex ^= afterIndex;
+                //        afterIndex ^= beforeIndex;
+                //        beforeIndex ^= afterIndex;
+                //    }
+                //    if (beforeIndex == 0 && afterIndex == n - 1)
+                //    {
+                //        if (n == 2)
+                //        {
+                //            endInsertIndex = 0;
+                //            int u = neighbors[end][0];
+                //            int v = neighbors[end][1];
+                //            int m = face.Count;
+                //            for (int i = 0; i < face.Count; i++)
+                //            {
+                //                if (face[i] == u && face[(i + 1) % m] == end && face[(i + 2) % m] == v)
+                //                {
+                //                    endInsertIndex = 1;
+                //                    break;
+                //                }
+                //            }
+                //        }
+                //        else
+                //        {
+                //            endInsertIndex = 0;
+                //        }
+
+                //    }
+                //    else
+                //    {
+                //        endInsertIndex = afterIndex;
+                //    }
+                //}
+
+                //if (path.Count == 2)
+                //{
+                //    neighbors[start].Insert(startInsertIndex, end);
+                //    neighbors[end].Insert(endInsertIndex, start);
+                //}
+                //else
+                //{
+                //    neighbors[start].Insert(startInsertIndex, path[1]);
+                //    if (!neighbors.ContainsKey(path[1]))
+                //    {
+                //        neighbors.Add(path[1], new List<int>());
+                //    }
+                //    neighbors[path[1]].Add(start);
+                //    neighbors[end].Insert(endInsertIndex, path[path.Count - 2]);
+                //    neighbors[path[path.Count - 2]].Add(end);
+            //}
+#endregion
+        }
+
+        internal void RemovePath(List<int> path)
+        {
+            for (int i = 0; i < path.Count - 1; i++)
+            {
+                RemoveEdgeSym(new Tuple<int, int>(path[i], path[i + 1]));
+            }
+        }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (int vertex in neighbors.Keys)
+            {
+                sb.Append(vertex.ToString());
+                sb.Append(", ");
+            }
+            sb.Append(string.Format("Number of edges : {0}, ",this.Count()));
+            foreach (var edge in this)
+            {
+                if (edge.Item1 < edge.Item2)
+                {                    
+                    if(!ContaintsEdgeAsym(new Tuple<int,int>(edge.Item2,edge.Item1)))
+                    {
+                        throw new NotImplementedException();
+                    }
+                    sb.Append(string.Format("{0} <-> {1}", edge.Item1, edge.Item2));
+                    sb.Append(", ");
+                }
+                if (edge.Item1 == edge.Item2)
+                {
+                    throw new NotImplementedException();
+                }
+            }
+            return sb.ToString();
+        }
+    }
+}

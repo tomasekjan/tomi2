@@ -1,0 +1,399 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using AddInView;
+using GraphEditor.GraphDeclaration;
+using System.Diagnostics;
+using System.Drawing;
+//using Plugin.EmbeddingPlugin;
+using System.Collections;
+
+namespace Plugin
+{
+    public partial class GraphEmbedding : IPozitioning
+    {
+        public override GraphDefinition Pozitioning(GraphDefinition sourceDefinition)
+        {
+            Embeding embeding = ConvertToEmbeding(sourceDefinition);
+            switch (sourceDefinition.suraceType)
+            {
+                case SurfaceTypeEnum.Sphere:
+                    return PozitioningSphere(embeding);
+                case SurfaceTypeEnum.Torus:
+                    return PozitioningTorus(embeding);
+                default:
+                    throw new ArgumentException();
+            }
+        }
+
+        private GraphDefinition PozitioningSphere(Embeding embeding)
+        {
+            embeding = GetSphereEmbeding(embeding);
+
+            return null;
+        }
+
+        private GraphDefinition PozitioningTorus(Embeding embeding)
+        {            
+            embeding = GetTorusEmbeding(embeding);
+
+            return null;
+        }
+
+        private Embeding ConvertToEmbeding(GraphDefinition sourceDefinition)
+        {
+            return new Embeding(sourceDefinition);            
+        }
+
+        private Embeding GetTorusEmbeding(Embeding sourceDefinition)
+        {
+            List<Embeding> components = Get2ConnectedComponents(sourceDefinition);
+            List<Embeding> nonPlanarComponents = new List<Embeding>();
+            
+            int p = components.Count;
+            int s = 0; //nonPlanaComponentsCount
+            int  t = -1;
+            for (int i = 0; i < p; i++)
+            {
+                if(! IsPlanar(components[i]))
+                {
+                    s ++;
+                    t = i;
+                    nonPlanarComponents.Add(GetKuratiwskiSubGraf(components[i]));
+                }
+            }
+            if (s == 0)
+            {
+                return GetSphereEmbeding(sourceDefinition);
+            }
+            if (s > 2)
+            {
+                //can not find embeding
+                return null;
+                return Embeding.Union(nonPlanarComponents[1], nonPlanarComponents[0]);
+            }
+            Embeding q = nonPlanarComponents[0];
+            List<Embeding> components3Connected = Get3ConnectedComponents(q);
+            int nonPlanarCount = 0;
+            Embeding nonPlanarComponent = null;
+            foreach (Embeding embeding in components3Connected)
+            {
+                if (!IsPlanar(embeding))
+                {
+                    nonPlanarCount++;
+                    nonPlanarComponent = embeding;
+                }
+            }
+            Debug.Assert(nonPlanarCount > 0);
+
+            if (nonPlanarCount > 1)
+            {
+                return SeparanleEmneding(sourceDefinition);
+            }
+
+            Embeding partialEmbeding = null;
+            if (!isProjectivePlanar(nonPlanarComponent))
+            {
+                partialEmbeding = GetProjectiveEmbeding(nonPlanarComponent);
+                if (CountFaceWidth(nonPlanarComponent, partialEmbeding) > 4)
+                {
+                    //can not find embeding
+                    return null;
+                }
+            }
+            else
+            {
+                Embeding obstruction = GetProjectiveEmbedingObstruction(nonPlanarComponent);
+                foreach (Embeding embeding in obstruction.getAllEmbedings())
+                {
+                    partialEmbeding = ExtendEmbeding(sourceDefinition, obstruction);                    
+                }
+                if (partialEmbeding == null)
+                {
+                    return null;
+                }
+
+            }
+            return combinate(partialEmbeding, components3Connected, components);
+            
+        }
+
+        private Embeding combinate(Embeding partialEmbeding, List<Embeding> components3Connected, List<Embeding> components)
+        {
+            throw new NotImplementedException();
+        }
+
+        private Embeding ExtendEmbeding(Embeding sourceDefinition, Embeding obstruction)
+        {
+            throw new NotImplementedException();
+        }
+
+        private Embeding GetProjectiveEmbedingObstruction(Embeding nonPlanarComponent)
+        {
+            throw new NotImplementedException();
+        }
+
+        private int CountFaceWidth(Embeding nonPlanarComponent, Embeding partialEmbeding)
+        {
+            throw new NotImplementedException();
+        }
+
+        private Embeding GetProjectiveEmbeding(Embeding nonPlanarComponent)
+        {
+            throw new NotImplementedException();
+        }
+
+        private bool isProjectivePlanar(Embeding nonPlanarComponent)
+        {
+            throw new NotImplementedException();
+        }
+
+        private Embeding SeparanleEmneding(Embeding sourceDefinition)
+        {
+            throw new NotImplementedException();
+        }
+
+        private List<Embeding> Get3ConnectedComponents(Embeding q)
+        {
+            throw new NotImplementedException();
+        }
+
+        private Embeding GetSphereEmbeding(Embeding embeding)
+        {
+            SphereEmbeder sphereEmbeder = new SphereEmbeder(embeding);
+
+            return null;
+        }
+
+        private Embeding GetKuratiwskiSubGraf(Embeding graphDefinition)
+        {
+            // TODO changeThis.
+            // Just debuging value.
+            return graphDefinition;
+        }
+
+        private bool IsPlanar(Embeding graphDefinition)
+        {
+            throw new NotImplementedException();
+        }
+
+        private List<Embeding> Get2ConnectedComponents(Embeding embeding)
+        {
+            ComponentGetter componentGeter = new ComponentGetter(embeding);
+            return componentGeter.GetComponents();
+        }
+        class ComponentGetter
+        {
+            //http://www.cs.umd.edu/class/fall2005/cmsc451/biconcomps.pdf
+            int count = 0;
+            Stack<Tuple<int, int>> stack = new Stack<Tuple<int, int>>();
+            List<bool> visited = new List<bool>();
+            List<int> parrent = new List<int>();
+            List<int> d = new List<int>();
+            List<int> low = new List<int>();
+            Embeding embeding;
+            List<Embeding> returnList = new List<Embeding>();
+            public ComponentGetter(Embeding embeding)
+            {
+                this.embeding = embeding;
+                foreach (var vertex in embeding.neighbors)
+                {
+                    visited.Add(false);
+                    parrent.Add(-1);
+                    d.Add(-1);
+                    low.Add(-1);
+                }
+            }
+
+            public List<Embeding> GetComponents()
+            {
+
+                for (int i = 0; i < parrent.Count; i++)
+                {
+                    if (!visited[i])
+                    {
+                        visit(i);
+                    }
+                }
+
+                return returnList;
+            }
+
+            private void visit(int u)
+            {
+
+                visited[u] = true;
+                count++;
+                d[u] = count;
+                low[u] = d[u];
+                foreach (int v in embeding.neighbors[u])
+                {
+                    if (!visited[v])
+                    {
+                        Push(u, v);
+                        parrent[v] = u;
+                        visit(v);
+                        if (low[v] >= d[u])
+                        {
+                            returnList.Add(GetComponent());
+                        }
+                        low[u] = low[u] < low[v] ? low[u] : low[v];
+
+                    }
+                    else
+                    {
+                        if (!(parrent[u] == v) && (d[v] < d[u]))
+                        {
+                            Push(u, v);
+                            low[u] = low[u] < d[v] ? low[u] : d[v];
+                        }
+                    }
+                }
+            }
+
+            private Embeding GetComponent()
+            {
+                return new Embeding(stack);
+            }
+
+            private void Push(int u, int v)
+            {
+                stack.Push(new Tuple<int, int>(u, v));
+            }
+        }
+
+        class SphereEmbeder
+        {
+            //http://mj.ucw.cz/vyuka/ga/11-planar.pdf
+            int[] enter;
+            int[] ancestor;
+            int[] lowPoint;
+            int[] close;
+            State[] state;
+
+            int time;
+
+            Embeding embeding;
+
+            int Count
+            {
+                get
+                {
+                    return embeding.neighbors.Count;
+                }
+            }
+
+            public SphereEmbeder(Embeding embeding)
+            {
+                this.embeding = embeding;
+                enter = new int[Count];
+                ancestor = new int[Count];
+                lowPoint = new int[Count];
+                for (int i = 0; i < Count; i++)
+                {
+                    enter[i] = 0;
+                    ancestor[i] = int.MaxValue;
+                    lowPoint[i] = int.MaxValue;
+                    state[i] = State.UNKNOWN;
+                }
+                time = 0;
+            }
+
+            public Embeding GetEmbeding()
+            {                
+                countEnterAncestorLowPoint();
+
+                return null;
+            }
+
+            private void countEnterAncestorLowPoint()
+            {
+                Visit(0);
+                for (int i = 0; i < Count; i++)
+                {
+                    state[i] = State.UNKNOWN;
+                }
+                CountLowPoint(0);
+
+            }
+
+            private void CountLowPoint(int u)
+            {
+                state[u] = State.OPEN;
+                int min = ancestor[u];
+                foreach (int v in embeding.neighbors[u])
+                {
+                    switch (state[v])
+                    {
+                        case State.UNKNOWN:
+                            if (ancestor[v] < min)
+                            {
+                                min = ancestor[v];
+                            }
+                            CountLowPoint(v);
+                            
+                            break;
+                        case State.OPEN:
+                            
+                            break;
+                        case State.CLOSE:
+                            
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                lowPoint[u] = min;
+            }
+
+            private void Visit(int u)
+            {
+                state[u] = State.OPEN;
+                enter[u] = ++time;
+                foreach (int v in embeding.neighbors[u])
+                {
+                    switch (state[v])
+                    {
+                        case State.UNKNOWN:
+                            // tree edge
+                            Visit(v);
+                            break;
+                        case State.OPEN:
+                            // back edge
+                            if (enter[v] < ancestor[u])
+                            {
+                                ancestor[u] = enter[v];
+                            }
+                            break;
+                        case State.CLOSE:
+                            if (close[v] < enter[u])
+                            {
+                                //cross edge
+                            }
+                            else
+                            {
+                                // forward edge
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                    
+                        
+                    
+                }
+                close[u] = ++time;
+                state[u] = State.CLOSE;
+            }
+            enum State
+            {
+                UNKNOWN,
+                OPEN,
+                CLOSE
+            }
+        }
+    }
+
+   
+}

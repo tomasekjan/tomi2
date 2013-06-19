@@ -1,0 +1,184 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using GraphEditor.GraphDeclaration;
+using GraphEditor.Primitives3D;
+using xna= Microsoft.Xna.Framework;
+using System.Windows.Controls;
+using System.Windows;
+using System.Windows.Media;
+using System.Windows.Shapes;
+
+namespace GraphEditor.Drawing
+{
+    class Line2DDrawer :IDrawer
+    {
+        internal Line2D line2D;
+        GeometricPrimitive line;
+        Func<bool> invalidateFunction;
+
+        public Line2DDrawer(Line2D line2D)
+        {
+            this.line2D = line2D;
+        }
+
+        public void Draw3D(xna.Graphics.GraphicsDevice graphicsDevice, xna.Matrix world, xna.Matrix view, xna.Matrix projection, SurfaceTypeEnum curentSurfaceType)
+        {
+            if ((!(line2D.PointBegin.isValid && line2D.PointEnd.isValid)) || line == null || curentSurfaceType != line2D.ReadyForSurface)
+            {
+                //TODO changeThis
+                line = new LinePrimtive(graphicsDevice, line2D.PointBegin.Pozition, line2D.PointEnd.Pozition, (line2D.WrapedHorizontal != 0), (line2D.WrapedVertical != 0), curentSurfaceType);
+                line2D.ReadyForSurface = curentSurfaceType;
+            }
+
+            line.Draw(world, view, projection, line2D.Color);
+        }
+
+        /// <summary>
+        /// Creating context menu for line
+        /// </summary>
+        /// <param name="AddPointFunction">delegate to function for add new sub point</param>
+        /// <param name="DelleteEdgeFunction">delegate to function for delete edge</param>
+        /// <returns></returns>
+        private ContextMenu CreateLine2DContextMenu(Action<object, RoutedEventArgs> AddPointFunction, Action<object, RoutedEventArgs> DelleteEdgeFunction)
+        {
+            ContextMenu vertexContextMenu = new ContextMenu();
+
+            MenuItem addPointMenuItem = new MenuItem()
+            {
+                Header = "Add Point",
+                IsCheckable = false};
+            addPointMenuItem.Click += new RoutedEventHandler(AddPointFunction.Invoke);
+
+            MenuItem useXJoinMenuItem = new MenuItem()
+            {
+                Header = "Use X join",
+                IsCheckable = true};
+            useXJoinMenuItem.Click += new RoutedEventHandler(useXJoinMenuItem_Click);
+
+            MenuItem useYJoinMenuItem = new MenuItem()
+            {
+                Header = "Use Y join",
+                IsCheckable = true};
+            useYJoinMenuItem.Click += new RoutedEventHandler(useYJoinMenuItem_Click);
+
+            MenuItem delleteEdgeMenuItem = new MenuItem()
+            {
+                Header = "Delete",
+                IsCheckable = false};
+            delleteEdgeMenuItem.Click += new RoutedEventHandler(DelleteEdgeFunction.Invoke);
+
+            MenuItem changeColorMenuItem = new MenuItem()
+            {
+                Header = "Change Color",
+                IsCheckable = false};
+            changeColorMenuItem.Click += new RoutedEventHandler(changeColorMenuItem_Click);
+            
+            vertexContextMenu.Items.Add(addPointMenuItem);
+            vertexContextMenu.Items.Add(useXJoinMenuItem);
+            vertexContextMenu.Items.Add(useYJoinMenuItem);
+            vertexContextMenu.Items.Add(delleteEdgeMenuItem);
+            vertexContextMenu.Items.Add(changeColorMenuItem);
+            return vertexContextMenu;
+        }
+
+        void changeColorMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new System.Windows.Forms.ColorDialog();
+            dialog.ShowDialog();
+            line2D.ChangeColor(dialog.Color);
+            invalidateFunction();
+        }
+
+        void useYJoinMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            MenuItem useYJoinMenuItem = (MenuItem)sender;
+            //TODO change this
+            line2D.WrapedVertical = useYJoinMenuItem.IsChecked ? 1 : 0;
+            invalidateFunction.Invoke();
+        }
+
+        void useXJoinMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            MenuItem useXJoinMenuItem = (MenuItem)sender;
+            //TODO change this
+            line2D.WrapedHorizontal = useXJoinMenuItem.IsChecked ? 1 : 0;
+            invalidateFunction.Invoke();
+        }
+
+        /// <summary>
+        /// drawing on canvas
+        /// </summary>
+        /// <param name="canvas">canvas to draw on</param>
+        /// <param name="AddPointFunction">delegate to add point function</param>
+        /// <param name="dependencyPropertyLine2D">dependency property to hold line pointer</param>
+        /// <param name="invalidateFunction">delegate to invalidate function</param>
+        /// <param name="DelleteEdgeFunction"></param>
+        public void Draw2D(Canvas canvas, Action<object, RoutedEventArgs> AddPointFunction, DependencyProperty dependencyPropertyLine2D, Func<bool> invalidateFunction, Action<object, RoutedEventArgs> DelleteEdgeFunction)
+        {
+            //TODO change this
+            this.invalidateFunction = invalidateFunction;
+            SolidColorBrush brush = new SolidColorBrush(Color.FromArgb((byte)line2D.Color.A, (byte)line2D.Color.R, (byte)line2D.Color.G, (byte)line2D.Color.B));
+            ContextMenu line2DContextMenu = CreateLine2DContextMenu(AddPointFunction, DelleteEdgeFunction);
+
+            /* Line section if useXJoin and useYJoin is false line1 and line2 are the same and line 3 and 4 are not used
+             * if is only one Join used line1 and lin2 make two parts (to and from join) and line3 and line4 are not used
+             * 
+             * for both joint are all lines needed
+             */
+            Line line1 = new Line()
+            {
+                X1 = line2D.PointBegin.Pozition.X * canvas.RenderSize.Width,
+                Y1 = line2D.PointBegin.Pozition.Y * canvas.RenderSize.Height,
+                X2 = (line2D.WrapedHorizontal != 0) ? (line2D.PointEnd.Pozition.X - 1) * canvas.RenderSize.Width : line2D.PointEnd.Pozition.X * canvas.RenderSize.Width,
+                Y2 = (line2D.WrapedVertical != 0) ? (line2D.PointEnd.Pozition.Y - 1) * canvas.RenderSize.Height : (line2D.PointEnd.Pozition.Y) * canvas.RenderSize.Height,
+                Stroke = brush,
+                ContextMenu = line2DContextMenu};
+
+            Line line2 = new Line()
+            {
+                X1 = (line2D.WrapedHorizontal != 0) ? (line2D.PointBegin.Pozition.X + 1) * canvas.RenderSize.Width : line2D.PointBegin.Pozition.X * canvas.RenderSize.Width,
+                Y1 = (line2D.WrapedVertical != 0) ? (line2D.PointBegin.Pozition.Y + 1) * canvas.RenderSize.Height : line2D.PointBegin.Pozition.Y * canvas.RenderSize.Height,
+                X2 = line2D.PointEnd.Pozition.X * canvas.RenderSize.Width,
+                Y2 = line2D.PointEnd.Pozition.Y * canvas.RenderSize.Height,
+                Stroke = brush,
+                ContextMenu = line2DContextMenu};
+
+            Line line3 = new Line()
+            {
+                X1 = (line2D.PointBegin.Pozition.X + 1) * canvas.RenderSize.Width,
+                Y1 = (line2D.PointBegin.Pozition.Y) * canvas.RenderSize.Height,
+                X2 = (line2D.PointEnd.Pozition.X) * canvas.RenderSize.Width,
+                Y2 = (line2D.PointEnd.Pozition.Y - 1) * canvas.RenderSize.Height,
+                Stroke = brush,
+                ContextMenu = line2DContextMenu};
+
+            Line line4 = new Line()
+            {
+                X1 = (line2D.PointBegin.Pozition.X) * canvas.RenderSize.Width,
+                Y1 = (line2D.PointBegin.Pozition.Y + 1) * canvas.RenderSize.Height,
+                X2 = (line2D.PointEnd.Pozition.X - 1) * canvas.RenderSize.Width,
+                Y2 = (line2D.PointEnd.Pozition.Y) * canvas.RenderSize.Height,
+                Stroke = brush,
+                ContextMenu = line2DContextMenu};
+
+            foreach (MenuItem menu in line2DContextMenu.Items)
+            {
+                menu.SetValue(dependencyPropertyLine2D, this);
+            }
+
+            ((MenuItem)(line2DContextMenu.Items[1])).IsChecked = (line2D.WrapedHorizontal != 0);
+            ((MenuItem)(line2DContextMenu.Items[2])).IsChecked = (line2D.WrapedVertical != 0);
+            canvas.Children.Add(line1);
+            canvas.Children.Add(line2);
+
+            if ((line2D.WrapedHorizontal != 0) && (line2D.WrapedVertical != 0))
+            {
+                canvas.Children.Add(line3);
+                canvas.Children.Add(line4);
+            }
+        }
+
+    }
+}

@@ -1,0 +1,322 @@
+﻿using System;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using System.Drawing;
+using GraphEditor.GraphDeclaration;
+
+namespace GraphEditor.Primitives3D
+{
+    class LinePrimtive : GeometricPrimitive
+    {
+        public LinePrimtive(GraphicsDevice graphicsDevice, PointF startPoint, PointF targePoint, bool useXJoin, bool useYJoin, SurfaceTypeEnum surfaceType)
+            : this(graphicsDevice, startPoint, targePoint, 0.01f, 0.01f, 200, 0.2f, useXJoin, useYJoin, surfaceType)
+        {
+
+        }
+        public LinePrimtive(GraphicsDevice graphicsDevice, PointF startPoint, PointF targePoint, float width, float depth, int tessellation, float radius, bool useXJoin, bool useYJoin, SurfaceTypeEnum surfaceType)
+        {
+            switch (surfaceType)
+            {
+                case SurfaceTypeEnum.Sphere:
+                    LineConstructionSphere(graphicsDevice, startPoint, targePoint, width, depth, tessellation, radius, useXJoin, useYJoin);
+                    break;
+                case SurfaceTypeEnum.Torus:
+                    LineConstructionTorus(graphicsDevice, startPoint, targePoint, width, depth, tessellation, radius, useXJoin, useYJoin);
+                    break;
+                case SurfaceTypeEnum.DoubleTorus:
+                    break;
+                case SurfaceTypeEnum.TripleTorus:
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Create line on Sphere
+        /// </summary>
+        /// <param name="graphicsDevice">device to create on</param>
+        /// <param name="startPoint">position of begin point</param>
+        /// <param name="targePoint">position of end point</param>
+        /// <param name="width">line width</param>
+        /// <param name="depth">line depth</param>
+        /// <param name="tessellation">set tessellation of line detail</param>
+        /// <param name="radius">sphere radius</param>        
+        public void LineConstructionSphere(GraphicsDevice graphicsDevice, PointF startPoint, PointF targePoint, float width, float depth, int tessellation, float radius, bool useXJoin, bool useYJoin)
+        {
+            useXJoin = false;
+            useYJoin = false;
+            radius = 0.5f;
+            float sizeX = (float)Math.Abs(startPoint.X - targePoint.X);
+            float sizeY = (float)Math.Abs(startPoint.Y - targePoint.Y);
+            float size = (float)Math.Sqrt(sizeX * sizeX + sizeY * sizeY);
+            float alfa = 2 * (float)Math.Asin((size / 2) / radius);
+            float length = radius * alfa;
+
+            double angleX = MathHelper.TwoPi * sizeX;
+            float lenght = sizeX * 0.1f;
+            if (useXJoin) lenght = (1 - sizeX);
+            double angleY = MathHelper.TwoPi * sizeY;
+            double anglePartX = angleX / tessellation;
+            double anglePartY = angleY / tessellation;
+            float beginAngleX = MathHelper.TwoPi * startPoint.X;
+            float beginAngleY = MathHelper.TwoPi * startPoint.Y;
+                        
+
+            for (int i = 0; i < tessellation; i++)
+            {
+                float actualAngelX = i * (float)anglePartX;
+                float actualAngelY = i * (float)anglePartY;
+                if (useXJoin) actualAngelX *= -1;
+                if (useYJoin) actualAngelY *= -1;
+                Matrix tranform = Matrix.CreateTranslation(radius, 0, 0) * Matrix.CreateRotationZ(beginAngleX - actualAngelX) * Matrix.CreateRotationY(beginAngleY - actualAngelY);
+
+
+                float transformangleZ = 0;
+                float transformangleY = 0;
+                //Matrix translation = Matrix.CreateTranslation(0.5f, 0, 0);
+                //Matrix tmp;
+                //Quaternion q;
+                //q = Quaternion.CreateFromAxisAngle(new Vector3(0, 1, 0), beginAngleY - actualAngelY);
+                //q *= Quaternion.CreateFromAxisAngle(new Vector3(0, 0, 1), beginAngleX - actualAngelX);
+                //Matrix.CreateFromQuaternion(ref q, out tmp);                
+                //Matrix tranform = translation * tmp;
+                if (startPoint.X < targePoint.X)
+                {
+                    //right
+                    if (startPoint.Y < targePoint.Y)
+                    {
+                        //down
+                        if (useXJoin)
+                        {
+                            tranform = Matrix.CreateTranslation(radius, 0, 0) * Matrix.CreateRotationZ(-(beginAngleX + actualAngelX)) * Matrix.CreateRotationY(beginAngleY + actualAngelY);
+                            transformangleZ = -(beginAngleX + actualAngelX);
+                            transformangleY = beginAngleY + actualAngelY;
+                        }
+                        else
+                        {
+                            tranform = Matrix.CreateTranslation(radius, 0, 0) * Matrix.CreateRotationZ(-(beginAngleX + actualAngelX)) * Matrix.CreateRotationY(beginAngleY + actualAngelY);
+                            transformangleZ = -(beginAngleX + actualAngelX);
+                            transformangleY = beginAngleY + actualAngelY;
+                        }
+                    }
+                    else
+                    {
+                        //up
+                        if (useXJoin)
+                        {
+                            tranform = Matrix.CreateTranslation(radius, 0, 0) * Matrix.CreateRotationZ(-(beginAngleX + actualAngelX)) * Matrix.CreateRotationY(beginAngleY - actualAngelY);
+                            transformangleZ = -(beginAngleX + actualAngelX);
+                            transformangleY = beginAngleY - actualAngelY;
+                        }
+                        else
+                        {
+                            tranform = Matrix.CreateTranslation(radius, 0, 0) * Matrix.CreateRotationZ(-(beginAngleX + actualAngelX)) * Matrix.CreateRotationY(beginAngleY - actualAngelY);
+                            transformangleZ = -(beginAngleX + actualAngelX);
+                            transformangleY = beginAngleY - actualAngelY;
+                        }
+                    }
+                }
+                else
+                {
+                    //left
+                    if (startPoint.Y < targePoint.Y)
+                    {
+                        //down
+                        if (useXJoin)
+                        {
+                            tranform = Matrix.CreateTranslation(radius, 0, 0) * Matrix.CreateRotationZ(-(beginAngleX - actualAngelX )) * Matrix.CreateRotationY(beginAngleY + actualAngelY);
+                            transformangleZ = -(beginAngleX - actualAngelX);
+                            transformangleY = beginAngleY + actualAngelY;
+                        }
+                        else
+                        {
+                            tranform = Matrix.CreateTranslation(radius, 0, 0) * Matrix.CreateRotationZ(-(beginAngleX - actualAngelX)) * Matrix.CreateRotationY(beginAngleY + actualAngelY);
+                            transformangleZ = -(beginAngleX - actualAngelX);
+                            transformangleY = beginAngleY + actualAngelY;
+                        }
+                    }
+                    else
+                    {
+                        //up
+                        tranform = Matrix.CreateTranslation(radius, 0, 0) * Matrix.CreateRotationZ(-(beginAngleX - actualAngelX)) * Matrix.CreateRotationY(beginAngleY - actualAngelY);
+                        transformangleZ = -(beginAngleX - actualAngelX);
+                        transformangleY = beginAngleY - actualAngelY;
+                    }
+                }
+                Vector3 position = new Vector3(0, 0, 1);
+                position.X = (float)Math.Sin(transformangleZ) * (float)Math.Sin(transformangleY);
+                position.Y = (float)Math.Sin(transformangleZ) * (float)Math.Cos(transformangleY);
+                position.Z = (float)Math.Cos(transformangleZ);
+                position *= 0.5f;
+                tranform = Matrix.CreateTranslation(position);
+
+                float pozitionY = (lenght / tessellation) * i;
+                float pozitionXLeft = -width;
+                float pozitionXRight = width;
+                float pozitionZFront = depth;
+                float pozitionZRear = -depth;
+
+                Vector3 pozitionLeftFront = new Vector3(pozitionXLeft, pozitionY, pozitionZFront);
+                Vector3 pozitionlLeftRear = new Vector3(pozitionXLeft, pozitionY, pozitionZRear);
+                Vector3 pozitionlRightFront = new Vector3(pozitionXRight, pozitionY, pozitionZFront);
+                Vector3 pozitionRightRear = new Vector3(pozitionXRight, pozitionY, pozitionZRear);
+
+                AddVertexs(tranform, pozitionLeftFront, pozitionlLeftRear, pozitionlRightFront, pozitionRightRear);
+
+                if (i != tessellation - 1)
+                {
+                    CreateSides(i);
+                }
+            }
+            InitializePrimitive(graphicsDevice);
+        }
+
+        /// <summary>
+        /// Create line on Torus
+        /// </summary>
+        /// <param name="graphicsDevice">device to create on</param>
+        /// <param name="startPoint">position of begin point</param>
+        /// <param name="targePoint">position of end point</param>
+        /// <param name="width">line width</param>
+        /// <param name="depth">line depth</param>
+        /// <param name="tessellation">set tessellation of line detail</param>
+        /// <param name="radius">Torus radius</param>
+        /// <param name="useXJoin">strait or round line in X axe</param>
+        /// <param name="useYJoin">straint or round line in Y axe</param>
+        public void LineConstructionTorus(GraphicsDevice graphicsDevice, PointF startPoint, PointF targePoint, float width, float depth, int tessellation, float radius, bool useXJoin, bool useYJoin)
+        {
+            float circuit = (float)(MathHelper.TwoPi * radius);
+            float sizeX = (float)Math.Abs(startPoint.X - targePoint.X);
+            if (useXJoin) sizeX = 1 - sizeX;
+            float sizeY = (float)Math.Abs(startPoint.Y - targePoint.Y);
+            if (useYJoin) sizeY = 1 - sizeY;
+            double angleX = MathHelper.TwoPi * sizeX;
+            float lenght = sizeX * 0.1f;
+            if (useXJoin) lenght = (1 - sizeX) * 0.045f;
+            double angleY = MathHelper.TwoPi * sizeY;
+            double anglePartX = angleX / tessellation;
+            double anglePartY = angleY / tessellation;
+            float beginAngleX = MathHelper.TwoPi * startPoint.X;
+            float beginAngleY = MathHelper.TwoPi * startPoint.Y;
+            for (int i = 0; i < tessellation; i++)
+            {
+                float actualAngelX = i * (float)anglePartX;
+                float actualAngelY = i * (float)anglePartY;
+                float diameter = 1;
+                if (useXJoin) actualAngelX *= -1;
+                if (useYJoin) actualAngelY *= -1;
+                Matrix tranform;
+                if (startPoint.X < targePoint.X)
+                {
+                    //right
+                    if (startPoint.Y < targePoint.Y)
+                    {
+                        //down
+                        if (useXJoin)
+                        {
+                            tranform = Matrix.CreateTranslation(radius - width / 2, 0, 0) * Matrix.CreateRotationZ(beginAngleX + actualAngelX * 1f) * Matrix.CreateTranslation(diameter / 2, 0, 0) * Matrix.CreateRotationY(beginAngleY + actualAngelY);
+                        }
+                        else
+                        {
+                            tranform = Matrix.CreateTranslation(radius - width / 2, 0, 0) * Matrix.CreateRotationZ(beginAngleX + actualAngelX * 0.9f) * Matrix.CreateTranslation(diameter / 2, 0, 0) * Matrix.CreateRotationY(beginAngleY + actualAngelY);
+                        }
+                    }
+                    else
+                    {
+                        //up
+                        if (useXJoin)
+                        {
+                            tranform = Matrix.CreateTranslation(radius - width / 2, 0, 0) * Matrix.CreateRotationZ(beginAngleX + actualAngelX * 1f) * Matrix.CreateTranslation(diameter / 2, 0, 0) * Matrix.CreateRotationY(beginAngleY - actualAngelY);
+                        }
+                        else
+                        {
+                            tranform = Matrix.CreateTranslation(radius - width / 2, 0, 0) * Matrix.CreateRotationZ(beginAngleX + actualAngelX * 0.9f) * Matrix.CreateTranslation(diameter / 2, 0, 0) * Matrix.CreateRotationY(beginAngleY - actualAngelY);
+                        }
+                    }
+                }
+                else
+                {
+                    //left
+                    if (startPoint.Y < targePoint.Y)
+                    {
+                        //down
+                        if (useXJoin)
+                        {
+                            tranform = Matrix.CreateTranslation(radius - width / 2, 0, 0) * Matrix.CreateRotationZ(beginAngleX - actualAngelX * 1f) * Matrix.CreateTranslation(diameter / 2, 0, 0) * Matrix.CreateRotationY(beginAngleY + actualAngelY);
+                        }
+                        else
+                        {
+                            tranform = Matrix.CreateTranslation(radius - width / 2, 0, 0) * Matrix.CreateRotationZ(beginAngleX - actualAngelX * 1.1f) * Matrix.CreateTranslation(diameter / 2, 0, 0) * Matrix.CreateRotationY(beginAngleY + actualAngelY);
+                        }
+                    }
+                    else
+                    {
+                        //up
+                        tranform = Matrix.CreateTranslation(radius - width / 2, 0, 0) * Matrix.CreateRotationZ(beginAngleX - actualAngelX * 1.1f) * Matrix.CreateTranslation(diameter / 2, 0, 0) * Matrix.CreateRotationY(beginAngleY - actualAngelY);
+                    }
+                }
+
+                float pozitionY = (lenght / tessellation) * i;
+                float pozitionXLeft = -width;
+                float pozitionXRight = width;
+                float pozitionZFront = depth;
+                float pozitionZRear = -depth;
+
+                Vector3 pozitionLeftFront = new Vector3(pozitionXLeft, pozitionY, pozitionZFront);
+                Vector3 pozitionlLeftRear = new Vector3(pozitionXLeft, pozitionY, pozitionZRear);
+                Vector3 pozitionlRightFront = new Vector3(pozitionXRight, pozitionY, pozitionZFront);
+                Vector3 pozitionRightRear = new Vector3(pozitionXRight, pozitionY, pozitionZRear);
+
+                AddVertexs(tranform, pozitionLeftFront, pozitionlLeftRear, pozitionlRightFront, pozitionRightRear);
+
+                if (i != tessellation - 1)
+                {
+                    CreateSides(i);
+                }
+            }
+            InitializePrimitive(graphicsDevice);
+        }
+        private void CreateSides(int i)
+        {
+            int j = i * 4;
+
+            //bottom side
+            AddIndexs(j + 0, j + 1, j + 2);
+            AddIndexs(j + 0, j + 2, j + 1);
+            AddIndexs(j + 1, j + 2, j + 3);
+            AddIndexs(j + 1, j + 3, j + 2);
+
+            //upper side
+            AddIndexs(j + 4, j + 5, j + 6);
+            AddIndexs(j + 4, j + 6, j + 5);
+            AddIndexs(j + 5, j + 6, j + 7);
+            AddIndexs(j + 5, j + 7, j + 6);
+
+            //left side
+            AddIndexs(j + 0, j + 1, j + 4);
+            AddIndexs(j + 0, j + 4, j + 1);
+            AddIndexs(j + 1, j + 5, j + 4);
+            AddIndexs(j + 1, j + 4, j + 5);
+
+            //right side
+            AddIndexs(j + 2, j + 3, j + 6);
+            AddIndexs(j + 2, j + 6, j + 3);
+            AddIndexs(j + 3, j + 6, j + 7);
+            AddIndexs(j + 3, j + 7, j + 6);
+
+            //front side
+            AddIndexs(j + 0, j + 2, j + 4);
+            AddIndexs(j + 0, j + 4, j + 2);
+            AddIndexs(j + 2, j + 4, j + 6);
+            AddIndexs(j + 2, j + 6, j + 4);
+
+            //back side
+            AddIndexs(j + 1, j + 3, j + 5);
+            AddIndexs(j + 1, j + 5, j + 3);
+            AddIndexs(j + 3, j + 5, j + 7);
+            AddIndexs(j + 3, j + 7, j + 5);
+        }
+    }
+}
+
