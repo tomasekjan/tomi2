@@ -117,6 +117,7 @@
     <Compile Include="Graph.cs" />
     <Compile Include="Graph_context_menus.cs" />
     <Compile Include="Graph_event_handling.cs" />
+    <Compile Include="MenuState.cs" />
     <Compile Include="Primitives\GeometricPrimitive.cs" />
     <Compile Include="Primitives\Line3D.cs" />
     <Compile Include="Primitives\Sphere.cs" />
@@ -207,7 +208,10 @@
       <Name>GraphDefinition</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="buttons\AddEdge.png" />
+    <Resource Include="buttons\AddPoint.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

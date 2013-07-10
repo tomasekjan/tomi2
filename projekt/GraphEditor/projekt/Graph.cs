@@ -25,8 +25,8 @@ namespace GraphEditor.GraphDeclaration
         DependencyProperty dependencyPropertyLine2D;
         Func<bool> invalidateFunction;
         
-        SubPoint ActualVertexMove = null;
-        Vertex ActualVertexAddEdge = null;        
+        SubPoint actualVertexMove = null;
+        Vertex actualVertexAddEdge = null;        
         GraphicsDevice graphicsDevice;
         public GraphDefinition graphDeclaration;
         UndoRedeSerializer serializer;
@@ -122,7 +122,7 @@ namespace GraphEditor.GraphDeclaration
         /// </summary>
         /// <param name="pointF">vertex position for new vertex get default color - black</param>
         public void AddVertex(PointF pointF)
-        {            
+        {   
             AddVertex(new Vertex(pointF, xna.Color.Black));
         }
 

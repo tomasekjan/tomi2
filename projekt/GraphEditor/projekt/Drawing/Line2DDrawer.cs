@@ -48,33 +48,40 @@ namespace GraphEditor.Drawing
             MenuItem addPointMenuItem = new MenuItem()
             {
                 Header = "Add Point",
-                IsCheckable = false};
+                IsCheckable = false
+            };
             addPointMenuItem.Click += new RoutedEventHandler(AddPointFunction.Invoke);
 
-            MenuItem useXJoinMenuItem = new MenuItem()
+            MenuItem useXJoinMenuItem = new MenuItemWithWrapNumber()
             {
-                Header = "Use X join",
-                IsCheckable = true};
+                JoinName = "X",
+                WrapNumber = line2D.WrapedHorizontal,
+                IsCheckable = false
+            };
             useXJoinMenuItem.Click += new RoutedEventHandler(useXJoinMenuItem_Click);
 
-            MenuItem useYJoinMenuItem = new MenuItem()
+            MenuItem useYJoinMenuItem = new MenuItemWithWrapNumber()
             {
-                Header = "Use Y join",
-                IsCheckable = true};
+                JoinName = "Y",
+                WrapNumber = line2D.WrapedVertical,
+                IsCheckable = false
+            };
             useYJoinMenuItem.Click += new RoutedEventHandler(useYJoinMenuItem_Click);
 
             MenuItem delleteEdgeMenuItem = new MenuItem()
             {
                 Header = "Delete",
-                IsCheckable = false};
+                IsCheckable = false
+            };
             delleteEdgeMenuItem.Click += new RoutedEventHandler(DelleteEdgeFunction.Invoke);
 
             MenuItem changeColorMenuItem = new MenuItem()
             {
                 Header = "Change Color",
-                IsCheckable = false};
+                IsCheckable = false
+            };
             changeColorMenuItem.Click += new RoutedEventHandler(changeColorMenuItem_Click);
-            
+
             vertexContextMenu.Items.Add(addPointMenuItem);
             vertexContextMenu.Items.Add(useXJoinMenuItem);
             vertexContextMenu.Items.Add(useYJoinMenuItem);
@@ -93,17 +100,17 @@ namespace GraphEditor.Drawing
 
         void useYJoinMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            MenuItem useYJoinMenuItem = (MenuItem)sender;
-            //TODO change this
-            line2D.WrapedVertical = useYJoinMenuItem.IsChecked ? 1 : 0;
+            MenuItemWithWrapNumber useYJoinMenuItem = (MenuItemWithWrapNumber)sender;
+            useYJoinMenuItem.SwitchWrapnumber();
+            line2D.WrapedVertical = useYJoinMenuItem.WrapNumber;
             invalidateFunction.Invoke();
         }
 
         void useXJoinMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            MenuItem useXJoinMenuItem = (MenuItem)sender;
-            //TODO change this
-            line2D.WrapedHorizontal = useXJoinMenuItem.IsChecked ? 1 : 0;
+            MenuItemWithWrapNumber useXJoinMenuItem = (MenuItemWithWrapNumber)sender;
+            useXJoinMenuItem.SwitchWrapnumber();
+            line2D.WrapedHorizontal = useXJoinMenuItem.WrapNumber;
             invalidateFunction.Invoke();
         }
 
@@ -180,5 +187,38 @@ namespace GraphEditor.Drawing
             }
         }
 
+    }
+    public class MenuItemWithWrapNumber : MenuItem
+    {
+        int wrapNumber;
+        String joinName;
+        public int WrapNumber
+        {
+            get
+            {
+                return wrapNumber;
+            }
+            set
+            {
+                wrapNumber = value;
+                this.Header = String.Format("{0} - wrap number = {1}", JoinName, wrapNumber);                
+            }
+        }
+        public String JoinName
+        {
+            get
+            {
+                return joinName;
+            }
+            set
+            {
+                joinName = value;
+            }
+        }
+
+        internal void SwitchWrapnumber()
+        {
+            WrapNumber = ((wrapNumber + 2) % 3) - 1;
+        }
     }
 }

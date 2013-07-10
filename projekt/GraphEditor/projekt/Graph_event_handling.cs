@@ -17,10 +17,10 @@ namespace GraphEditor.GraphDeclaration
         // move vertex if selected
         public void MouseLeftUp(PointF pointF)
         {
-            if (ActualVertexMove != null)
+            if (actualVertexMove != null)
             {
                 Action();
-                ActualVertexMove.Pozition = pointF;                
+                actualVertexMove.Pozition = pointF;                
             }
         }
 
@@ -28,12 +28,12 @@ namespace GraphEditor.GraphDeclaration
         // if is nearby some point store it to ActualVertexMove
         public bool MouseLeftDown(PointF pointF)
         {
-            ActualVertexMove = null;
+            actualVertexMove = null;
             foreach (Vertex vertex in graphDeclaration.vertices)
             {
                 if (vertex.Pozition.Compare(pointF))
                 {
-                    ActualVertexMove = vertex;
+                    actualVertexMove = vertex;
                     return true;
                 }
             }
@@ -42,7 +42,7 @@ namespace GraphEditor.GraphDeclaration
             {
                 if (edge.HaveVertex(pointF))
                 {
-                    ActualVertexMove = edge.getVertex(pointF);
+                    actualVertexMove = edge.getVertex(pointF);
                     return true;
                 }
             }
@@ -52,12 +52,12 @@ namespace GraphEditor.GraphDeclaration
 
         public bool MouseMiddletDown(PointF pointF)
         {
-            ActualVertexAddEdge = null;
+            actualVertexAddEdge = null;
             foreach (Vertex vertex in graphDeclaration.vertices)
             {
                 if (vertex.Pozition.Compare(pointF))
                 {
-                    ActualVertexAddEdge = vertex;
+                    actualVertexAddEdge = vertex;
                     return true;
                 }
             }
@@ -66,13 +66,13 @@ namespace GraphEditor.GraphDeclaration
 
         public void MouseMiddletUp(PointF pointF, bool useXJoin, bool useYJoin)
         {
-            if (ActualVertexAddEdge != null)
+            if (actualVertexAddEdge != null)
             {
                 foreach (Vertex vertex in graphDeclaration.vertices)
                 {
                     if (vertex.Pozition.Compare(pointF))
                     {
-                        AddEdge(vertex, ActualVertexAddEdge, useXJoin, useYJoin);
+                        AddEdge(vertex, actualVertexAddEdge, useXJoin, useYJoin);
                     }
                 }
             }

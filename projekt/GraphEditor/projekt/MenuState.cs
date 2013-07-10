@@ -10,9 +10,10 @@ using Plugin;
 
 namespace GraphEditor
 {
-    public struct ControlState
+    public enum MenuState
     {
-        public bool isLeftDown, CtrlDown, AltDown, isMiddleDown;
-        public MenuState menuSate;
+        NONE,
+        ADD_VERTEX,
+        ADD_EDGE
     }
 }

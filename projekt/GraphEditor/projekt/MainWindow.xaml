@@ -178,6 +178,26 @@
                         
                 </MenuItem>
             </MenuItem>
+            
+            <MenuItem
+                Click="AddVertex_Click">
+                <MenuItem.Header>
+                    <Image 
+                        Source="buttons\AddPoint.png"                        
+                        ToolTip="Add vertex"/>
+                </MenuItem.Header>
+                
+            </MenuItem>
+
+            <MenuItem
+                Click="AddEdge_Click">
+                <MenuItem.Header>
+                    <Image 
+                        Source="buttons\AddEdge.png"                        
+                        ToolTip="Add edge"                        
+                        />
+                </MenuItem.Header>
+            </MenuItem>
 
         </Menu>
         
@@ -219,6 +239,7 @@
             Grid.Row="1" 
             MouseLeftButtonDown="canvas_MouseLeftDown" 
             MouseLeftButtonUp="canvas_MouseLeftUp"
+            MouseRightButtonDown="canvas_MouseRightButtonDown"
             MouseDown="canvas_MouseDown" 
             MouseUp="canvas_MouseUp" 
             />                                       

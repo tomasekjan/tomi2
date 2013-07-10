@@ -8,10 +8,12 @@ using GraphEditor.GraphDeclaration;
 using AddInView;
 using System.Globalization;
 using Plugin;
+using System.Windows.Annotations;
 
 
 namespace GraphEditor
 {
+
     public partial class MainWindow : Window
     {
         #region contants
@@ -55,6 +57,7 @@ namespace GraphEditor
         ControlState controlState;
         string CurentFileName = string.Empty;
         Graph graph;
+        
         #endregion
 
         #region load
@@ -178,16 +181,37 @@ namespace GraphEditor
                 
         private void canvas_MouseLeftDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            if (e.LeftButton == System.Windows.Input.MouseButtonState.Pressed)
+            var point = e.GetPosition(canvas);
+            System.Drawing.PointF pointF = new System.Drawing.PointF(((float)point.X) / (float)canvas.RenderSize.Width, ((float)point.Y) / (float)canvas.RenderSize.Height);
+            switch (controlState.menuSate)
             {
-                controlState.isLeftDown = true;
-                var point = e.GetPosition(canvas);
-                System.Drawing.PointF pointF = new System.Drawing.PointF(((float)point.X) / (float)canvas.RenderSize.Width, ((float)point.Y) / (float)canvas.RenderSize.Height);
-                if (graph.MouseLeftDown(pointF))
-                {
-                    canvas.Cursor = System.Windows.Input.Cursors.Hand;
-                }
+                case MenuState.NONE:
+                    if (e.LeftButton == System.Windows.Input.MouseButtonState.Pressed)
+                    {
+                        controlState.isLeftDown = true;
+                        
+                        if (graph.MouseLeftDown(pointF))
+                        {
+                            canvas.Cursor = System.Windows.Input.Cursors.Hand;
+                        }
+                    }        
+                    break;
+                case MenuState.ADD_VERTEX:
+                    graph.AddVertex(pointF);
+                    controlState.menuSate = MenuState.NONE;
+                    Invalidate();
+                    break;
+                case MenuState.ADD_EDGE:
+                    //TODO solve this case
+                          
+                    if (graph.MouseMiddletDown(pointF))
+                    {
+                        canvas.Cursor = System.Windows.Input.Cursors.Pen;
+                        controlState.isMiddleDown = true;
+                    }
+                    break;
             }
+            
         }
 
         void canvas_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -229,10 +253,9 @@ namespace GraphEditor
                 }
             }
         }
-
+        
         private void canvas_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            canvas.Cursor = System.Windows.Input.Cursors.Arrow;
+        {            
             if (controlState.isMiddleDown)
             {
                 var point = e.GetPosition(canvas);
@@ -240,11 +263,18 @@ namespace GraphEditor
                 graph.MouseMiddletUp(pointF, controlState.CtrlDown, controlState.AltDown);
                 Invalidate();
                 controlState.isMiddleDown = false;
+                canvas.Cursor = System.Windows.Input.Cursors.Arrow;
             }
+            controlState.menuSate = MenuState.NONE;
         }
         
         private void MainForm_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
+            if (e.Key == System.Windows.Input.Key.Escape)
+            {
+                canvas.Cursor = System.Windows.Input.Cursors.Arrow;
+                controlState.menuSate = MenuState.NONE;
+            }
             if (e.Key == System.Windows.Input.Key.LeftCtrl)
             {
                 controlState.CtrlDown = true;
@@ -290,7 +320,15 @@ namespace GraphEditor
                 }
             }
             
-        } 
+        }
+
+        private void canvas_MouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            canvas.Cursor = System.Windows.Input.Cursors.Arrow;
+            controlState.menuSate = MenuState.NONE;
+        }
+
+
         #endregion
 
         #region Menuitems
@@ -417,6 +455,18 @@ namespace GraphEditor
             graph.graphDeclaration = plugin.Pozitioning(graph.graphDeclaration);
             Invalidate();
         }
-        #endregion
+
+        private void AddVertex_Click(object sender, RoutedEventArgs e)
+        {
+            controlState.menuSate = MenuState.ADD_VERTEX;
+            canvas.Cursor = System.Windows.Input.Cursors.Cross;
+        }
+
+        private void AddEdge_Click(object sender, RoutedEventArgs e)
+        {
+            controlState.menuSate = MenuState.ADD_EDGE;
+            canvas.Cursor = System.Windows.Input.Cursors.Pen;            
+        }
+        #endregion                        
     }
 }

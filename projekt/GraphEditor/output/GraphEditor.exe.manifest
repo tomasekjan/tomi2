@@ -66,14 +66,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="GraphEditor.exe" size="66048">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="GraphEditor.exe" size="68608">
       <assemblyIdentity name="GraphEditor" version="0.0.0.0" language="neutral" processorArchitecture="x86" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>I0rgR9AMPsnzgQS8ByPMqeZvlHo=</dsig:DigestValue>
+        <dsig:DigestValue>vp1O4etH1guFGNs5zs2SJdygKcA=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -102,14 +102,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Plugin.dll" size="46592">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Plugin.dll" size="47104">
       <assemblyIdentity name="Plugin" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1" />
-        <dsig:DigestValue>aEm9DYlMptSDMzhhfMs0VItEJeI=</dsig:DigestValue>
+        <dsig:DigestValue>7TgKUXbMZh5Azxfj2u4YTJhtJ0E=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
