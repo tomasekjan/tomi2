@@ -105,6 +105,7 @@
     <Compile Include="Drawing\EdgeDrawer.cs" />
     <Compile Include="Drawing\IDrawer.cs" />
     <Compile Include="Drawing\Line2DDrawer.cs" />
+    <Compile Include="Drawing\MenuItemWithWrapNumber.cs" />
     <Compile Include="Drawing\PointDrawer.cs" />
     <Compile Include="Drawing\VertexDrawer.cs" />
     <Compile Include="EmbeddingWindow.xaml.cs">

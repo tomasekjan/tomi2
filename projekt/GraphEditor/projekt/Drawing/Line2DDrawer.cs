@@ -28,7 +28,7 @@ namespace GraphEditor.Drawing
             if ((!(line2D.PointBegin.isValid && line2D.PointEnd.isValid)) || line == null || curentSurfaceType != line2D.ReadyForSurface)
             {
                 //TODO changeThis
-                line = new LinePrimtive(graphicsDevice, line2D.PointBegin.Pozition, line2D.PointEnd.Pozition, (line2D.WrapedHorizontal != 0), (line2D.WrapedVertical != 0), curentSurfaceType);
+                line = new LinePrimtive(graphicsDevice, line2D.PointBegin.Pozition, line2D.PointEnd.Pozition, line2D.WrapedHorizontal, line2D.WrapedVertical, curentSurfaceType);
                 line2D.ReadyForSurface = curentSurfaceType;
             }
 
@@ -121,7 +121,7 @@ namespace GraphEditor.Drawing
         /// <param name="AddPointFunction">delegate to add point function</param>
         /// <param name="dependencyPropertyLine2D">dependency property to hold line pointer</param>
         /// <param name="invalidateFunction">delegate to invalidate function</param>
-        /// <param name="DelleteEdgeFunction"></param>
+        /// <param name="DelleteEdgeFunction">delegate to delteting function</param>
         public void Draw2D(Canvas canvas, Action<object, RoutedEventArgs> AddPointFunction, DependencyProperty dependencyPropertyLine2D, Func<bool> invalidateFunction, Action<object, RoutedEventArgs> DelleteEdgeFunction)
         {
             //TODO change this
@@ -129,96 +129,124 @@ namespace GraphEditor.Drawing
             SolidColorBrush brush = new SolidColorBrush(Color.FromArgb((byte)line2D.Color.A, (byte)line2D.Color.R, (byte)line2D.Color.G, (byte)line2D.Color.B));
             ContextMenu line2DContextMenu = CreateLine2DContextMenu(AddPointFunction, DelleteEdgeFunction);
 
-            /* Line section if useXJoin and useYJoin is false line1 and line2 are the same and line 3 and 4 are not used
-             * if is only one Join used line1 and lin2 make two parts (to and from join) and line3 and line4 are not used
-             * 
-             * for both joint are all lines needed
-             */
             Line line1 = new Line()
             {
                 X1 = line2D.PointBegin.Pozition.X * canvas.RenderSize.Width,
                 Y1 = line2D.PointBegin.Pozition.Y * canvas.RenderSize.Height,
-                X2 = (line2D.WrapedHorizontal != 0) ? (line2D.PointEnd.Pozition.X - 1) * canvas.RenderSize.Width : line2D.PointEnd.Pozition.X * canvas.RenderSize.Width,
-                Y2 = (line2D.WrapedVertical != 0) ? (line2D.PointEnd.Pozition.Y - 1) * canvas.RenderSize.Height : (line2D.PointEnd.Pozition.Y) * canvas.RenderSize.Height,
+                X2 = (line2D.PointEnd.Pozition.X + line2D.WrapedHorizontal) * canvas.RenderSize.Width,
+                Y2 = (line2D.PointEnd.Pozition.Y + line2D.WrapedVertical) * canvas.RenderSize.Height,
                 Stroke = brush,
-                ContextMenu = line2DContextMenu};
+                ContextMenu = line2DContextMenu
+            };
 
             Line line2 = new Line()
             {
-                X1 = (line2D.WrapedHorizontal != 0) ? (line2D.PointBegin.Pozition.X + 1) * canvas.RenderSize.Width : line2D.PointBegin.Pozition.X * canvas.RenderSize.Width,
-                Y1 = (line2D.WrapedVertical != 0) ? (line2D.PointBegin.Pozition.Y + 1) * canvas.RenderSize.Height : line2D.PointBegin.Pozition.Y * canvas.RenderSize.Height,
-                X2 = line2D.PointEnd.Pozition.X * canvas.RenderSize.Width,
-                Y2 = line2D.PointEnd.Pozition.Y * canvas.RenderSize.Height,
+                X1 = (line2D.PointBegin.Pozition.X - line2D.WrapedHorizontal) * canvas.RenderSize.Width,
+                Y1 = (line2D.PointBegin.Pozition.Y - line2D.WrapedVertical) * canvas.RenderSize.Height,
+                X2 = (line2D.PointEnd.Pozition.X) * canvas.RenderSize.Width,
+                Y2 = (line2D.PointEnd.Pozition.Y) * canvas.RenderSize.Height,
                 Stroke = brush,
-                ContextMenu = line2DContextMenu};
+                ContextMenu = line2DContextMenu
+            };
 
             Line line3 = new Line()
             {
-                X1 = (line2D.PointBegin.Pozition.X + 1) * canvas.RenderSize.Width,
+                X1 = (line2D.PointBegin.Pozition.X - line2D.WrapedHorizontal) * canvas.RenderSize.Width,
                 Y1 = (line2D.PointBegin.Pozition.Y) * canvas.RenderSize.Height,
                 X2 = (line2D.PointEnd.Pozition.X) * canvas.RenderSize.Width,
-                Y2 = (line2D.PointEnd.Pozition.Y - 1) * canvas.RenderSize.Height,
+                Y2 = (line2D.PointEnd.Pozition.Y + line2D.WrapedVertical) * canvas.RenderSize.Height,
                 Stroke = brush,
-                ContextMenu = line2DContextMenu};
+                ContextMenu = line2DContextMenu
+            };
 
             Line line4 = new Line()
             {
                 X1 = (line2D.PointBegin.Pozition.X) * canvas.RenderSize.Width,
-                Y1 = (line2D.PointBegin.Pozition.Y + 1) * canvas.RenderSize.Height,
-                X2 = (line2D.PointEnd.Pozition.X - 1) * canvas.RenderSize.Width,
+                Y1 = (line2D.PointBegin.Pozition.Y - line2D.WrapedVertical) * canvas.RenderSize.Height,
+                X2 = (line2D.PointEnd.Pozition.X + line2D.WrapedHorizontal) * canvas.RenderSize.Width,
                 Y2 = (line2D.PointEnd.Pozition.Y) * canvas.RenderSize.Height,
                 Stroke = brush,
-                ContextMenu = line2DContextMenu};
+                ContextMenu = line2DContextMenu
+            };
 
             foreach (MenuItem menu in line2DContextMenu.Items)
             {
                 menu.SetValue(dependencyPropertyLine2D, this);
             }
 
-            ((MenuItem)(line2DContextMenu.Items[1])).IsChecked = (line2D.WrapedHorizontal != 0);
-            ((MenuItem)(line2DContextMenu.Items[2])).IsChecked = (line2D.WrapedVertical != 0);
             canvas.Children.Add(line1);
             canvas.Children.Add(line2);
-
-            if ((line2D.WrapedHorizontal != 0) && (line2D.WrapedVertical != 0))
-            {
-                canvas.Children.Add(line3);
-                canvas.Children.Add(line4);
-            }
+            canvas.Children.Add(line3);
+            canvas.Children.Add(line4);
         }
 
-    }
-    public class MenuItemWithWrapNumber : MenuItem
-    {
-        int wrapNumber;
-        String joinName;
-        public int WrapNumber
-        {
-            get
-            {
-                return wrapNumber;
-            }
-            set
-            {
-                wrapNumber = value;
-                this.Header = String.Format("{0} - wrap number = {1}", JoinName, wrapNumber);                
-            }
-        }
-        public String JoinName
-        {
-            get
-            {
-                return joinName;
-            }
-            set
-            {
-                joinName = value;
-            }
-        }
 
-        internal void SwitchWrapnumber()
-        {
-            WrapNumber = ((wrapNumber + 2) % 3) - 1;
-        }
-    }
+        
+        
+        //public void Draw2D(Canvas canvas, Action<object, RoutedEventArgs> AddPointFunction, DependencyProperty dependencyPropertyLine2D, Func<bool> invalidateFunction, Action<object, RoutedEventArgs> DelleteEdgeFunction)
+        //{
+        //    //TODO change this
+        //    this.invalidateFunction = invalidateFunction;
+        //    SolidColorBrush brush = new SolidColorBrush(Color.FromArgb((byte)line2D.Color.A, (byte)line2D.Color.R, (byte)line2D.Color.G, (byte)line2D.Color.B));
+        //    ContextMenu line2DContextMenu = CreateLine2DContextMenu(AddPointFunction, DelleteEdgeFunction);
+
+        //    /* Line section if useXJoin and useYJoin is false line1 and line2 are the same and line 3 and 4 are not used
+        //     * if is only one Join used line1 and lin2 make two parts (to and from join) and line3 and line4 are not used
+        //     * 
+        //     * for both joint are all lines needed
+        //     */
+        //    Line line1 = new Line()
+        //    {
+        //        X1 = line2D.PointBegin.Pozition.X * canvas.RenderSize.Width,
+        //        Y1 = line2D.PointBegin.Pozition.Y * canvas.RenderSize.Height,
+        //        X2 = (line2D.WrapedHorizontal != 0) ? (line2D.PointEnd.Pozition.X - 1) * canvas.RenderSize.Width : line2D.PointEnd.Pozition.X * canvas.RenderSize.Width,
+        //        Y2 = (line2D.WrapedVertical != 0) ? (line2D.PointEnd.Pozition.Y - 1) * canvas.RenderSize.Height : (line2D.PointEnd.Pozition.Y) * canvas.RenderSize.Height,
+        //        Stroke = brush,
+        //        ContextMenu = line2DContextMenu};
+
+        //    Line line2 = new Line()
+        //    {
+        //        X1 = (line2D.WrapedHorizontal != 0) ? (line2D.PointBegin.Pozition.X + 1) * canvas.RenderSize.Width : line2D.PointBegin.Pozition.X * canvas.RenderSize.Width,
+        //        Y1 = (line2D.WrapedVertical != 0) ? (line2D.PointBegin.Pozition.Y + 1) * canvas.RenderSize.Height : line2D.PointBegin.Pozition.Y * canvas.RenderSize.Height,
+        //        X2 = line2D.PointEnd.Pozition.X * canvas.RenderSize.Width,
+        //        Y2 = line2D.PointEnd.Pozition.Y * canvas.RenderSize.Height,
+        //        Stroke = brush,
+        //        ContextMenu = line2DContextMenu};
+
+        //    Line line3 = new Line()
+        //    {
+        //        X1 = (line2D.PointBegin.Pozition.X + 1) * canvas.RenderSize.Width,
+        //        Y1 = (line2D.PointBegin.Pozition.Y) * canvas.RenderSize.Height,
+        //        X2 = (line2D.PointEnd.Pozition.X) * canvas.RenderSize.Width,
+        //        Y2 = (line2D.PointEnd.Pozition.Y - 1) * canvas.RenderSize.Height,
+        //        Stroke = brush,
+        //        ContextMenu = line2DContextMenu};
+
+        //    Line line4 = new Line()
+        //    {
+        //        X1 = (line2D.PointBegin.Pozition.X) * canvas.RenderSize.Width,
+        //        Y1 = (line2D.PointBegin.Pozition.Y + 1) * canvas.RenderSize.Height,
+        //        X2 = (line2D.PointEnd.Pozition.X - 1) * canvas.RenderSize.Width,
+        //        Y2 = (line2D.PointEnd.Pozition.Y) * canvas.RenderSize.Height,
+        //        Stroke = brush,
+        //        ContextMenu = line2DContextMenu};
+
+        //    foreach (MenuItem menu in line2DContextMenu.Items)
+        //    {
+        //        menu.SetValue(dependencyPropertyLine2D, this);
+        //    }
+
+        //    ((MenuItem)(line2DContextMenu.Items[1])).IsChecked = (line2D.WrapedHorizontal != 0);
+        //    ((MenuItem)(line2DContextMenu.Items[2])).IsChecked = (line2D.WrapedVertical != 0);
+        //    canvas.Children.Add(line1);
+        //    canvas.Children.Add(line2);
+
+        //    if ((line2D.WrapedHorizontal != 0) && (line2D.WrapedVertical != 0))
+        //    {
+        //        canvas.Children.Add(line3);
+        //        canvas.Children.Add(line4);
+        //    }
+        //}
+
+    }   
 }

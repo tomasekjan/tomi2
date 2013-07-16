@@ -30,46 +30,31 @@ namespace GraphEditor.Drawing
             {
                 vertex.isValid = true;
             }
-            //counting rotation angle
-            float rotationXt = (xna.MathHelper.TwoPi) * vertex.Pozition.X;
-            float rotationYt = (xna.MathHelper.TwoPi) * vertex.Pozition.Y;
-
+            
+            
+            
             switch (surfaceType)
             {
                 case SurfaceTypeEnum.Sphere:
-                    #region EnumCode
+                    float x = vertex.Pozition.X * 0.7f;
+                    float y = vertex.Pozition.Y * 0.7f;
                     xna.Vector3 position = new xna.Vector3(0, 0, 1);
-                    float transformangleZ = -rotationXt;
-                    float transformangleY = rotationYt;
-                    position.X = (float)Math.Sin(transformangleZ) * (float)Math.Sin(transformangleY);
-                    position.Y = (float)Math.Sin(transformangleZ) * (float)Math.Cos(transformangleY);
-                    position.Z = (float)Math.Cos(transformangleZ);
-                    position *= 0.5f;
+                    position.X = x;
+                    position.Y = y;
+                    position.Z = (float)Math.Sqrt((1 - x*x -y*y));                    
+                    position *= 0.7f;
                     xna.Matrix tranform = xna.Matrix.CreateTranslation(position);
-                    sphere.Draw(tranform * world, view, projection, vertex.Color);
-                    #endregion
-
-                    #region ProjectFinishCode
-                    //xna.Matrix translation = xna.Matrix.CreateTranslation(0.5f, 0, 0);
-                    //xna.Matrix rotationY = xna.Matrix.CreateRotationY(rotationYt);
-                    //xna.Matrix rotatuonZ = xna.Matrix.CreateRotationZ(-rotationXt);
-                    //xna.Matrix tmp;
-                    //xna.Quaternion q;
-                    //q = xna.Quaternion.CreateFromAxisAngle(new xna.Vector3(0, 1, 0), rotationYt);
-                    //q *= xna.Quaternion.CreateFromAxisAngle(new xna.Vector3(0, 0, 1), -rotationXt);
-                    //xna.Matrix.CreateFromQuaternion(ref q, out tmp);
-                    ////xna.Matrix tranform = translation * rotatuonZ * rotationY;                 
-                    //xna.Matrix tranform = translation * tmp;
-                    //sphere.Draw(tranform * world, view, projection, vertex.Color);
-                    #endregion
+                    sphere.Draw(tranform * world, view, projection, vertex.Color);                    
 
                     break;
                 case SurfaceTypeEnum.Torus:
-                    xna.Matrix moveTomidleOfTorus = xna.Matrix.CreateTranslation(0.5f, 0, 0);
+                    float rotationXt = (xna.MathHelper.TwoPi) * vertex.Pozition.X;
+                    float rotationYt = (xna.MathHelper.TwoPi) * vertex.Pozition.Y;
+                    xna.Matrix moveToMidleOfTorus = xna.Matrix.CreateTranslation(0.5f, 0, 0);
                     xna.Matrix rotationX = xna.Matrix.CreateRotationZ(rotationXt);
                     xna.Matrix rotationY2 = xna.Matrix.CreateRotationY(rotationYt);
                     xna.Matrix moveOnSideOfTorus = xna.Matrix.CreateTranslation(0.2f, 0, 0);
-                    sphere.Draw(moveOnSideOfTorus * rotationX * moveTomidleOfTorus * rotationY2 * world, view, projection, vertex.Color);
+                    sphere.Draw(moveOnSideOfTorus * rotationX * moveToMidleOfTorus * rotationY2 * world, view, projection, vertex.Color);
                     break;                
                 default:
                     break;

@@ -13,7 +13,7 @@ namespace GraphEditor.Primitives3D
     {
         
         public SpherePrimitive(GraphicsDevice graphicsDevice)
-            : this(graphicsDevice, 1, 16)
+            : this(graphicsDevice, 1.4f, 16)
         {
         }
 
