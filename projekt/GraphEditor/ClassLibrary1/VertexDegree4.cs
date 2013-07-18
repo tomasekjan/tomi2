@@ -14,6 +14,10 @@ namespace Plugin
         EdgeMultiGraph ev, ew, ex, ey = null;
         int iv, iw, ix, iy = -1;
         List<EdgeMultiGraph> addedEdges = new List<EdgeMultiGraph>();
+        /// <summary>
+        /// adding vertex back to embedding
+        /// </summary>
+        /// <param name="embedding">embedding to add vertex to</param>
         public override void Add(EmbedingMultiGraph embedding)
         {
             PointF position = new PointF();
@@ -38,6 +42,11 @@ namespace Plugin
             embedding.incidenceEdges[w].Insert(iw, ew);
             embedding.incidenceEdges[v].Insert(iv, ev);
         }
+        /// <summary>
+        /// removing vertex with given index from embedding
+        /// </summary>
+        /// <param name="embedding">embedding to remove vertex from</param>
+        /// <param name="vertex">index of vertex to remove</param>
         public override void Remove(EmbedingMultiGraph embedding, int vertex)
         {
             u = vertex;

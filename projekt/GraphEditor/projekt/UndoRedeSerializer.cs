@@ -40,6 +40,9 @@ namespace GraphEditor.GraphDeclaration
             key = new object();
         }
 
+        /// <summary>
+        /// initialize auto save function
+        /// </summary>
         private void InicializeAutoSave()
         {
             DirectoryInfo dir = new DirectoryInfo("AutoSave");
@@ -71,6 +74,10 @@ namespace GraphEditor.GraphDeclaration
             }
         }
 
+        /// <summary>
+        /// save to file 
+        /// </summary>
+        /// <param name="graphDeclaration"></param>
         private void AutoSaveToFile(GraphDefinition graphDeclaration)
         {
             if (!inicialized)
@@ -126,7 +133,11 @@ namespace GraphEditor.GraphDeclaration
             }
         }
 
-        // graph serialization 
+        /// <summary>
+        /// graph serialization
+        /// </summary>
+        /// <param name="fileName">target file name</param>
+        /// <param name="graph">graph object to serialize</param>  
         public static void Serialize(string fileName, Graph graph)
         {
             try
@@ -141,7 +152,11 @@ namespace GraphEditor.GraphDeclaration
             }
         }
 
-        //graph deserialization
+        /// <summary>
+        /// graph de serialization
+        /// </summary>
+        /// <param name="fileName">source fine name</param>
+        /// <returns>deserialized graph</returns>
         public static GraphDefinition Deserialize(string fileName)
         {
             try

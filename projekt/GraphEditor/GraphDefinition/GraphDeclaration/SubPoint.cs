@@ -23,7 +23,7 @@ namespace GraphEditor.GraphDeclaration
         /// </summary>
         public bool isValid;
         /// <summary>
-        /// point collor
+        /// point color
         /// </summary>
         internal xna.Color color;
 
@@ -66,7 +66,7 @@ namespace GraphEditor.GraphDeclaration
         }
 
         /// <summary>
-        ///
+        /// creates new instance of vertex class
         /// </summary>
         /// <param name="pozition">PointF position of Vertex</param>
         public SubPoint(PointF pozition)
@@ -89,12 +89,10 @@ namespace GraphEditor.GraphDeclaration
             return (int)(pozition.X * int.MaxValue) + (int)(pozition.Y * int.MaxValue);
         }
         
-        //public override bool Equals(object obj)
-        //{
-        //    SubPoint point2 = obj as SubPoint;
-        //    return pozition.X.Equals(point2.pozition.X) && pozition.Y.Equals(point2.pozition.Y);
-        //}
-
+        /// <summary>
+        /// Change color of vertex
+        /// </summary>
+        /// <param name="color">new color</param>
         public void ChangeColor(Color color)
         {
             this.color = new xna.Color(color.R, color.G, color.B, color.A);

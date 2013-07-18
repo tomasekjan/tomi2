@@ -31,7 +31,10 @@ namespace GraphEditor.GraphDeclaration
         public GraphDefinition graphDeclaration;
         UndoRedeSerializer serializer;
         Dictionary<Edge, EdgeDrawer> edgeDrawerCache;
-
+        
+        /// <summary>
+        /// gets instance of valid surface
+        /// </summary>
         private GeometricPrimitive Surface
         {
             get
@@ -136,9 +139,9 @@ namespace GraphEditor.GraphDeclaration
             graphDeclaration.edges.Add(edge);
         }
 
-        private void AddEdge(Vertex vertex, Vertex ActualVertexAddEdge, bool useXJoin, bool useYJoin)
+        private void AddEdge(Vertex vertex, Vertex ActualVertexAddEdge)
         {            
-            AddEdge(new Edge(vertex, ActualVertexAddEdge, xna.Color.Blue, useXJoin, useYJoin));
+            AddEdge(new Edge(vertex, ActualVertexAddEdge, xna.Color.Blue));
         }
 
         /// <summary>
@@ -179,7 +182,7 @@ namespace GraphEditor.GraphDeclaration
                 Surface.Draw(world, view, projection, graphDeclaration.surfaceColor);
                 foreach (Edge edge in graphDeclaration.edges)
                 {
-                    GetEdgeDraver(edge).Draw3D(graphicsDevice, world, view, projection, SurfaceType);
+                    GetEdgeDraver(edge).Draw3D(graphicsDevice, world, view, projection, SurfaceType);                    
                 }
                 foreach (Vertex vertex in graphDeclaration.vertices)
                 {
@@ -193,7 +196,10 @@ namespace GraphEditor.GraphDeclaration
             }
         }
 
-        // draw entire graph on canvas
+        /// <summary>
+        /// draw entire graph on canvas
+        /// </summary>
+        /// <param name="canvas"></param>
         public void Draw2D(Canvas canvas)
         {
             foreach (Edge edge in graphDeclaration.edges)
@@ -209,8 +215,7 @@ namespace GraphEditor.GraphDeclaration
 
         public void SetValuesOnDeserializing()
         {
-            isSurfaceValid = false;
-            var tmp = Surface;
+            isSurfaceValid = false;            
         }
 
         /// <summary>
@@ -271,14 +276,7 @@ namespace GraphEditor.GraphDeclaration
         /// </summary>
         private void Action()
         {
-            //try
-            //{
-                serializer.Action(graphDeclaration);
-            //}
-            //catch (Exception exception)
-            //{
-            //    throw new UndoRedoException("Error by storing state", exception);
-            //}
+            serializer.Action(graphDeclaration);
         }
     }
 }

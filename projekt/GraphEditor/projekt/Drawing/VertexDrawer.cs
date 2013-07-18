@@ -23,6 +23,14 @@ namespace GraphEditor.Drawing
         }
 
 
+        /// <summary>
+        /// Basic 3D draw method
+        /// </summary>
+        /// <param name="graphicsDevice">device to draw on</param>
+        /// <param name="world">world matrix</param>
+        /// <param name="view">view matrix</param>
+        /// <param name="projection">projection matrix</param>
+        /// <param name="surfaceType">surface to be projected on</param>
         public override void Draw3D(GraphicsDevice graphicsDevice, xna.Matrix world, xna.Matrix view, xna.Matrix projection, SurfaceTypeEnum surfaceType, GeometricPrimitive sphere)
         {
             Vertex vertex = point as Vertex;
@@ -61,6 +69,12 @@ namespace GraphEditor.Drawing
             }
         }
 
+        /// <summary>
+        /// drawing on canvas
+        /// </summary>
+        /// <param name="canvas">canvas to draw on</param>
+        /// <param name="vertexContextMenu">context menu for vertex</param>
+        /// <param name="dependencyProperty"></param>
         public override void Draw2D(Canvas canvas, ContextMenu vertexContextMenu, DependencyProperty dependencyProperty)
         {
             Vertex vertex = point as Vertex;

@@ -17,19 +17,32 @@ namespace GraphEditor.Drawing
         internal Line2D line2D;
         GeometricPrimitive line;
         Func<bool> invalidateFunction;
+        SurfaceTypeEnum readyForSurface;
 
+        /// <summary>
+        /// crete new instance of line drawer
+        /// </summary>
+        /// <param name="line2D"></param>
         public Line2DDrawer(Line2D line2D)
         {
             this.line2D = line2D;
         }
 
+        /// <summary>
+        /// Basic 3D draw method
+        /// </summary>
+        /// <param name="graphicsDevice">device to draw on</param>
+        /// <param name="world">world matrix</param>
+        /// <param name="view">view matrix</param>
+        /// <param name="projection">projection matrix</param>
+        /// <param name="surfaceType">surface to be projected on</param>
         public void Draw3D(xna.Graphics.GraphicsDevice graphicsDevice, xna.Matrix world, xna.Matrix view, xna.Matrix projection, SurfaceTypeEnum curentSurfaceType)
         {
-            if ((!(line2D.PointBegin.isValid && line2D.PointEnd.isValid)) || line == null || curentSurfaceType != line2D.ReadyForSurface)
+            if ((!(line2D.PointBegin.isValid && line2D.PointEnd.isValid)) || line == null || curentSurfaceType != readyForSurface)
             {
-                //TODO changeThis
-                line = new LinePrimtive(graphicsDevice, line2D.PointBegin.Pozition, line2D.PointEnd.Pozition, line2D.WrapedHorizontal, line2D.WrapedVertical, curentSurfaceType);
-                line2D.ReadyForSurface = curentSurfaceType;
+                
+                line = new LinePrimtive(graphicsDevice, line2D.PointBegin.Pozition, line2D.PointEnd.Pozition, line2D.WrappedHorizontal, line2D.WrapedVertical, curentSurfaceType);
+                readyForSurface = curentSurfaceType;
             }
 
             line.Draw(world, view, projection, line2D.Color);
@@ -40,7 +53,7 @@ namespace GraphEditor.Drawing
         /// </summary>
         /// <param name="AddPointFunction">delegate to function for add new sub point</param>
         /// <param name="DelleteEdgeFunction">delegate to function for delete edge</param>
-        /// <returns></returns>
+        /// <returns>new context menu</returns>
         private ContextMenu CreateLine2DContextMenu(Action<object, RoutedEventArgs> AddPointFunction, Action<object, RoutedEventArgs> DelleteEdgeFunction)
         {
             ContextMenu vertexContextMenu = new ContextMenu();
@@ -55,7 +68,7 @@ namespace GraphEditor.Drawing
             MenuItem useXJoinMenuItem = new MenuItemWithWrapNumber()
             {
                 JoinName = "X",
-                WrapNumber = line2D.WrapedHorizontal,
+                WrapNumber = line2D.WrappedHorizontal,
                 IsCheckable = false
             };
             useXJoinMenuItem.Click += new RoutedEventHandler(useXJoinMenuItem_Click);
@@ -110,7 +123,7 @@ namespace GraphEditor.Drawing
         {
             MenuItemWithWrapNumber useXJoinMenuItem = (MenuItemWithWrapNumber)sender;
             useXJoinMenuItem.SwitchWrapnumber();
-            line2D.WrapedHorizontal = useXJoinMenuItem.WrapNumber;
+            line2D.WrappedHorizontal = useXJoinMenuItem.WrapNumber;
             invalidateFunction.Invoke();
         }
 
@@ -121,10 +134,9 @@ namespace GraphEditor.Drawing
         /// <param name="AddPointFunction">delegate to add point function</param>
         /// <param name="dependencyPropertyLine2D">dependency property to hold line pointer</param>
         /// <param name="invalidateFunction">delegate to invalidate function</param>
-        /// <param name="DelleteEdgeFunction">delegate to delteting function</param>
+        /// <param name="DelleteEdgeFunction">delegate to deleting function</param>
         public void Draw2D(Canvas canvas, Action<object, RoutedEventArgs> AddPointFunction, DependencyProperty dependencyPropertyLine2D, Func<bool> invalidateFunction, Action<object, RoutedEventArgs> DelleteEdgeFunction)
-        {
-            //TODO change this
+        {            
             this.invalidateFunction = invalidateFunction;
             SolidColorBrush brush = new SolidColorBrush(Color.FromArgb((byte)line2D.Color.A, (byte)line2D.Color.R, (byte)line2D.Color.G, (byte)line2D.Color.B));
             ContextMenu line2DContextMenu = CreateLine2DContextMenu(AddPointFunction, DelleteEdgeFunction);
@@ -133,7 +145,7 @@ namespace GraphEditor.Drawing
             {
                 X1 = line2D.PointBegin.Pozition.X * canvas.RenderSize.Width,
                 Y1 = line2D.PointBegin.Pozition.Y * canvas.RenderSize.Height,
-                X2 = (line2D.PointEnd.Pozition.X + line2D.WrapedHorizontal) * canvas.RenderSize.Width,
+                X2 = (line2D.PointEnd.Pozition.X + line2D.WrappedHorizontal) * canvas.RenderSize.Width,
                 Y2 = (line2D.PointEnd.Pozition.Y + line2D.WrapedVertical) * canvas.RenderSize.Height,
                 Stroke = brush,
                 ContextMenu = line2DContextMenu
@@ -141,7 +153,7 @@ namespace GraphEditor.Drawing
 
             Line line2 = new Line()
             {
-                X1 = (line2D.PointBegin.Pozition.X - line2D.WrapedHorizontal) * canvas.RenderSize.Width,
+                X1 = (line2D.PointBegin.Pozition.X - line2D.WrappedHorizontal) * canvas.RenderSize.Width,
                 Y1 = (line2D.PointBegin.Pozition.Y - line2D.WrapedVertical) * canvas.RenderSize.Height,
                 X2 = (line2D.PointEnd.Pozition.X) * canvas.RenderSize.Width,
                 Y2 = (line2D.PointEnd.Pozition.Y) * canvas.RenderSize.Height,
@@ -151,7 +163,7 @@ namespace GraphEditor.Drawing
 
             Line line3 = new Line()
             {
-                X1 = (line2D.PointBegin.Pozition.X - line2D.WrapedHorizontal) * canvas.RenderSize.Width,
+                X1 = (line2D.PointBegin.Pozition.X - line2D.WrappedHorizontal) * canvas.RenderSize.Width,
                 Y1 = (line2D.PointBegin.Pozition.Y) * canvas.RenderSize.Height,
                 X2 = (line2D.PointEnd.Pozition.X) * canvas.RenderSize.Width,
                 Y2 = (line2D.PointEnd.Pozition.Y + line2D.WrapedVertical) * canvas.RenderSize.Height,
@@ -163,7 +175,7 @@ namespace GraphEditor.Drawing
             {
                 X1 = (line2D.PointBegin.Pozition.X) * canvas.RenderSize.Width,
                 Y1 = (line2D.PointBegin.Pozition.Y - line2D.WrapedVertical) * canvas.RenderSize.Height,
-                X2 = (line2D.PointEnd.Pozition.X + line2D.WrapedHorizontal) * canvas.RenderSize.Width,
+                X2 = (line2D.PointEnd.Pozition.X + line2D.WrappedHorizontal) * canvas.RenderSize.Width,
                 Y2 = (line2D.PointEnd.Pozition.Y) * canvas.RenderSize.Height,
                 Stroke = brush,
                 ContextMenu = line2DContextMenu
@@ -180,73 +192,6 @@ namespace GraphEditor.Drawing
             canvas.Children.Add(line4);
         }
 
-
-        
-        
-        //public void Draw2D(Canvas canvas, Action<object, RoutedEventArgs> AddPointFunction, DependencyProperty dependencyPropertyLine2D, Func<bool> invalidateFunction, Action<object, RoutedEventArgs> DelleteEdgeFunction)
-        //{
-        //    //TODO change this
-        //    this.invalidateFunction = invalidateFunction;
-        //    SolidColorBrush brush = new SolidColorBrush(Color.FromArgb((byte)line2D.Color.A, (byte)line2D.Color.R, (byte)line2D.Color.G, (byte)line2D.Color.B));
-        //    ContextMenu line2DContextMenu = CreateLine2DContextMenu(AddPointFunction, DelleteEdgeFunction);
-
-        //    /* Line section if useXJoin and useYJoin is false line1 and line2 are the same and line 3 and 4 are not used
-        //     * if is only one Join used line1 and lin2 make two parts (to and from join) and line3 and line4 are not used
-        //     * 
-        //     * for both joint are all lines needed
-        //     */
-        //    Line line1 = new Line()
-        //    {
-        //        X1 = line2D.PointBegin.Pozition.X * canvas.RenderSize.Width,
-        //        Y1 = line2D.PointBegin.Pozition.Y * canvas.RenderSize.Height,
-        //        X2 = (line2D.WrapedHorizontal != 0) ? (line2D.PointEnd.Pozition.X - 1) * canvas.RenderSize.Width : line2D.PointEnd.Pozition.X * canvas.RenderSize.Width,
-        //        Y2 = (line2D.WrapedVertical != 0) ? (line2D.PointEnd.Pozition.Y - 1) * canvas.RenderSize.Height : (line2D.PointEnd.Pozition.Y) * canvas.RenderSize.Height,
-        //        Stroke = brush,
-        //        ContextMenu = line2DContextMenu};
-
-        //    Line line2 = new Line()
-        //    {
-        //        X1 = (line2D.WrapedHorizontal != 0) ? (line2D.PointBegin.Pozition.X + 1) * canvas.RenderSize.Width : line2D.PointBegin.Pozition.X * canvas.RenderSize.Width,
-        //        Y1 = (line2D.WrapedVertical != 0) ? (line2D.PointBegin.Pozition.Y + 1) * canvas.RenderSize.Height : line2D.PointBegin.Pozition.Y * canvas.RenderSize.Height,
-        //        X2 = line2D.PointEnd.Pozition.X * canvas.RenderSize.Width,
-        //        Y2 = line2D.PointEnd.Pozition.Y * canvas.RenderSize.Height,
-        //        Stroke = brush,
-        //        ContextMenu = line2DContextMenu};
-
-        //    Line line3 = new Line()
-        //    {
-        //        X1 = (line2D.PointBegin.Pozition.X + 1) * canvas.RenderSize.Width,
-        //        Y1 = (line2D.PointBegin.Pozition.Y) * canvas.RenderSize.Height,
-        //        X2 = (line2D.PointEnd.Pozition.X) * canvas.RenderSize.Width,
-        //        Y2 = (line2D.PointEnd.Pozition.Y - 1) * canvas.RenderSize.Height,
-        //        Stroke = brush,
-        //        ContextMenu = line2DContextMenu};
-
-        //    Line line4 = new Line()
-        //    {
-        //        X1 = (line2D.PointBegin.Pozition.X) * canvas.RenderSize.Width,
-        //        Y1 = (line2D.PointBegin.Pozition.Y + 1) * canvas.RenderSize.Height,
-        //        X2 = (line2D.PointEnd.Pozition.X - 1) * canvas.RenderSize.Width,
-        //        Y2 = (line2D.PointEnd.Pozition.Y) * canvas.RenderSize.Height,
-        //        Stroke = brush,
-        //        ContextMenu = line2DContextMenu};
-
-        //    foreach (MenuItem menu in line2DContextMenu.Items)
-        //    {
-        //        menu.SetValue(dependencyPropertyLine2D, this);
-        //    }
-
-        //    ((MenuItem)(line2DContextMenu.Items[1])).IsChecked = (line2D.WrapedHorizontal != 0);
-        //    ((MenuItem)(line2DContextMenu.Items[2])).IsChecked = (line2D.WrapedVertical != 0);
-        //    canvas.Children.Add(line1);
-        //    canvas.Children.Add(line2);
-
-        //    if ((line2D.WrapedHorizontal != 0) && (line2D.WrapedVertical != 0))
-        //    {
-        //        canvas.Children.Add(line3);
-        //        canvas.Children.Add(line4);
-        //    }
-        //}
 
     }   
 }

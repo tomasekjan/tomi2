@@ -19,7 +19,7 @@ namespace GraphEditor.Drawing
         Dictionary<Line2D, Line2DDrawer> cache;
 
         /// <summary>
-        ///
+        /// creates new instance of edge drawer
         /// </summary>
         /// <param name="edge">Edge for drawing</param>
         public EdgeDrawer(Edge edge)
@@ -27,7 +27,16 @@ namespace GraphEditor.Drawing
             this.edge = edge;
             cache = new Dictionary<Line2D, Line2DDrawer>();
         }
-                
+
+
+        /// <summary>
+        /// Basic 3D draw method
+        /// </summary>
+        /// <param name="graphicsDevice">device to draw on</param>
+        /// <param name="world">world matrix</param>
+        /// <param name="view">view matrix</param>
+        /// <param name="projection">projection matrix</param>
+        /// <param name="surfaceType">surface to be projected on</param>
         public void Draw3D(GraphicsDevice graphicsDevice, Matrix world, Matrix view, Matrix projection, SurfaceTypeEnum surfaceType)
         {
             foreach (Line2D line in edge.lines)
@@ -36,7 +45,12 @@ namespace GraphEditor.Drawing
             }
         }
 
-        // getting drawer from cache or create new and store to cache
+        /// <summary>
+        /// getting drawer from cache or create new and store to cache
+        /// </summary>
+        /// <param name="line"></param>
+        /// <returns>valid drawer for line</returns>
+ 
         private Line2DDrawer GetLineDrawer(Line2D line)
         {
             Line2DDrawer lineDrawer;

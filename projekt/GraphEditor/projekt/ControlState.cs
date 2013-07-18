@@ -11,8 +11,11 @@ using Plugin;
 namespace GraphEditor
 {
     public struct ControlState
-    {
+    {        
         public bool isLeftDown, CtrlDown, AltDown, isMiddleDown;
+        /// <summary>
+        /// program state : adding vertex / adding edge / normal
+        /// </summary>
         public MenuState menuSate;
     }
 }

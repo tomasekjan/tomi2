@@ -10,11 +10,24 @@ using System.Collections;
 
 namespace Plugin
 {
+    /// <summary>
+    /// class representing bridge with respect to according to "A Faster Algorithm for Torus Embedding" [12]
+    /// </summary>
     class BridgeWithRespectTo : IComparable<BridgeWithRespectTo>
     {
+        /// <summary>
+        /// type of bridge according to "A Faster Algorithm for Torus Embedding" [12]
+        /// </summary>
         BridgType bridgeType;
-        Embeding embeding;
+        /// <summary>
+        /// graph declaration of bridge
+        /// </summary>
+        Embedding bridge;
+        /// <summary>
+        /// vertexes that is bridge attached to in embedding
+        /// </summary>
         HashSet<int> attachmentVertexes;
+
         List<CircularListInt> faces;
         
         public BridgType BridgeType
@@ -47,15 +60,15 @@ namespace Plugin
                 return faces.Count;
             }
         }
-        public Embeding Embeding
+        public Embedding Embeding
         {
             get
             {
-                return embeding;
+                return bridge;
             }
             set
             {
-                embeding = value;
+                bridge = value;
             }
         }
         public HashSet<int> AttachmentVertexes
@@ -70,35 +83,61 @@ namespace Plugin
             }
         }
         
+        /// <summary>
+        /// creating empty bridge
+        /// </summary>
         public BridgeWithRespectTo()
         {
             attachmentVertexes = new HashSet<int>();
             faces = new List<CircularListInt>();
         }
 
-        public BridgeWithRespectTo(Embeding embeding):this()
+        /// <summary>
+        /// bridge of type 1
+        /// </summary>
+        /// <param name="embeding"></param>
+        public BridgeWithRespectTo(Embedding embeding):this()
         {
-            this.embeding = embeding;
+            this.bridge = embeding;
             BridgeType = BridgType.Type1;
         }
 
-        public BridgeWithRespectTo(Embeding embeding, Tuple<int, int> edge):this()
+        /// <summary>
+        /// bridge of type 2
+        /// </summary>
+        /// <param name="embeding"></param>
+        /// <param name="edge"></param>
+        public BridgeWithRespectTo(Embedding embeding, Tuple<int, int> edge):this()
         {
-            this.embeding = embeding;
+            this.bridge = embeding;
             attachmentVertexes.Add(edge.Item1);
             attachmentVertexes.Add(edge.Item2);
             BridgeType = BridgType.Type2;
         }
+
+        /// <summary>
+        /// add symmetric edge to bridge
+        /// </summary>
+        /// <param name="edge"></param>
         public void AddEdgeSym(Tuple<int, int> edge)
         {
-            embeding.AddEdgeSym(edge);
+            bridge.AddEdgeSym(edge);
         }
 
+        /// <summary>
+        /// compering two bridges by Number of Admissible faces
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
         public int CompareTo(BridgeWithRespectTo other)
         {
             return NumberOfAdmisibleFaces.CompareTo(other.NumberOfAdmisibleFaces);
         }
 
+        /// <summary>
+        /// get path from bridge witch can be embedded
+        /// </summary>
+        /// <returns></returns>
         internal List<int> GetPath()
         {
             switch (BridgeType)
@@ -109,7 +148,7 @@ namespace Plugin
                     int start = attachmentVertexes.First();
                     path.Add(start);
                     visited = new Dictionary<int, bool>();
-                    foreach (var v in embeding.neighbors.Keys)
+                    foreach (var v in bridge.neighbors.Keys)
                     {
                         visited.Add(v, false);
                     }
@@ -135,7 +174,7 @@ namespace Plugin
                 return;
             }
             visited[u] = true;
-            foreach (var v in embeding.neighbors[u])
+            foreach (var v in bridge.neighbors[u])
             {
                 if (end) return;
                 if (!visited[v])
@@ -150,10 +189,5 @@ namespace Plugin
                 }
             }
         }
-    }
-    public enum BridgType
-    {
-        Type1,
-        Type2
     }
 }

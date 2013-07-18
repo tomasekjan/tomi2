@@ -16,10 +16,10 @@ namespace Plugin
         Dictionary<int, VertexProperities> vertexs;
         int count = 0;
         Stack<Tuple<int, int>> stack = new Stack<Tuple<int, int>>();
-        Embeding embeding;
-        List<Embeding> returnList = new List<Embeding>();
+        Embedding embeding;
+        List<Embedding> returnList = new List<Embedding>();
 
-        public TwoConnectedComponentGetter(Embeding embeding)
+        public TwoConnectedComponentGetter(Embedding embeding)
         {
             this.embeding = embeding;
             vertexs = new Dictionary<int, VertexProperities>();
@@ -33,7 +33,7 @@ namespace Plugin
             }
         }
 
-        public List<Embeding> GetComponents()
+        public List<Embedding> GetComponents()
         {
 
             int i = 0;
@@ -80,9 +80,9 @@ namespace Plugin
             }
         }
 
-        private Embeding GetComponent(int u, int v)
+        private Embedding GetComponent(int u, int v)
         {
-            return new Embeding(stack, u, v);
+            return new Embedding(stack, u, v);
         }
 
         private void Push(int u, int v)

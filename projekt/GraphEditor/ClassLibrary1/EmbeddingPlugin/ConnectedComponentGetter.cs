@@ -12,10 +12,15 @@ namespace Plugin
 {
     class ConnectedComponentGetter
     {
-        private Embeding embeding;
+        private Embedding embeding;
         private Dictionary<int, bool> visited;
         List<int> comp;
-        public ConnectedComponentGetter(Embeding embeding)
+
+        /// <summary>
+        /// creates new instance of component getter
+        /// </summary>
+        /// <param name="embeding">embedding to search components in</param>
+        public ConnectedComponentGetter(Embedding embeding)
         {
             this.embeding = embeding;
             visited = new Dictionary<int, bool>();
@@ -24,9 +29,14 @@ namespace Plugin
                 visited.Add(v, false);
             }
         }
-        public List<Embeding> GetComponents()
+
+        /// <summary>
+        /// get connected components of graph described by embedding
+        /// </summary>
+        /// <returns></returns>
+        public List<Embedding> GetComponents()
         {
-            List<Embeding> returnList = new List<Embeding>();
+            List<Embedding> returnList = new List<Embedding>();
             foreach (var v in embeding.neighbors.Keys)
             {
                 comp = new List<int>();                
@@ -37,13 +47,17 @@ namespace Plugin
                 }
                 if (comp.Count != 0)
                 {
-                    Embeding component = new Embeding(comp, embeding);
+                    Embedding component = new Embedding(comp, embeding);
                     returnList.Add(component);
                 }
             }
             return returnList;
         }
 
+        /// <summary>
+        /// dfs visit functino
+        /// </summary>
+        /// <param name="u"></param>
         private void visit(int u)
         {
             visited[u] = true;

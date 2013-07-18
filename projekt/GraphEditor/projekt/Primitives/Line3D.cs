@@ -15,21 +15,34 @@ namespace GraphEditor.Primitives3D
         /// <param name="graphicsDevice">Graphics device to show on</param>
         /// <param name="startPoint">line begin point</param>
         /// <param name="targePoint">line end point</param>
-        /// <param name="useXJoin"></param>
-        /// <param name="useYJoin"></param>
+        /// <param name="wrapedHorizontal"></param>
+        /// <param name="wrapedVertical"></param>
         /// <param name="surfaceType">Chose torus or sphere</param>
         public LinePrimtive(GraphicsDevice graphicsDevice, PointF startPoint, PointF targePoint, int wrapedHorizontal, int wrapedVertical, SurfaceTypeEnum surfaceType)
             : this(graphicsDevice, startPoint, targePoint, 0.01f, 0.01f, 200, 0.2f, wrapedHorizontal, wrapedVertical, surfaceType)
         {
 
         }
-                
+        
+        /// <summary>
+        /// Construct LilePrimitive used to show 3D line
+        /// </summary>
+        /// <param name="graphicsDevice">Graphics device to show on</param>
+        /// <param name="startPoint">line begin point</param>
+        /// <param name="targePoint">line end point</param>
+        /// <param name="width">line cuboid width</param>
+        /// <param name="depth">line cuboid depth</param>
+        /// <param name="tessellation">line cuboid tessellation</param>
+        /// <param name="radius"></param>
+        /// <param name="wrapedHorizontal"></param>
+        /// <param name="wrapedVertical"></param>
+        /// <param name="surfaceType"></param>
         private LinePrimtive(GraphicsDevice graphicsDevice, PointF startPoint, PointF targePoint, float width, float depth, int tessellation, float radius,  int wrapedHorizontal, int wrapedVertical, SurfaceTypeEnum surfaceType)
         {
             switch (surfaceType)
             {
                 case SurfaceTypeEnum.Sphere:
-                    LineConstructionSphere(graphicsDevice, startPoint, targePoint, width, depth, tessellation, radius);
+                    LineConstructionSphere(graphicsDevice, startPoint, targePoint, width, depth, tessellation);
                     break;
                 case SurfaceTypeEnum.Torus:
                     LineConstructionTorus(graphicsDevice, startPoint, targePoint, width, depth, tessellation, radius, wrapedHorizontal, wrapedVertical);                    
@@ -49,7 +62,7 @@ namespace GraphEditor.Primitives3D
         /// <param name="depth">line depth</param>
         /// <param name="tessellation">set tessellation of line detail</param>
         /// <param name="radius">sphere radius</param>
-        private void LineConstructionSphere(GraphicsDevice graphicsDevice, PointF startPoint, PointF targePoint, float width, float depth, int tessellation, float radius)
+        private void LineConstructionSphere(GraphicsDevice graphicsDevice, PointF startPoint, PointF targePoint, float width, float depth, int tessellation)
         {
             
             
@@ -263,45 +276,50 @@ namespace GraphEditor.Primitives3D
             }
             InitializePrimitive(graphicsDevice);
         }
+
+        /// <summary>
+        /// creates sides of box by triangles
+        /// </summary>
+        /// <param name="i">start index</param>
         private void CreateSides(int i)
         {
             int j = i * 4;
 
             //bottom side
-            AddIndexs(j + 0, j + 1, j + 2);
-            AddIndexs(j + 0, j + 2, j + 1);
-            AddIndexs(j + 1, j + 2, j + 3);
-            AddIndexs(j + 1, j + 3, j + 2);
+            AddIndexes(j + 0, j + 1, j + 2);
+            AddIndexes(j + 0, j + 2, j + 1);
+            AddIndexes(j + 1, j + 2, j + 3);
+            AddIndexes(j + 1, j + 3, j + 2);
 
             //upper side
-            AddIndexs(j + 4, j + 5, j + 6);
-            AddIndexs(j + 4, j + 6, j + 5);
-            AddIndexs(j + 5, j + 6, j + 7);
-            AddIndexs(j + 5, j + 7, j + 6);
+            AddIndexes(j + 4, j + 5, j + 6);
+            AddIndexes(j + 4, j + 6, j + 5);
+            AddIndexes(j + 5, j + 6, j + 7);
+            AddIndexes(j + 5, j + 7, j + 6);
 
             //left side
-            AddIndexs(j + 0, j + 1, j + 4);
-            AddIndexs(j + 0, j + 4, j + 1);
-            AddIndexs(j + 1, j + 5, j + 4);
-            AddIndexs(j + 1, j + 4, j + 5);
+            AddIndexes(j + 0, j + 1, j + 4);
+            AddIndexes(j + 0, j + 4, j + 1);
+            AddIndexes(j + 1, j + 5, j + 4);
+            AddIndexes(j + 1, j + 4, j + 5);
 
             //right side
-            AddIndexs(j + 2, j + 3, j + 6);
-            AddIndexs(j + 2, j + 6, j + 3);
-            AddIndexs(j + 3, j + 6, j + 7);
-            AddIndexs(j + 3, j + 7, j + 6);
+            AddIndexes(j + 2, j + 3, j + 6);
+            AddIndexes(j + 2, j + 6, j + 3);
+            AddIndexes(j + 3, j + 6, j + 7);
+            AddIndexes(j + 3, j + 7, j + 6);
 
             //front side
-            AddIndexs(j + 0, j + 2, j + 4);
-            AddIndexs(j + 0, j + 4, j + 2);
-            AddIndexs(j + 2, j + 4, j + 6);
-            AddIndexs(j + 2, j + 6, j + 4);
+            AddIndexes(j + 0, j + 2, j + 4);
+            AddIndexes(j + 0, j + 4, j + 2);
+            AddIndexes(j + 2, j + 4, j + 6);
+            AddIndexes(j + 2, j + 6, j + 4);
 
             //back side
-            AddIndexs(j + 1, j + 3, j + 5);
-            AddIndexs(j + 1, j + 5, j + 3);
-            AddIndexs(j + 3, j + 5, j + 7);
-            AddIndexs(j + 3, j + 7, j + 5);
+            AddIndexes(j + 1, j + 3, j + 5);
+            AddIndexes(j + 1, j + 5, j + 3);
+            AddIndexes(j + 3, j + 5, j + 7);
+            AddIndexes(j + 3, j + 7, j + 5);
         }
     }
 }

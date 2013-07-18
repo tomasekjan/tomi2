@@ -36,7 +36,11 @@ namespace GraphEditor.GraphDeclaration
             return vertexContextMenu;
         }
 
-        // Handling change color event on vertex
+        /// <summary>
+        /// Handling change color event on vertex
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param> 
         void ChangeColormenuItem_Click(object sender, RoutedEventArgs e)
         {
             Action();
@@ -49,7 +53,11 @@ namespace GraphEditor.GraphDeclaration
             invalidateFunction();
         }
 
-        // add point function for edge
+        /// <summary>
+        /// add point function for edge
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void AddPoint(object sender, RoutedEventArgs e)
         {
             Action();
@@ -61,7 +69,11 @@ namespace GraphEditor.GraphDeclaration
             invalidateFunction.Invoke();
         }
 
-        // delete selected edge from graph
+        /// <summary>
+        /// delete selected edge from graph
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param> 
         void DeleteEdge(object sender, RoutedEventArgs e)
         {
             Action();
@@ -95,7 +107,11 @@ namespace GraphEditor.GraphDeclaration
             return new KeyValuePair<int, Edge>(-1, null);
         }
 
-        // handling delete event on ponint or vertex
+        /// <summary>
+        /// handling delete event on ponint or vertex
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void deleteMenuItem_Click(object sender, RoutedEventArgs e)
         {
             Action();

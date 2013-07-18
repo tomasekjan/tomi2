@@ -10,7 +10,9 @@ namespace Plugin
 {
     class EdgeMultiGraph
     {
-        //opozite edge
+        /// <summary>
+        /// symmetric edge
+        /// </summary>
         EdgeMultiGraph symetricEdge;        
         int index;
         int u;
@@ -19,6 +21,9 @@ namespace Plugin
         int wrapVertical = 0;
         bool triangulateEdge;
 
+        /// <summary>
+        /// gets or sets symmetric edge property
+        /// </summary>
         public EdgeMultiGraph SymetricEdge
         {
             get
@@ -41,6 +46,9 @@ namespace Plugin
                 index = value;
             }
         }
+        /// <summary>
+        /// gets or sets index of begin vertex
+        /// </summary>
         public int U
         {
             get
@@ -52,6 +60,9 @@ namespace Plugin
                 u = value;
             }
         }
+        /// <summary>
+        /// gets or sets index of end vertex
+        /// </summary>
         public int V
         {
             get
@@ -85,6 +96,9 @@ namespace Plugin
                 wrapVertical = value;
             }
         }
+        /// <summary>
+        /// mark if this edge is from original graph or added in triangulation
+        /// </summary>
         public bool TriangulateEdge
         {
             get

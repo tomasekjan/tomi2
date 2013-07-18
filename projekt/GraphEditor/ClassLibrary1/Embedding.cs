@@ -9,11 +9,15 @@ using GraphEditor.GraphDeclaration;
 
 namespace Plugin
 {   
-    class Embeding : IEnumerable<Tuple<int, int>>
+    class Embedding : IEnumerable<Tuple<int, int>>
     {        
         public Dictionary<int, CircularListInt> neighbors;
 
-        public Embeding(GraphDefinition sourceDefinition)
+        /// <summary>
+        /// creates new embedding from graph definition
+        /// </summary>
+        /// <param name="sourceDefinition"></param>
+        public Embedding(GraphDefinition sourceDefinition)
         {
             neighbors = new Dictionary<int, CircularListInt>();
             
@@ -28,7 +32,13 @@ namespace Plugin
             }
         }
 
-        public Embeding(Stack<Tuple<int, int>> stack, int u, int v)
+        /// <summary>
+        /// creates new embedding from stack of edges
+        /// </summary>
+        /// <param name="stack"></param>
+        /// <param name="u"></param>
+        /// <param name="v"></param>
+        public Embedding(Stack<Tuple<int, int>> stack, int u, int v)
         {
             //agreeOrientation = new List<bool>();
             neighbors = new Dictionary<int, CircularListInt>();            
@@ -42,7 +52,11 @@ namespace Plugin
             }            
         }
 
-        public Embeding(Embeding embedding)
+        /// <summary>
+        /// copy constructor for embedding
+        /// </summary>
+        /// <param name="embedding"></param>
+        public Embedding(Embedding embedding)
         {
             neighbors = new Dictionary<int, CircularListInt>();
             foreach (KeyValuePair<int, CircularListInt> v in embedding.neighbors)
@@ -52,12 +66,19 @@ namespace Plugin
             }
         }
 
-        public Embeding()
+        /// <summary>
+        /// creates empty embedding
+        /// </summary>
+        public Embedding()
         {
             neighbors = new Dictionary<int, CircularListInt>();
         }
 
-        public Embeding(List<int> cycle)
+        /// <summary>
+        /// creates embedding from cycle definition
+        /// </summary>
+        /// <param name="cycle"></param>
+        public Embedding(List<int> cycle)
         {
             neighbors = new Dictionary<int, CircularListInt>();
             for (int j = 0; j < cycle.Count; j++)
@@ -66,13 +87,22 @@ namespace Plugin
             }
         }
 
-        public Embeding(Tuple<int, int> edge)
+        /// <summary>
+        /// creates embedding with only one edge
+        /// </summary>
+        /// <param name="edge"></param>
+        public Embedding(Tuple<int, int> edge)
         {
             neighbors = new Dictionary<int, CircularListInt>();
             AddEdgeSym(edge);
         }
 
-        public Embeding(List<int> comp, Embeding embeding)
+        /// <summary>
+        /// get sub embedding for selected component
+        /// </summary>
+        /// <param name="comp"></param>
+        /// <param name="embeding"></param>
+        public Embedding(List<int> comp, Embedding embeding)
         {
             neighbors = new Dictionary<int, CircularListInt>();
             foreach (var v in comp)
@@ -91,45 +121,49 @@ namespace Plugin
             }
         }
 
-        public static List<Embeding> GetK5Embedings()
+        /// <summary>
+        /// enumerates all possible non-isomorphic embedding of K5 on torus
+        /// </summary>
+        /// <returns></returns>
+        public static List<Embedding> GetK5Embedings()
         {
-            List<Embeding> list = new List<Embeding>();
-            Embeding embeding1 = new Embeding();
+            List<Embedding> list = new List<Embedding>();
+            Embedding embeding1 = new Embedding();
             embeding1.neighbors.Add(0, new CircularListInt(new int[] { 2, 3, 1, 4 }));
             embeding1.neighbors.Add(1, new CircularListInt(new int[] { 0, 4, 2, 3 }));
             embeding1.neighbors.Add(2, new CircularListInt(new int[] { 1, 4, 3, 0 }));
             embeding1.neighbors.Add(3, new CircularListInt(new int[] { 2, 1, 4, 0 }));
             embeding1.neighbors.Add(4, new CircularListInt(new int[] { 3, 0, 2, 1 }));
             list.Add(embeding1);
-            Embeding embeding2 = new Embeding();
+            Embedding embeding2 = new Embedding();
             embeding2.neighbors.Add(0, new CircularListInt(new int[] { 2, 1, 4, 3 }));
             embeding2.neighbors.Add(1, new CircularListInt(new int[] { 0, 3, 2, 4 }));
             embeding2.neighbors.Add(2, new CircularListInt(new int[] { 1, 4, 3, 0 }));
             embeding2.neighbors.Add(3, new CircularListInt(new int[] { 2, 0, 4, 1 }));
             embeding2.neighbors.Add(4, new CircularListInt(new int[] { 3, 0, 1, 2 }));
             list.Add(embeding2);
-            Embeding embeding3 = new Embeding();
+            Embedding embeding3 = new Embedding();
             embeding3.neighbors.Add(0, new CircularListInt(new int[] { 2, 3, 1, 4 }));
             embeding3.neighbors.Add(1, new CircularListInt(new int[] { 2, 0, 4, 3 }));
             embeding3.neighbors.Add(2, new CircularListInt(new int[] { 3, 4, 1, 0 }));
             embeding3.neighbors.Add(3, new CircularListInt(new int[] { 0, 1, 2, 4 }));
             embeding3.neighbors.Add(4, new CircularListInt(new int[] { 1, 3, 0, 2 }));
             list.Add(embeding3);
-            Embeding embeding4 = new Embeding();
+            Embedding embeding4 = new Embedding();
             embeding4.neighbors.Add(0, new CircularListInt(new int[] { 4, 1, 2, 3 }));
             embeding4.neighbors.Add(1, new CircularListInt(new int[] { 3, 4, 2, 0 }));
             embeding4.neighbors.Add(2, new CircularListInt(new int[] { 1, 4, 3, 0 }));
             embeding4.neighbors.Add(3, new CircularListInt(new int[] { 0, 2, 4, 1 }));
             embeding4.neighbors.Add(4, new CircularListInt(new int[] { 0, 3, 2, 1 }));
             list.Add(embeding4);
-            Embeding embeding5 = new Embeding();
+            Embedding embeding5 = new Embedding();
             embeding5.neighbors.Add(0, new CircularListInt(new int[] { 4, 1, 2, 3 }));
             embeding5.neighbors.Add(1, new CircularListInt(new int[] { 3, 4, 2, 0 }));
             embeding5.neighbors.Add(2, new CircularListInt(new int[] { 1, 4, 3, 0 }));
             embeding5.neighbors.Add(3, new CircularListInt(new int[] { 2, 1, 4, 0 }));
             embeding5.neighbors.Add(4, new CircularListInt(new int[] { 3, 0, 2, 1 }));
             list.Add(embeding5);
-            Embeding embeding6 = new Embeding();
+            Embedding embeding6 = new Embedding();
             embeding6.neighbors.Add(0, new CircularListInt(new int[] { 2, 3, 4, 1 }));
             embeding6.neighbors.Add(1, new CircularListInt(new int[] { 0, 4, 2, 3 }));
             embeding6.neighbors.Add(2, new CircularListInt(new int[] { 1, 4, 3, 0 }));
@@ -139,10 +173,14 @@ namespace Plugin
             return list;
         }
 
-        public static List<Embeding> GetK3_3Embedings()
+        /// <summary>
+        /// enumerates all possible non-isomorphic embedding of K{3,3} on torus
+        /// </summary>
+        /// <returns></returns>
+        public static List<Embedding> GetK3_3Embedings()
         {
-            List<Embeding> list = new List<Embeding>();
-            Embeding embeding1 = new Embeding();
+            List<Embedding> list = new List<Embedding>();
+            Embedding embeding1 = new Embedding();
             embeding1.neighbors.Add(0, new CircularListInt(new int[] { 5, 3, 4 }));
             embeding1.neighbors.Add(1, new CircularListInt(new int[] { 4, 5, 3 }));
             embeding1.neighbors.Add(2, new CircularListInt(new int[] { 5, 4, 3 }));
@@ -150,7 +188,7 @@ namespace Plugin
             embeding1.neighbors.Add(4, new CircularListInt(new int[] { 2, 1, 0 }));
             embeding1.neighbors.Add(5, new CircularListInt(new int[] { 0, 2, 1 }));
             list.Add(embeding1);
-            Embeding embeding2 = new Embeding();
+            Embedding embeding2 = new Embedding();
             embeding2.neighbors.Add(0, new CircularListInt(new int[] { 3, 5, 4 }));
             embeding2.neighbors.Add(1, new CircularListInt(new int[] { 3, 5, 4 }));
             embeding2.neighbors.Add(2, new CircularListInt(new int[] { 4, 3, 5 }));
@@ -161,6 +199,10 @@ namespace Plugin
             return list;
         }
                 
+        /// <summary>
+        /// get all faces in embedding
+        /// </summary>
+        /// <returns>List of faces in current embedding</returns>
         public List<CircularListInt> GetFaces()
         {
             // algoritm 2.2.
@@ -198,6 +240,10 @@ namespace Plugin
             return faces;
         }
 
+        /// <summary>
+        /// checks if current graph is isomorphic to K5
+        /// </summary>
+        /// <returns></returns>
         internal bool IsK5()
         {
             int count = 0;
@@ -211,6 +257,10 @@ namespace Plugin
             return count == 5;
         }
 
+        /// <summary>
+        /// checks if current graph is isomorphic to K{3,3}
+        /// </summary>
+        /// <returns></returns>
         internal bool IsK3_3()
         {
             int count = 0;
@@ -224,6 +274,7 @@ namespace Plugin
             return count == 6;
         }
         
+
         internal void RemovePath(List<int> bisectingPath, VertexState vertexStateFirst, VertexState vertexStateSeccond)
         {
             throw new NotImplementedException();
@@ -248,11 +299,19 @@ namespace Plugin
             return GetEnumerator();
         }
         
+        /// <summary>
+        /// remove edge from embedding (not deleting symmetric edge)
+        /// </summary>
+        /// <param name="edge"></param>
         internal void RemoveEdgeASym(Tuple<int, int> edge)
         {
             neighbors[edge.Item1].Remove(edge.Item2);   
         }
 
+        /// <summary>
+        /// remove edge from embedding with deleting symmetric edge
+        /// </summary>
+        /// <param name="edge"></param>
         internal void RemoveEdgeSym(Tuple<int, int> edge)
         {
             neighbors[edge.Item1].Remove(edge.Item2);
@@ -267,6 +326,10 @@ namespace Plugin
             }
         }
 
+        /// <summary>
+        /// add edge to embedding with creating 
+        /// </summary>
+        /// <param name="edge"></param>
         internal void AddEdgeSym(Tuple<int, int> edge)
         {
             if (edge.Item1 == edge.Item2) throw new NotImplementedException();
@@ -286,6 +349,10 @@ namespace Plugin
 
         }
 
+        /// <summary>
+        /// add edge without adding symmetric edge
+        /// </summary>
+        /// <param name="edge"></param>
         internal void AddEdgeAsym(Tuple<int, int> edge)
         {
             if (edge.Item1 == edge.Item2) throw new NotImplementedException();
@@ -296,7 +363,11 @@ namespace Plugin
             neighbors[edge.Item1].Add(edge.Item2);            
         }               
         
-        internal void Minus(Embeding h)
+        /// <summary>
+        /// subtracts embedding h from current embedding
+        /// </summary>
+        /// <param name="h"></param>
+        internal void Minus(Embedding h)
         {
             List<Tuple<int, int>> toRemove = new List<Tuple<int, int>>();
             foreach (Tuple<int, int> edge in this)
@@ -316,17 +387,29 @@ namespace Plugin
             }
         }
 
+        /// <summary>
+        /// checks if embedding contains given edge
+        /// </summary>
+        /// <param name="edge"></param>
+        /// <returns></returns>
         public bool ContaintsEdgeAsym(Tuple<int, int> edge)
         {
             return neighbors[edge.Item1].Contains(edge.Item2);
         }
 
+        /// <summary>
+        /// returns true if embedding is empty
+        /// </summary>
+        /// <returns></returns>
         internal bool isEmpty()
         {
             //RemoveEmpty();
             return neighbors.Keys.Count == 0;
         }
 
+        /// <summary>
+        /// removes empty vertexes from embedding
+        /// </summary>
         private void RemoveEmpty()
         {
             List<int> toRemove = new List<int>();
@@ -343,11 +426,24 @@ namespace Plugin
             }
         }
 
+        /// <summary>
+        /// return true if embedding contains given vertex
+        /// </summary>
+        /// <param name="vertex"></param>
+        /// <returns></returns>
         internal bool ConteintsVertex(int vertex)
         {
             return neighbors.ContainsKey(vertex);
         }
 
+        /// <summary>
+        /// add path to curren embedding
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="face"></param>
+        /// <param name="vertexStateFirst"></param>
+        /// <param name="vertexStateSeccond"></param>
+        /// <returns></returns>
         internal bool AddPath(List<int> path, CircularListInt face, VertexState vertexStateFirst, VertexState vertexStateSeccond)
         {
             if (path.Count < 2)
@@ -439,7 +535,11 @@ namespace Plugin
             path.Add(edge.Item2);
             AddPath(path, face);
         }
-
+        
+        /// <summary>
+        /// remove path from embedding
+        /// </summary>
+        /// <param name="path"></param>
         internal void RemovePath(List<int> path)
         {
             for (int i = 0; i < path.Count - 1; i++)
@@ -448,6 +548,10 @@ namespace Plugin
             }
         }
 
+        /// <summary>
+        /// to string value -  for debugging reasons
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
@@ -476,6 +580,10 @@ namespace Plugin
             return sb.ToString();
         }
         
+        /// <summary>
+        /// returns indexes of vertices witch are isomorphic to K{3,3}
+        /// </summary>
+        /// <returns></returns>
         internal List<int> GetK33Vertices()
         {
             List<int> list = new List<int>();
@@ -489,6 +597,10 @@ namespace Plugin
             return list; 
         }
 
+        /// <summary>
+        /// returns indexes of vertices witch are isomorphic to K5
+        /// </summary>
+        /// <returns></returns>
         internal List<int> GetK5Vertices()
         {
             List<int> list = new List<int>();

@@ -27,7 +27,7 @@ namespace Plugin
             }
         }
                 
-        public EmbedingMultiGraph(Embeding embeding)
+        public EmbedingMultiGraph(Embedding embeding)
         {
             incidenceEdges = new Dictionary<int, CircularListEdge>();
             foreach (int u in embeding.neighbors.Keys)

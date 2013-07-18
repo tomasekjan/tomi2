@@ -17,6 +17,11 @@ namespace Plugin
         int indexReflexiveSymetricEdge = -1;
         int z = -1;
         int v = -1;
+        /// <summary>
+        /// removing vertex with given index from embedding
+        /// </summary>
+        /// <param name="embedding">embedding to remove vertex from</param>
+        /// <param name="vertex">index of vertex to remove</param>
         public override void Remove(EmbedingMultiGraph embedding, int v)
         {
             this.v = v;

@@ -17,6 +17,12 @@ namespace GraphEditor.Primitives3D
         {
         }
 
+        /// <summary>
+        /// creating new sphere
+        /// </summary>
+        /// <param name="graphicsDevice"></param>
+        /// <param name="diameter">diameter of sphere</param>
+        /// <param name="tessellation">tessellation (bigger means more detail, but possibly slow output) </param>
         public SpherePrimitive(GraphicsDevice graphicsDevice, float diameter, int tessellation)
         {
             if (tessellation < 3)
@@ -84,9 +90,9 @@ namespace GraphEditor.Primitives3D
             //bottom connections
             for (int k = 0; k < horizontalSegments; k++)
             {
-                AddIndex(CurrentVertex - 1);
-                AddIndex(CurrentVertex - 2 - (k + 1) % horizontalSegments);
-                AddIndex(CurrentVertex - 2 - k);
+                AddIndex(VerticesCount - 1);
+                AddIndex(VerticesCount - 2 - (k + 1) % horizontalSegments);
+                AddIndex(VerticesCount - 2 - k);
             }
 
             InitializePrimitive(graphicsDevice);

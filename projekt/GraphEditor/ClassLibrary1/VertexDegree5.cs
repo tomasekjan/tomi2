@@ -16,6 +16,10 @@ namespace Plugin
         int v, w, x, y, z = -1;
         int u =-1;
         List<EdgeMultiGraph> addedEdges = new List<EdgeMultiGraph>();
+        /// <summary>
+        /// adding vertex back to embedding
+        /// </summary>
+        /// <param name="embedding">embedding to add vertex to</param>
         public override void Add(EmbedingMultiGraph e)
         {
             
@@ -92,6 +96,11 @@ namespace Plugin
             return result;
         }
 
+        /// <summary>
+        /// removing vertex with given index from embedding
+        /// </summary>
+        /// <param name="embedding">embedding to remove vertex from</param>
+        /// <param name="vertex">index of vertex to remove</param>
         public override void Remove(EmbedingMultiGraph embedding, int vertex)
         {
             u = vertex;

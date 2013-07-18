@@ -14,6 +14,10 @@ namespace Plugin
         int u, v, w, x = -1;
 
         List<EdgeMultiGraph> copyFromU = new List<EdgeMultiGraph>();
+        /// <summary>
+        /// adding vertex back to embedding
+        /// </summary>
+        /// <param name="embedding">embedding to add vertex to</param>
         public override void Add(EmbedingMultiGraph embedding)
         {
             PointF position = GetPosition(embedding.incidenceEdges[v][indexV], embedding);
@@ -44,6 +48,11 @@ namespace Plugin
             embedding.incidenceEdges[x].Insert(indexX, copyFromU[2].SymetricEdge);
             embedding.pozition.Add(u, position);
         }
+        /// <summary>
+        /// removing vertex with given index from embedding
+        /// </summary>
+        /// <param name="embedding">embedding to remove vertex from</param>
+        /// <param name="vertex">index of vertex to remove</param>
         public override void Remove(EmbedingMultiGraph embedding, int u)
         {
             copyFromU = new List<EdgeMultiGraph>();

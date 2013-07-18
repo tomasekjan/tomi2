@@ -10,6 +10,11 @@ namespace Plugin
 {
     class CircularListEdge : List<EdgeMultiGraph>
     {
+        /// <summary>
+        /// get edge which is before vale edge
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         internal EdgeMultiGraph GetBeforeValue(EdgeMultiGraph value)
         {
             EdgeMultiGraph before = null;
@@ -25,6 +30,11 @@ namespace Plugin
             return before;
         }
 
+        /// <summary>
+        /// gets or sets edge on index
+        /// </summary>
+        /// <param name="i">index</param>
+        /// <returns>edge on given index</returns>
         public EdgeMultiGraph this[int i]
         {            
             get
@@ -39,11 +49,22 @@ namespace Plugin
             }
         }
 
-        public void Insert(int i, EdgeMultiGraph item)
+
+        /// <summary>
+        /// insert item on given index
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="item"></param>
+        public void Insert(int index, EdgeMultiGraph item)
         {
-            base.Insert(i, item);
+            base.Insert(index, item);            
         }
 
+        /// <summary>
+        /// get edge which is stored after value
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         internal EdgeMultiGraph GetAfterValue(EdgeMultiGraph value)
         {
             EdgeMultiGraph after = null;
@@ -58,6 +79,13 @@ namespace Plugin
             }
             return after;
         }
+
+        /// <summary>
+        /// inserts new value betwen before an after or fais if it is inposible
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="before"></param>
+        /// <param name="after"></param>
         internal void InserBeintwen(EdgeMultiGraph value, EdgeMultiGraph before, EdgeMultiGraph after)
         {
             for (int i = 0; i < this.Count; i++)
@@ -73,6 +101,11 @@ namespace Plugin
             }
             throw new ArgumentException();
         }
+
+        /// <summary>
+        /// debuging to string
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();

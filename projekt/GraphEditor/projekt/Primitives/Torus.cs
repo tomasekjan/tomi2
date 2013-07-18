@@ -13,7 +13,13 @@ namespace GraphEditor.Primitives3D
         {
         }
 
-
+        /// <summary>
+        /// creating new torus
+        /// </summary>
+        /// <param name="graphicsDevice"></param>
+        /// <param name="diameter">diameter of torus</param>
+        /// <param name="radius">radius of torus</param>
+        /// <param name="tessellation">tessellation (bigger means more detail, but possibly slow output) </param>
         public TorusPrimitive(GraphicsDevice graphicsDevice,  float diameter, float radius, int tessellation)
         {
             if (tessellation < 3)

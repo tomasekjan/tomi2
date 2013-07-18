@@ -18,7 +18,7 @@ namespace GraphEditor.GraphDeclaration
         /// +1 if wrap right
         /// -1 if wrap left
         /// </summary>
-        int wrapedHorizontal;
+        int wrappedHorizontal;
 
         /// <summary>
         /// 0 if no wrap
@@ -26,18 +26,7 @@ namespace GraphEditor.GraphDeclaration
         /// -1 if wrap up
         /// </summary>
         int wrapedVertical;
-        
-        /// <summary>
-        /// if true line is not strait, but goes around torus x join
-        /// </summary>
-        //bool useXJoin;
-        /// <summary>
-        /// if true line is not strait, but goes around using y join
-        /// </summary>
-        //bool useYJoin;       
-        
-        SurfaceTypeEnum readyForSurface;
-
+                
         #region Geters        
         public xna.Color Color
         {
@@ -60,42 +49,37 @@ namespace GraphEditor.GraphDeclaration
             {
                 return pointEnd;
             }
-        }
-        public SurfaceTypeEnum ReadyForSurface
-        {
-            get
-            {
-                return readyForSurface;
-            }
-            set
-            {
-                readyForSurface = value;
-            }
-        }
+        }        
 
-        public int WrapedHorizontal
+        /// <summary>
+        /// gets or sets wrapped horizontal value with check
+        /// </summary>
+        public int WrappedHorizontal
         {
             get
             {
-                return wrapedHorizontal;
+                return wrappedHorizontal;
             }
             set
             {
                 if (value == 0)
                 {
-                    wrapedHorizontal = 0;
+                    wrappedHorizontal = 0;
                 }
                 if (value < 0)
                 {
-                    wrapedHorizontal = -1;
+                    wrappedHorizontal = -1;
                 }
                 if (value > 0)
                 {
-                    wrapedHorizontal = 1;
+                    wrappedHorizontal = 1;
                 }
             }
         }
 
+        /// <summary>
+        /// gets or sets wrapped vertical value with check
+        /// </summary>
         public int WrapedVertical
         {
             get
@@ -121,7 +105,7 @@ namespace GraphEditor.GraphDeclaration
         #endregion
 
         /// <summary>
-        ///
+        /// constructs new line
         /// </summary>
         /// <param name="pointBegin">begin point</param>
         /// <param name="pointEnd">end point</param>
@@ -131,11 +115,14 @@ namespace GraphEditor.GraphDeclaration
             this.pointBegin = pointBegin;
             this.pointEnd = pointEnd;
             this.color = color;
-            this.wrapedHorizontal = wrapedHorizontal;
+            this.wrappedHorizontal = wrapedHorizontal;
             this.wrapedVertical = wrapedVertical;
         }
         
-
+        /// <summary>
+        /// gets position of middle of the line
+        /// </summary>
+        /// <returns>point in the middle of the line</returns>
         internal System.Drawing.PointF getMiddle()
         {
             return new System.Drawing.PointF((PointBegin.Pozition.X + PointEnd.Pozition.X) / 2, (PointBegin.Pozition.Y + PointEnd.Pozition.Y) / 2);

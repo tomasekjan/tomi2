@@ -18,12 +18,26 @@ namespace GraphEditor.Drawing
             this.point = point;
         }
 
-        //sub points are not shown on 3D projection
+        /// <summary>
+        /// Basic 3D draw method
+        /// </summary>
+        /// <param name="graphicsDevice">device to draw on</param>
+        /// <param name="world">world matrix</param>
+        /// <param name="view">view matrix</param>
+        /// <param name="projection">projection matrix</param>
+        /// <param name="surfaceType">surface to be projected on</param>
+        /// <param name="sphere"></param>
         public virtual void Draw3D(Microsoft.Xna.Framework.Graphics.GraphicsDevice graphicsDevice, Microsoft.Xna.Framework.Matrix world, Microsoft.Xna.Framework.Matrix view, Microsoft.Xna.Framework.Matrix projection, SurfaceTypeEnum surfaceType, GeometricPrimitive sphere)
         {
-            throw new NotImplementedException();
+            
         }
 
+        /// <summary>
+        /// drawing on canvas
+        /// </summary>
+        /// <param name="canvas">canvas to draw on</param>
+        /// <param name="vertexContextMenu">context menu for vertex</param>
+        /// <param name="dependencyProperty"></param>
         public virtual void Draw2D(Canvas canvas, ContextMenu vertexContextMenu, DependencyProperty dependencyProperty)
         {
             System.Windows.Shapes.Rectangle rectangle = new System.Windows.Shapes.Rectangle();
@@ -40,6 +54,8 @@ namespace GraphEditor.Drawing
                 rectangle.ContextMenu.Items.RemoveAt(1);
             }
             canvas.Children.Add(rectangle);
-        }  
+        }
+
+        
     }
 }

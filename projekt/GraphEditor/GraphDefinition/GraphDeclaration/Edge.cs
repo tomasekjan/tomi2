@@ -18,6 +18,9 @@ namespace GraphEditor.GraphDeclaration
         public List<Line2D> lines;
         xna.Color color;
 
+        /// <summary>
+        /// gets begin vertex of edge
+        /// </summary>
         public SubPoint Begin
         {
             get
@@ -26,6 +29,9 @@ namespace GraphEditor.GraphDeclaration
             }
         }
 
+        /// <summary>
+        /// gets end point of edge
+        /// </summary>
         public SubPoint End
         {
             get
@@ -33,8 +39,15 @@ namespace GraphEditor.GraphDeclaration
                 return points.Last();
             }
         }
-        
-        public Edge(Vertex pointBegin, Vertex pointEnd, xna.Color color, bool useXJoin, bool useYJoin)
+
+
+        /// <summary>
+        /// constructs new edge
+        /// </summary>
+        /// <param name="pointBegin">begin vertex</param>
+        /// <param name="pointEnd">end vertex</param>
+        /// <param name="color">initial color of new edge</param>        
+        public Edge(Vertex pointBegin, Vertex pointEnd, xna.Color color)
         {
             points = new List<SubPoint>();
             points.Add(pointBegin);
@@ -43,6 +56,9 @@ namespace GraphEditor.GraphDeclaration
             LinesRebuild();
         }
 
+        /// <summary>
+        /// rebuild sub lines list
+        /// </summary>
         internal void LinesRebuild()
         {
             if (points.Count < 2)
@@ -56,6 +72,11 @@ namespace GraphEditor.GraphDeclaration
             }
         }
 
+        /// <summary>
+        /// add new sub point and rebuild lines
+        /// </summary>
+        /// <param name="index">index to insert at</param>
+        /// <param name="point">new point</param>
         internal void addPoint(int index, SubPoint point)
         {
             if (index > (points.Count - 2))
@@ -101,7 +122,11 @@ namespace GraphEditor.GraphDeclaration
             return false;
         }
 
-
+        /// <summary>
+        /// returns true if given vertex is start vertex of this edge
+        /// </summary>
+        /// <param name="vertex"></param>
+        /// <returns></returns>
         public bool HaveVertexBegin(SubPoint vertex)
         {
             if (vertex == points[0])
@@ -111,6 +136,11 @@ namespace GraphEditor.GraphDeclaration
             return false;
         }
 
+        /// <summary>
+        /// returns true if given vertex is end vertex of this edge
+        /// </summary>
+        /// <param name="vertex"></param>
+        /// <returns></returns>
         public bool HaveVertexEnd(SubPoint vertex)
         {            
             if (vertex == points.Last())
@@ -181,6 +211,11 @@ namespace GraphEditor.GraphDeclaration
             return null;
         }
         
+        /// <summary>
+        /// returns index of given line at edge
+        /// </summary>
+        /// <param name="line">line we are looking for</param>
+        /// <returns></returns>
         public int Containts(Line2D line)
         {
             for(int i = 0;i <lines.Count;i++)

@@ -5,11 +5,10 @@ using Microsoft.Xna.Framework.Graphics;
 
 
 namespace GraphEditor.Primitives3D
-{
+{    
     [Serializable]
     public abstract class GeometricPrimitive :IDisposable
-    {
-        
+    {        
         List<VertexPositionNormal> vertices = new List<VertexPositionNormal>();
         List<ushort> indices = new List<ushort>();
 
@@ -17,18 +16,33 @@ namespace GraphEditor.Primitives3D
         IndexBuffer indexBuffer;
         BasicEffect basicEffect;
 
+        /// <summary>
+        /// add vertex with position same as normal
+        /// </summary>
+        /// <param name="pozition">position and normal vector</param>
         protected void AddVertex(Vector3 pozition)
         {
             vertices.Add(new VertexPositionNormal(pozition,pozition));
         }
-        protected void AddVertexs(Matrix m , params Vector3[] pozitions)
+
+        /// <summary>
+        /// add vertices with position, each position will be tranformed with given matrix
+        /// </summary>
+        /// <param name="transofmMatrix">matrix to transform with</param>
+        /// <param name="positions">positions</param>
+        protected void AddVertexs(Matrix transofmMatrix , params Vector3[] positions)
         {
-            foreach (Vector3 v in pozitions)
+            foreach (Vector3 v in positions)
             {
-                AddVertex(Vector3.Transform(v,m));
+                AddVertex(Vector3.Transform(v,transofmMatrix));
             }
         }
 
+        /// <summary>
+        /// add vertex with position and normal
+        /// </summary>
+        /// <param name="position">position of vertex</param>
+        /// <param name="normal">normal of vertex</param>
         protected void AddVertex(Vector3 position, Vector3 normal)
         {
             vertices.Add(new VertexPositionNormal(position, normal));
@@ -45,7 +59,11 @@ namespace GraphEditor.Primitives3D
                 vertices[i] = new VertexPositionNormal(Vector3.Transform(vertices[i].Position, transformMatrix), Vector3.Transform(vertices[i].Normal, transformMatrix));
             }
         }
-
+        
+        /// <summary>
+        /// add new index to indexes objects
+        /// </summary>
+        /// <param name="index"></param>
         protected void AddIndex(int index)
         {
             if (index > ushort.MaxValue)
@@ -55,18 +73,27 @@ namespace GraphEditor.Primitives3D
             indices.Add((ushort)index);
         }
 
-        protected void AddIndexs(params int[] indexs)
+        /// <summary>
+        /// add multiple indexes to indexes objects
+        /// </summary>
+        /// <param name="indexes"></param>
+        protected void AddIndexes(params int[] indexes)
         {
-            foreach (int i in indexs)
+            foreach (int i in indexes)
             {
                 AddIndex(i);
             }
         }
-        protected int CurrentVertex
+
+        protected int VerticesCount
         {
             get { return vertices.Count; }
         }
 
+        /// <summary>
+        /// initializing buffers
+        /// </summary>
+        /// <param name="graphicsDevice">device to show on</param>
         protected void InitializePrimitive(GraphicsDevice graphicsDevice)
         {
          
@@ -80,6 +107,10 @@ namespace GraphEditor.Primitives3D
             basicEffect.EnableDefaultLighting();            
         }
 
+        /// <summary>
+        /// draw primitive
+        /// </summary>
+        /// <param name="effect"></param>
         public void Draw(Effect effect)
         {
             GraphicsDevice graphicsDevice = effect.GraphicsDevice;
@@ -100,35 +131,37 @@ namespace GraphEditor.Primitives3D
 
             }
         }
+
+        /// <summary>
+        /// draw primitive
+        /// </summary>
+        /// <param name="world">word matrix</param>
+        /// <param name="view">view matrix</param>
+        /// <param name="projection">projection matrix</param>
+        /// <param name="color">color</param>
         public void Draw(Matrix world, Matrix view, Matrix projection, Color color)
         {
-            // Set BasicEffect parameters.
             basicEffect.World = world;
             basicEffect.View = view;
             basicEffect.Projection = projection;
             basicEffect.DiffuseColor = color.ToVector3();
-            basicEffect.Alpha = color.A / 255.0f;            
+            basicEffect.Alpha = 1;
 
             GraphicsDevice device = basicEffect.GraphicsDevice;
             device.DepthStencilState = DepthStencilState.Default;
 
-            if (color.A < 255)
-            {
-                // Set renderstates for alpha blended rendering.
-                device.BlendState = BlendState.AlphaBlend;
-            }
-            else
-            {
-                // Set renderstates for opaque rendering.
-                device.BlendState = BlendState.Opaque;
-            }
-                        
+            device.BlendState = BlendState.Opaque;        
             Draw(basicEffect);
         }
 
+        /// <summary>
+        /// disposing buffers
+        /// </summary>
         public void Dispose()
         {
-            throw new NotImplementedException();
+            basicEffect.Dispose();
+            indexBuffer.Dispose();
+            vertexBuffer.Dispose();
         }
     }
 }

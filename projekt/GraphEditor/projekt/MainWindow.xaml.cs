@@ -260,7 +260,7 @@ namespace GraphEditor
             {
                 var point = e.GetPosition(canvas);
                 System.Drawing.PointF pointF = new System.Drawing.PointF(((float)point.X) / (float)canvas.RenderSize.Width, ((float)point.Y) / (float)canvas.RenderSize.Height);
-                graph.MouseMiddletUp(pointF, controlState.CtrlDown, controlState.AltDown);
+                graph.MouseMiddletUp(pointF);
                 Invalidate();
                 controlState.isMiddleDown = false;
                 canvas.Cursor = System.Windows.Input.Cursors.Arrow;

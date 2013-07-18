@@ -13,8 +13,10 @@ namespace GraphEditor.GraphDeclaration
 {
     public sealed partial class Graph
     {
-        // left mouse button released 
-        // move vertex if selected
+        /// <summary>
+        /// left mouse button released, move vertex if selected
+        /// </summary>
+        /// <param name="pointF">position of mouse event</param> 
         public void MouseLeftUp(PointF pointF)
         {
             if (actualVertexMove != null)
@@ -24,8 +26,11 @@ namespace GraphEditor.GraphDeclaration
             }
         }
 
-        // left mouse button pressed
-        // if is nearby some point store it to ActualVertexMove
+        /// <summary>
+        /// left mouse button pressed, if is nearby some point store it to actualVertexMove
+        /// </summary>
+        /// <param name="pointF">position of mouse event</param>
+        /// <returns></returns>
         public bool MouseLeftDown(PointF pointF)
         {
             actualVertexMove = null;
@@ -49,7 +54,11 @@ namespace GraphEditor.GraphDeclaration
             return false;
         }
 
-
+        /// <summary>
+        /// middle button pressed if is nearby some point store it to actualVertexAddEdge
+        /// </summary>
+        /// <param name="pointF">position of mouse event</param>
+        /// <returns></returns>
         public bool MouseMiddletDown(PointF pointF)
         {
             actualVertexAddEdge = null;
@@ -64,7 +73,11 @@ namespace GraphEditor.GraphDeclaration
             return false;
         }
 
-        public void MouseMiddletUp(PointF pointF, bool useXJoin, bool useYJoin)
+        /// <summary>
+        /// middle button released if there is actualvertexAddEdge and button is released near by some other vertex
+        /// </summary>
+        /// <param name="pointF">position of mouse event</param>
+        public void MouseMiddletUp(PointF pointF)
         {
             if (actualVertexAddEdge != null)
             {
@@ -72,7 +85,7 @@ namespace GraphEditor.GraphDeclaration
                 {
                     if (vertex.Pozition.Compare(pointF))
                     {
-                        AddEdge(vertex, actualVertexAddEdge, useXJoin, useYJoin);
+                        AddEdge(vertex, actualVertexAddEdge);
                     }
                 }
             }

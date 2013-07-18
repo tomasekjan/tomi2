@@ -10,16 +10,21 @@ namespace Plugin
 {
     abstract class VertexDegree
     {
-        public static bool Distinct(params int[] pole)
+        /// <summary>
+        /// checks if all variables are distinct
+        /// </summary>
+        /// <param name="array"></param>
+        /// <returns></returns>
+        public static bool Distinct(params int[] array)
         {
             bool valid = true;
-            for (int i = 0; i < pole.Length; i++)
+            for (int i = 0; i < array.Length; i++)
             {
-                for (int j = 0; j < pole.Length; j++)
+                for (int j = 0; j < array.Length; j++)
                 {
                     if (i != j)
                     {
-                        if (pole[i] == pole[j])
+                        if (array[i] == array[j])
                         {
                             valid = false;
                         }
@@ -28,14 +33,25 @@ namespace Plugin
             }
             return valid;
         }
+        /// <summary>
+        /// removing vertex with given index from embedding
+        /// </summary>
+        /// <param name="embedding">embedding to remove vertex from</param>
+        /// <param name="vertex">index of vertex to remove</param>
         public abstract void Remove(EmbedingMultiGraph embedding, int vertex);
 
-        public PointF GetPosition(EdgeMultiGraph edgeSel, EmbedingMultiGraph embedding)
+        /// <summary>
+        /// get position of middle of triangle drawn on torus
+        /// </summary>
+        /// <param name="selectingEdge"></param>
+        /// <param name="embedding"></param>
+        /// <returns></returns>
+        public PointF GetPosition(EdgeMultiGraph selectingEdge, EmbedingMultiGraph embedding)
         {
             CircularListEdge selectedFace = null ;
             foreach (CircularListEdge face in embedding.GetFaces())
             {
-                if (face.Contains(edgeSel))
+                if (face.Contains(selectingEdge))
                 {
                     selectedFace = face;
                     break;
@@ -53,6 +69,10 @@ namespace Plugin
             return position;
         }
 
+        /// <summary>
+        /// adding vertex back to embedding
+        /// </summary>
+        /// <param name="embedding">embedding to add vertex to</param>
         public abstract void Add(EmbedingMultiGraph embedding);
     }
 }

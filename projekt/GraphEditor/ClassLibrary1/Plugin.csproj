@@ -47,12 +47,13 @@
     <Compile Include="CircularListEdge.cs" />
     <Compile Include="EdgeMultiGraph.cs" />
     <Compile Include="EmbeddingPlugin\BridgeWithRespectTo.cs" />
+    <Compile Include="EmbeddingPlugin\BridgType.cs" />
     <Compile Include="EmbeddingPlugin\EmbeddingException.cs" />
     <Compile Include="EmbeddingPlugin\GraphEmbeddingExponentioal.cs" />
     <Compile Include="EmbeddingPlugin\ConnectedComponentGetter.cs" />
     <Compile Include="EmbeddingPlugin\TwoConnectedComponentGetter2.cs" />
     <Compile Include="EmbeddingPlugin\VertexState.cs" />
-    <Compile Include="Embeding.cs" />
+    <Compile Include="Embedding.cs" />
     <Compile Include="EmbedingMultiGraph.cs" />
     <Compile Include="LineSegment.cs" />
     <Compile Include="Loop.cs" />
