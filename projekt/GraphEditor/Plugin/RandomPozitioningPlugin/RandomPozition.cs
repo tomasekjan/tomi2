@@ -6,6 +6,9 @@ using AddInView;
 
 namespace Plugin
 {
+    /// <summary>
+    /// testing plug in witch sets random positions to each vertex 
+    /// </summary>
     [Serializable]
     public sealed class RandomPozition : IPozitioning 
     {

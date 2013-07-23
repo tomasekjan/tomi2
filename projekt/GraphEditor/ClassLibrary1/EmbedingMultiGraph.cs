@@ -260,26 +260,29 @@ namespace Plugin
             {
                 run = false;
                 int vertexToRemove = -1;
+
                 foreach (int vertex in vertices)
                 {
                     if (incidenceEdges[vertex].Count == 3)
                     {
                         run = true;
-                        VertexDegree3 vertex3 = new VertexDegree3();                        
+                        VertexDegree3 vertex3 = new VertexDegree3();
                         vertex3.Remove(this, vertex);
                         vertexToRemove = vertex;
                         stack.Push(vertex3);
                         break;
                     }
+
                     if (incidenceEdges[vertex].Count == 4)
                     {
                         run = true;
-                        VertexDegree4 vertex4 = new VertexDegree4();                        
+                        VertexDegree4 vertex4 = new VertexDegree4();
                         vertex4.Remove(this, vertex);
                         vertexToRemove = vertex;
                         stack.Push(vertex4);
                         break;
                     }
+                    
                     if (incidenceEdges[vertex].Count == 5)
                     {
                         run = true;
@@ -288,13 +291,12 @@ namespace Plugin
                         stack.Push(vertex5);
                         vertexToRemove = vertex;
                         break;
-                    }
+                    }                    
                 }
                 if (vertexToRemove != -1)
                 {
                     vertices.Remove(vertexToRemove);
                 }
-
             }
             
         }

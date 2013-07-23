@@ -69,15 +69,6 @@ namespace Plugin
             iy = embedding.incidenceEdges[y].IndexOf(ey);
             embedding.RemoveEdgeSym(ey);
 
-            if (Distinct(v, x))
-            {
-                // add vx diagonal
-                EdgeMultiGraph diagonalVX = embedding.GetNewEdgeSym(v, x);
-                embedding.incidenceEdges[v].Insert(iv, diagonalVX);
-                embedding.incidenceEdges[x].Insert(ix, diagonalVX.SymetricEdge);
-                addedEdges.Add(diagonalVX);
-                return;
-            }
             if (Distinct(w, y))
             {
                 EdgeMultiGraph diagonalWY = embedding.GetNewEdgeSym(w, y);
@@ -86,6 +77,16 @@ namespace Plugin
                 addedEdges.Add(diagonalWY);
                 return;
             }
+
+            if (Distinct(v, x))
+            {
+                // add vx diagonal
+                EdgeMultiGraph diagonalVX = embedding.GetNewEdgeSym(v, x);
+                embedding.incidenceEdges[v].Insert(iv, diagonalVX);
+                embedding.incidenceEdges[x].Insert(ix, diagonalVX.SymetricEdge);
+                addedEdges.Add(diagonalVX);
+                return;
+            }           
                         
             throw new NotImplementedException();
         }

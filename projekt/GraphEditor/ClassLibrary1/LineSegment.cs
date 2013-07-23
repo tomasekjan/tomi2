@@ -61,8 +61,15 @@ namespace Plugin
         public bool IsCrossing(LineSegment lineSegment)
         {
             Vector2 i;
-            return IsCrossing(lineSegment, out i);
+            bool result = IsCrossing(lineSegment, out i);
+            if (i == A || i == B)
+            {
+                return false;
+            }
+            return result;
         }
+
+        
 
         /// <summary>
         /// checks if current line is crossing with lineSegment and outs intersection if so
