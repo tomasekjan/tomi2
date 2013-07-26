@@ -65,6 +65,11 @@ namespace GraphEditor.GraphDeclaration
             Line2DDrawer lineDrawer = addPointItem.GetValue(dependencyPropertyLine2D) as Line2DDrawer;
             Line2D line = lineDrawer.line2D;
             KeyValuePair<int, Edge> pair = findEdge(line);
+            // TODO repair this
+            if (pair.Key == -1)
+            {
+                return;
+            }
             pair.Value.addPoint(pair.Key);
             invalidateFunction.Invoke();
         }

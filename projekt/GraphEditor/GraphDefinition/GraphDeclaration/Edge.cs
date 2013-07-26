@@ -8,6 +8,7 @@ using System.Windows.Shapes;
 using System.Windows.Media;
 using System.Windows.Controls;
 using System.Windows;
+using System.Windows.Documents;
 
 namespace GraphEditor.GraphDeclaration
 {
@@ -218,6 +219,7 @@ namespace GraphEditor.GraphDeclaration
         /// <returns></returns>
         public int Containts(Line2D line)
         {
+            
             for(int i = 0;i <lines.Count;i++)
             {
                 if (lines[i] == line)
@@ -226,6 +228,20 @@ namespace GraphEditor.GraphDeclaration
                 }
             }
             return -1;
+        }
+
+        public void RemoveAllSubPoints()
+        {
+            List<SubPoint> toRemove = new List<SubPoint>();
+            for (int i = 1; i < (lines.Count - 1); i++)
+            {
+                toRemove.Add(points[i]);
+            }
+            foreach (var point in toRemove)
+            {
+                points.Remove(point);
+            }
+            LinesRebuild();
         }
     }
 }

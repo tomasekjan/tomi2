@@ -45,7 +45,7 @@ namespace Plugin
         private PointF PentagonMidle(params PointF[] points)
         {
             PointF result = new PointF();
-            int resulution = 1000;
+            int resulution = 100;
             for (int i = 0; i < points.Length; i++)
             {
                 points[i].X *= resulution;
@@ -91,8 +91,8 @@ namespace Plugin
             }
             result.X = sumX / count;
             result.Y = sumY / count;
-            result.X /= 1000;
-            result.Y /= 1000;
+            result.X /= resulution;
+            result.Y /= resulution;
             return result;
         }
 

@@ -175,6 +175,7 @@ namespace GraphEditor.GraphDeclaration
         /// <param name="world">word matrix</param>
         /// <param name="view">view matrix</param>
         /// <param name="projection">projection matrix</param>
+        /// <exception cref="Draw3DException">throws when there is problem with 3D drawing</exception>
         public void Draw3D(Matrix world, Matrix view, Matrix projection)
         {
             try

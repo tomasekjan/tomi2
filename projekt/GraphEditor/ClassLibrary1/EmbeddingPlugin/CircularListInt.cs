@@ -95,7 +95,7 @@ namespace Plugin
             }
             return after;
         }
-
+                
         public void InserBeintwen(int value, int before, int after)
         {
             for (int i = 0; i < this.Count; i++)

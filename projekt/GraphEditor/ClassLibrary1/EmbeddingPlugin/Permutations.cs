@@ -55,7 +55,7 @@ namespace Plugin
         }
 
         List<int[]> list;
-        internal List<int[]> CalcPermutation()
+        public List<int[]> CalcPermutation()
         {
             list = new List<int[]>();
             CalcPermutation(0);

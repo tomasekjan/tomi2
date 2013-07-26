@@ -85,7 +85,7 @@ namespace Plugin
         /// </summary>
         /// <param name="value"></param>
         /// <param name="before"></param>
-        /// <param name="after"></param>
+        /// <param name="after"></param>        
         internal void InserBeintwen(EdgeMultiGraph value, EdgeMultiGraph before, EdgeMultiGraph after)
         {
             for (int i = 0; i < this.Count; i++)

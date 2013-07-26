@@ -73,8 +73,7 @@ namespace Plugin
             foreach (EdgeMultiGraph edge in this)
             {
                 record.Add(edge, false);
-            }
-            //h.makeAsymmetric();
+            }            
             List<CircularListEdge> faces = new List<CircularListEdge>();
             foreach (EdgeMultiGraph e in this)
             {               
@@ -101,21 +100,14 @@ namespace Plugin
         }
 
         public Dictionary<int, PointF> GetPositions()
-        {
-            List<EdgeMultiGraph> before = new List<EdgeMultiGraph>();
-            List<EdgeMultiGraph> after = new List<EdgeMultiGraph>();
-            foreach (var edge in this)
-            {
-                before.Add(new EdgeMultiGraph(edge.U, edge.V, edge.Index));
-            }
+        {            
             Triangulate();
             Stack<VertexDegree> stack = new Stack<VertexDegree>();
             RemoveLoops(stack);            
             Reduce(stack);
             SetPosition();
             Reinsert(stack);            
-            RemoveTriangulation();
-            
+            RemoveTriangulation();            
             return pozition;
         }
 
@@ -127,8 +119,12 @@ namespace Plugin
                 vertex.Add(this);
             }
         }
-
-        private void Triangulate()
+                
+        /// <summary>
+        /// triangulate all faces in graph
+        /// </summary>
+        /// <exception cref="System.ArgumentException">throws when there is multi graph on input instead of graph</exception>
+        private void Triangulate()  
         {
             bool run = true;
             while (run)
@@ -168,7 +164,7 @@ namespace Plugin
                     }
                     if (face.Count < 3)
                     {
-                        throw new NotImplementedException();
+                        throw new ArgumentException("multi graph on input - not supported");
                     }
                 }
             }
@@ -192,12 +188,7 @@ namespace Plugin
             e2.SymetricEdge = e1;
             return e1;
         }
-
-        private void AddEdge(Tuple<int, int> tuple, CircularListInt face)
-        {
-            throw new NotImplementedException();
-        }
-
+        
         public void RemoveEdgeSym(EdgeMultiGraph edge)
         {
             incidenceEdges[edge.U].Remove(edge);
@@ -211,8 +202,7 @@ namespace Plugin
                 incidenceEdges.Remove(edge.V);
             }
         }
-
-
+        
         private void RemoveLoops(Stack<VertexDegree> stack)
         {
             bool run = true;
@@ -226,6 +216,7 @@ namespace Plugin
                     {
                         Loop l = new Loop();
                         l.Remove(this, face[0].U);
+                        stack.Push(l);
                         run = true;
                         break;
                     }
@@ -233,6 +224,7 @@ namespace Plugin
                     {
                         Loop l = new Loop();
                         l.Remove(this, face[1].U);
+                        stack.Push(l);
                         run = true;
                         break;
                     }
@@ -240,6 +232,7 @@ namespace Plugin
                     {
                         Loop l = new Loop();
                         l.Remove(this, face[0].U);
+                        stack.Push(l);
                         run = true;
                         break;
                     }
@@ -371,14 +364,7 @@ namespace Plugin
             }
             //6-relar
         }
-
-        
-
-        private void RestoreLoops()
-        {
-            throw new NotImplementedException();
-        }
-
+                
         private void RemoveTriangulation()
         {
             List<EdgeMultiGraph> list = new List<EdgeMultiGraph>();

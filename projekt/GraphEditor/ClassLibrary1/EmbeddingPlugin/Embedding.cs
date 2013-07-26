@@ -6,6 +6,7 @@ using System.Text;
 using System.Collections;
 using System.Drawing;
 using GraphEditor.GraphDeclaration;
+using System.Diagnostics;
 
 namespace Plugin
 {   
@@ -125,7 +126,56 @@ namespace Plugin
         /// enumerates all possible non-isomorphic embedding of K5 on torus
         /// </summary>
         /// <returns></returns>
-        public static List<Embedding> GetK5Embedings()
+        public static List<Embedding> GetK5Embedings(int[] vertexNames)
+        {
+            Debug.Assert(vertexNames.Length == 5);
+            List<Embedding> list = new List<Embedding>();
+            Embedding K5Embeding = new Embedding();
+            K5Embeding.neighbors.Add(vertexNames[0], new CircularListInt(new int[] { vertexNames[2], vertexNames[3], vertexNames[1], vertexNames[4] }));
+            K5Embeding.neighbors.Add(vertexNames[1], new CircularListInt(new int[] { vertexNames[0], vertexNames[4], vertexNames[2], vertexNames[3] }));
+            K5Embeding.neighbors.Add(vertexNames[2], new CircularListInt(new int[] { vertexNames[1], vertexNames[4], vertexNames[3], vertexNames[0] }));
+            K5Embeding.neighbors.Add(vertexNames[3], new CircularListInt(new int[] { vertexNames[2], vertexNames[1], vertexNames[4], vertexNames[0] }));
+            K5Embeding.neighbors.Add(vertexNames[4], new CircularListInt(new int[] { vertexNames[3], vertexNames[0], vertexNames[2], vertexNames[1] }));
+            list.Add(K5Embeding);
+            K5Embeding = new Embedding();
+            K5Embeding.neighbors.Add(vertexNames[0], new CircularListInt(new int[] { vertexNames[2], vertexNames[1], vertexNames[4], vertexNames[3] }));
+            K5Embeding.neighbors.Add(vertexNames[1], new CircularListInt(new int[] { vertexNames[0], vertexNames[3], vertexNames[2], vertexNames[4] }));
+            K5Embeding.neighbors.Add(vertexNames[2], new CircularListInt(new int[] { vertexNames[1], vertexNames[4], vertexNames[3], vertexNames[0] }));
+            K5Embeding.neighbors.Add(vertexNames[3], new CircularListInt(new int[] { vertexNames[2], vertexNames[0], vertexNames[4], vertexNames[1] }));
+            K5Embeding.neighbors.Add(vertexNames[4], new CircularListInt(new int[] { vertexNames[3], vertexNames[0], vertexNames[1], vertexNames[2] }));
+            list.Add(K5Embeding);
+            K5Embeding = new Embedding();
+            K5Embeding.neighbors.Add(vertexNames[0], new CircularListInt(new int[] { vertexNames[2], vertexNames[3], vertexNames[1], vertexNames[4] }));
+            K5Embeding.neighbors.Add(vertexNames[1], new CircularListInt(new int[] { vertexNames[2], vertexNames[0], vertexNames[4], vertexNames[3] }));
+            K5Embeding.neighbors.Add(vertexNames[2], new CircularListInt(new int[] { vertexNames[3], vertexNames[4], vertexNames[1], vertexNames[0] }));
+            K5Embeding.neighbors.Add(vertexNames[3], new CircularListInt(new int[] { vertexNames[0], vertexNames[1], vertexNames[2], vertexNames[4] }));
+            K5Embeding.neighbors.Add(vertexNames[4], new CircularListInt(new int[] { vertexNames[1], vertexNames[3], vertexNames[0], vertexNames[2] }));
+            list.Add(K5Embeding);
+            K5Embeding = new Embedding();
+            K5Embeding.neighbors.Add(vertexNames[0], new CircularListInt(new int[] { vertexNames[4], vertexNames[1], vertexNames[2], vertexNames[3] }));
+            K5Embeding.neighbors.Add(vertexNames[1], new CircularListInt(new int[] { vertexNames[3], vertexNames[4], vertexNames[2], vertexNames[0] }));
+            K5Embeding.neighbors.Add(vertexNames[2], new CircularListInt(new int[] { vertexNames[1], vertexNames[4], vertexNames[3], vertexNames[0] }));
+            K5Embeding.neighbors.Add(vertexNames[3], new CircularListInt(new int[] { vertexNames[0], vertexNames[2], vertexNames[4], vertexNames[1] }));
+            K5Embeding.neighbors.Add(vertexNames[4], new CircularListInt(new int[] { vertexNames[0], vertexNames[3], vertexNames[2], vertexNames[1] }));
+            list.Add(K5Embeding);
+            K5Embeding = new Embedding();
+            K5Embeding.neighbors.Add(vertexNames[0], new CircularListInt(new int[] { vertexNames[4], vertexNames[1], vertexNames[2], vertexNames[3] }));
+            K5Embeding.neighbors.Add(vertexNames[1], new CircularListInt(new int[] { vertexNames[3], vertexNames[4], vertexNames[2], vertexNames[0] }));
+            K5Embeding.neighbors.Add(vertexNames[2], new CircularListInt(new int[] { vertexNames[1], vertexNames[4], vertexNames[3], vertexNames[0] }));
+            K5Embeding.neighbors.Add(vertexNames[3], new CircularListInt(new int[] { vertexNames[2], vertexNames[1], vertexNames[4], vertexNames[0] }));
+            K5Embeding.neighbors.Add(vertexNames[4], new CircularListInt(new int[] { vertexNames[3], vertexNames[0], vertexNames[2], vertexNames[1] }));
+            list.Add(K5Embeding);
+            K5Embeding = new Embedding();
+            K5Embeding.neighbors.Add(vertexNames[0], new CircularListInt(new int[] { vertexNames[2], vertexNames[3], vertexNames[4], vertexNames[1] }));
+            K5Embeding.neighbors.Add(vertexNames[1], new CircularListInt(new int[] { vertexNames[0], vertexNames[4], vertexNames[2], vertexNames[3] }));
+            K5Embeding.neighbors.Add(vertexNames[2], new CircularListInt(new int[] { vertexNames[1], vertexNames[4], vertexNames[3], vertexNames[0] }));
+            K5Embeding.neighbors.Add(vertexNames[3], new CircularListInt(new int[] { vertexNames[2], vertexNames[1], vertexNames[4], vertexNames[0] }));
+            K5Embeding.neighbors.Add(vertexNames[4], new CircularListInt(new int[] { vertexNames[0], vertexNames[3], vertexNames[2], vertexNames[1] }));
+            list.Add(K5Embeding);
+            return list;
+        }
+
+        public static List<Embedding> GetK5EmbedingsConstant()
         {
             List<Embedding> list = new List<Embedding>();
             Embedding embeding1 = new Embedding();
@@ -330,9 +380,10 @@ namespace Plugin
         /// add edge to embedding with creating 
         /// </summary>
         /// <param name="edge"></param>
+        /// <exception cref="System.ArgumentException">throws then you try to add loop to graph</exception>
         internal void AddEdgeSym(Tuple<int, int> edge)
         {
-            if (edge.Item1 == edge.Item2) throw new NotImplementedException();
+            if (edge.Item1 == edge.Item2) throw new ArgumentException("does not support adding loops");
             if (!neighbors.ContainsKey(edge.Item1))
             {
                 neighbors.Add(edge.Item1, new CircularListInt());
@@ -353,9 +404,10 @@ namespace Plugin
         /// add edge without adding symmetric edge
         /// </summary>
         /// <param name="edge"></param>
+        /// <exception cref="System.ArgumentException">throws then you try to add loop to graph</exception>
         internal void AddEdgeAsym(Tuple<int, int> edge)
         {
-            if (edge.Item1 == edge.Item2) throw new NotImplementedException();
+            if (edge.Item1 == edge.Item2) throw new ArgumentException("does not support adding loops");
             if (!neighbors.ContainsKey(edge.Item1))
             {
                 neighbors.Add(edge.Item1, new CircularListInt());
@@ -567,14 +619,10 @@ namespace Plugin
                 {                    
                     if(!ContaintsEdgeAsym(new Tuple<int,int>(edge.Item2,edge.Item1)))
                     {
-                        throw new NotImplementedException();
+                        sb.Append("data consistensi error");
                     }
                     sb.Append(string.Format("{0} <-> {1}", edge.Item1, edge.Item2));
                     sb.Append(", ");
-                }
-                if (edge.Item1 == edge.Item2)
-                {
-                    //throw new NotImplementedException();
                 }
             }
             return sb.ToString();

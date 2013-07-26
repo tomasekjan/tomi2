@@ -138,6 +138,7 @@ namespace GraphEditor.GraphDeclaration
         /// </summary>
         /// <param name="fileName">target file name</param>
         /// <param name="graph">graph object to serialize</param>  
+        /// <exception cref="SerializationException">throws then there is some IO error by serializing</exception>
         public static void Serialize(string fileName, Graph graph)
         {
             try
@@ -156,7 +157,8 @@ namespace GraphEditor.GraphDeclaration
         /// graph de serialization
         /// </summary>
         /// <param name="fileName">source fine name</param>
-        /// <returns>deserialized graph</returns>
+        /// <returns>de serialized graph</returns>
+        /// <exception cref="SerializationException">throws then there is some IO error by serializing</exception>
         public static GraphDefinition Deserialize(string fileName)
         {
             try

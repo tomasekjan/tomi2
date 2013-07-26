@@ -58,6 +58,7 @@ namespace Plugin
             embedding.RemoveEdgeSym(edge2);
             embedding.incidenceEdges[v].Insert(indexReflexiveEdge, originalEdge);
             embedding.incidenceEdges[v].Insert(indexReflexiveSymetricEdge, originalEdge.SymetricEdge);
+            embedding.pozition.Remove(z);
         }
     }
 }

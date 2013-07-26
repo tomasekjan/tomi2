@@ -5,6 +5,7 @@ using System.Text;
 using System.Collections;
 using System.Drawing;
 using GraphEditor.GraphDeclaration;
+using Microsoft.Xna.Framework;
 
 namespace Plugin
 {
@@ -15,7 +16,7 @@ namespace Plugin
         /// </summary>
         /// <param name="array"></param>
         /// <returns></returns>
-        public static bool Distinct(params int[] array)
+        protected static bool Distinct(params int[] array)
         {
             bool valid = true;
             for (int i = 0; i < array.Length; i++)
@@ -33,6 +34,12 @@ namespace Plugin
             }
             return valid;
         }
+
+        protected Vector2 PointF2Vector(PointF point)
+        {
+            return new Vector2(point.X, point.Y);
+        }
+
         /// <summary>
         /// removing vertex with given index from embedding
         /// </summary>
@@ -46,7 +53,7 @@ namespace Plugin
         /// <param name="selectingEdge"></param>
         /// <param name="embedding"></param>
         /// <returns></returns>
-        public PointF GetPosition(EdgeMultiGraph selectingEdge, EmbedingMultiGraph embedding)
+        protected PointF GetPosition(EdgeMultiGraph selectingEdge, EmbedingMultiGraph embedding)
         {
             CircularListEdge selectedFace = null ;
             foreach (CircularListEdge face in embedding.GetFaces())

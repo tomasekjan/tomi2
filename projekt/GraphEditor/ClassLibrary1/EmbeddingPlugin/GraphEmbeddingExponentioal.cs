@@ -13,42 +13,37 @@ namespace Plugin
 {
     public class GraphEmbeddingExponentioal : IPozitioning
     {
-        GraphDefinition tmp;
+        
         public override GraphDefinition Pozitioning(GraphDefinition sourceDefinition)
-        {            
-            tmp = sourceDefinition;
+        {
             Embedding embeding = new Embedding(sourceDefinition);
-            Embedding embeding2 = GetSphereEmbeding(embeding);
-            EmbedingMultiGraph multi = new EmbedingMultiGraph(embeding2);
-            Dictionary<int, PointF> pos = multi.GetPositions();            
-            foreach (var item in pos)
-            {
-                tmp.vertices[item.Key].Pozition = item.Value;
-            }
-            return tmp;
             switch (sourceDefinition.suraceType)
             {
                 case SurfaceTypeEnum.Sphere:
-                    return GetSpherePozitioning(embeding);
+                    embeding = GetSphereEmbeding(embeding);
+                    break;
                 case SurfaceTypeEnum.Torus:
-                    return GetTorusPozitioning(embeding);
+                    embeding = GetTorusEmbeding(embeding);
+                    break;
                 default:
                     throw new ArgumentException();
             }
-        }
-        
-        private GraphDefinition GetTorusPozitioning(Embedding embeding)
-        {
-            Embedding embeding2 = GetTorusEmbeding(embeding);
-            if (embeding2 != null)
+            if (embeding == null)
             {
-                MessageBox.Show("ano");
+                MessageBox.Show("unable to draw given graph on selected surface!");
+                return sourceDefinition;
             }
-            else
+            EmbedingMultiGraph multiGraphEmbeding = new EmbedingMultiGraph(embeding);
+            Dictionary<int, PointF> positions = multiGraphEmbeding.GetPositions();            
+            foreach (var item in positions)
             {
-                MessageBox.Show("nenalezeno");
+                sourceDefinition.vertices[item.Key].Pozition = item.Value;
             }
-            return tmp;
+            foreach (Edge edge in sourceDefinition.edges)
+            {
+                edge.RemoveAllSubPoints();
+            }
+            return sourceDefinition;            
         }
 
         private Embedding GetTorusEmbeding(Embedding embeding)
@@ -63,14 +58,18 @@ namespace Plugin
             if (h.IsK5())
             {
                 List<int> k5Vertices = h.GetK5Vertices();
-                foreach (Embedding e in Embedding.GetK5Embedings())
+                Permutations permutations = new Permutations(k5Vertices.ToArray());
+                foreach (int[] permutation in permutations.CalcPermutation())
                 {
-                    //dfs najit vrchly pro vesechny potencionali sousedy a naprasit je tam pri vytvareni
-                    var tmp = ExtedEmgeddingTorus(embeding, e);
-                    if (tmp != null)
+                    foreach (Embedding e in Embedding.GetK5Embedings(permutation))
                     {
-                        return tmp;
+                        var tmp = ExtedEmgeddingTorus(embeding, e);
+                        if (tmp != null)
+                        {
+                            return tmp;
+                        }
                     }
+                 
                 }
                 // no embedding found
                 return null;
@@ -86,10 +85,10 @@ namespace Plugin
                         return tmp;
                     }
                 }
-                // no embeding found
+                // no embedding found
                 return null;
             }
-            throw new EmbeddingException("there schould be k5 or k3_3");
+            throw new EmbeddingException("there should be k5 or k3_3");
         }
                 
         private Embedding SubgrafHomoomorphicToK5K3_3(Embedding embeding)
@@ -107,20 +106,6 @@ namespace Plugin
                 }
             }            
             return h;
-        }
-
-        private GraphDefinition GetSpherePozitioning(Embedding embeding)
-        {
-            Embedding embeding2 = GetSphereEmbeding(embeding);
-            if (embeding2 == null)
-            {
-                MessageBox.Show("nenalezeno");
-            }
-            else
-            {
-                MessageBox.Show("ano");
-            }
-            return tmp;
         }
 
         //returns null if not planar
@@ -199,7 +184,7 @@ namespace Plugin
                 foreach (CircularListInt face in faces)
                 {
                     bool isValid = true;
-                    foreach (var v in bridge.AttachmentVertexes)
+                    foreach (int v in bridge.AttachmentVertexes)
                     {
                         if (!face.Contains(v))
                         {
@@ -216,7 +201,7 @@ namespace Plugin
             BridgeWithRespectTo brigdesWithRespectBest = brigdesWithRespect[0];
             if (brigdesWithRespectBest.NumberOfAdmisibleFaces == 0)
             {
-                //this graph canot be embeded.
+                //this graph cannot be embedded.
                 return null;
             }
             if (brigdesWithRespectBest.BridgeType == BridgType.Type1)
@@ -224,7 +209,8 @@ namespace Plugin
                 List<int> path = brigdesWithRespectBest.GetPath();
                 if (path == null)
                 {
-                    throw new NotImplementedException();
+                    // TODO can it occur ?
+                    return null;
                 }
                 h.AddPath(path, brigdesWithRespectBest.Faces[0]);
             }
@@ -235,23 +221,14 @@ namespace Plugin
                 path.Add(brigdesWithRespectBest.Embeding.First().Item2);
                 h.AddPath(path, brigdesWithRespectBest.Faces[0]);
             }
-            //this can be done better
+            //TODO this can be done better
             i = new Embedding(g);
-            i.Minus(h);
-            //MessageBox.Show(h.ToString());
+            i.Minus(h);            
             return ExtedEmgeddingPlanar(g, h, i);
         }
-        // add some better return type
-        private Embedding ExtedEmgeddingTorus(Embedding g, Embedding h)
+
+        private static void FindAddmisibleFaces(List<CircularListInt> faces, List<BridgeWithRespectTo> brigdesWithRespect)
         {
-            if (g.Count() == h.Count())
-            {
-                return h;
-            }
-            Embedding i = new Embedding(g);
-            g.Minus(h);
-            List<CircularListInt> faces = h.GetFaces();
-            List<BridgeWithRespectTo> brigdesWithRespect = GerBridgesWithRespect(g, h, i);
             foreach (BridgeWithRespectTo bridge in brigdesWithRespect)
             {
                 foreach (CircularListInt face in faces)
@@ -267,30 +244,45 @@ namespace Plugin
                     if (isValid)
                     {
                         bridge.Faces.Add(face);
-                    }                    
+                    }
                 }
             }
+        }
+
+        private static List<int> GetPath(BridgeWithRespectTo brigdesWithRespectBest)
+        {
+            List<int> path = null;
+            if (brigdesWithRespectBest.BridgeType == BridgType.Type1)
+            {
+                path = brigdesWithRespectBest.GetPath();
+            }
+            if (brigdesWithRespectBest.BridgeType == BridgType.Type2)
+            {
+                path = new List<int>();
+                path.Add(brigdesWithRespectBest.Embeding.First().Item1);
+                path.Add(brigdesWithRespectBest.Embeding.First().Item2);
+            }
+            return path;
+        }
+
+        private Embedding ExtedEmgeddingTorus(Embedding g, Embedding h)
+        {
+            if (g.Count() == h.Count())
+            {
+                return h;
+            }
+            Embedding i = new Embedding(g);
+            i.Minus(h);
+            List<CircularListInt> faces = h.GetFaces();
+            List<BridgeWithRespectTo> brigdesWithRespect = GerBridgesWithRespect(g, h, i);
+            FindAddmisibleFaces(faces, brigdesWithRespect);
             brigdesWithRespect.Sort();
             BridgeWithRespectTo brigdesWithRespectBest = brigdesWithRespect[0];
             if (brigdesWithRespectBest.NumberOfAdmisibleFaces == 0)
             {                
                 return null;
             }
-            List<int> path = null ;
-            if (brigdesWithRespectBest.BridgeType == BridgType.Type1)
-            {
-                path = brigdesWithRespectBest.GetPath();
-                if (path == null)
-                {
-                    throw new NotImplementedException();
-                }                
-            }
-            if (brigdesWithRespectBest.BridgeType == BridgType.Type2)
-            {
-                path = new List<int>();
-                path.Add(brigdesWithRespectBest.Embeding.First().Item1);
-                path.Add(brigdesWithRespectBest.Embeding.First().Item2);                
-            }
+            List<int> path = GetPath(brigdesWithRespectBest);
 
             h.AddPath(path, brigdesWithRespectBest.Faces[0],VertexState.FIRST,VertexState.FIRST);
             Embedding emgeddingTorus = ExtedEmgeddingTorus(g, h);

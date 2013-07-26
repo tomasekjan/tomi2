@@ -64,6 +64,7 @@ namespace GraphEditor.Primitives3D
         /// add new index to indexes objects
         /// </summary>
         /// <param name="index"></param>
+        /// <<exception cref="System.OverflowException">only values in rang of unsigned short are allowed</exception>
         protected void AddIndex(int index)
         {
             if (index > ushort.MaxValue)
