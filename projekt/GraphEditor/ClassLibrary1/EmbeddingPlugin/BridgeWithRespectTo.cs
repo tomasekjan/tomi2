@@ -144,16 +144,19 @@ namespace Plugin
             {
                 case BridgType.Type1:
                     path = new List<int>();
-                    //this can be done better with some heuristic chose of start an end.
+                    
                     int start = attachmentVertexes.First();
+                    queue = new Queue<int>();
                     path.Add(start);
-                    visited = new Dictionary<int, bool>();
-                    foreach (var v in bridge.neighbors.Keys)
+                    visited.Add(start);
+                    visited = new HashSet<int>();
+                    visited.Add(start);
+                    foreach (int v in bridge.neighbors[start])
                     {
-                        visited.Add(v, false);
+                        queue.Enqueue(v);
+                        visited.Add(v);
                     }
-                    visit(start);
-                    if (path.Count == 1) return null;
+                    search(queue);
                     break;                    
                 case BridgType.Type2:
                     path = new List<int>();
@@ -164,30 +167,28 @@ namespace Plugin
             return path;
 
         }
-        List<int> path;
-        Dictionary<int, bool> visited;
-        bool end = false;
-        private void visit(int u)
+
+        private void search(Queue<int> queue)
         {
-            if (end)
+            while (true)
             {
-                return;
-            }
-            visited[u] = true;
-            foreach (var v in bridge.neighbors[u])
-            {
-                if (end) return;
-                if (!visited[v])
+                int v = queue.Dequeue();                
+                if (attachmentVertexes.Contains(v))
                 {
-                    path.Add(v);
-                    if (attachmentVertexes.Contains(v))
+                    break;
+                }
+                foreach (int u in bridge.neighbors[v])
+                {
+                    if (!visited.Contains(u))
                     {
-                        end = true;
-                        return;                        
+                        queue.Enqueue(u);
+                        visited.Add(u);
                     }
-                    visit(v);
                 }
             }
         }
+        List<int> path;
+        HashSet<int> visited;
+        Queue<int> queue;
     }
 }

@@ -8,58 +8,47 @@ using System.Drawing;
 
 namespace Plugin
 {
-    class Permutations
+    public class PermutationFinder<T>
     {
-        private int elementLevel = -1;
-        private int numberOfElements;
-        private int[] permutationValue;
+        private T[] items;
+        private Predicate<T[]> SuccessFunc;
+        private bool success = false;
+        private int itemsCount;
 
-        private int[] inputSet;
-
-        public Permutations(int[] inputSet)
+        public void Evaluate(T[] items, Predicate<T[]> SuccessFunc)
         {
-            this.inputSet = inputSet;
-            permutationValue = new int[inputSet.Length];
-            numberOfElements = inputSet.Length;
-        }
-        private int permutationCount = 0;
-        public int PermutationCount
-        {
-            get { return permutationCount; }
+            this.items = items;
+            this.SuccessFunc = SuccessFunc;
+            this.itemsCount = items.Count();
+            Recurse(0);
         }
 
-        public void CalcPermutation(int k)
+        private void Recurse(int index)
         {
-            elementLevel++;
-            permutationValue.SetValue(elementLevel, k);
+            T tmp;
 
-            if (elementLevel == numberOfElements)
+            if (index == itemsCount)
             {
-                int[] tmp = new int[permutationValue.Length];
-                Array.Copy(permutationValue, tmp, permutationValue.Length);
-                list.Add(tmp);
+                success = SuccessFunc(items);
             }
             else
             {
-                for (int i = 0; i < numberOfElements; i++)
+                for (int i = index; i < itemsCount; i++)
                 {
-                    if (permutationValue[i] == 0)
-                    {
-                        CalcPermutation(i);
-                    }
+                    tmp = items[index];
+                    items[index] = items[i];
+                    items[i] = tmp;
+
+                    Recurse(index + 1);
+
+                    if (success)
+                        break;
+
+                    tmp = items[index];
+                    items[index] = items[i];
+                    items[i] = tmp;
                 }
             }
-            elementLevel--;
-            permutationValue.SetValue(0, k);
-
-        }
-
-        List<int[]> list;
-        public List<int[]> CalcPermutation()
-        {
-            list = new List<int[]>();
-            CalcPermutation(0);
-            return list;
         }
     }
 }

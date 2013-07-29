@@ -29,6 +29,7 @@ namespace Plugin
                 if (value == selected)
                 {
                     before = bef;
+                    break;
                 }
             }
             return before;
@@ -46,7 +47,8 @@ namespace Plugin
                 {
                     if (first)
                     {
-                        before = bef;                        
+                        before = bef;
+                        break;
                     }
                     else
                     {
@@ -61,13 +63,14 @@ namespace Plugin
         public int GetAfterValue(int value)
         {
             int after = -1;
-            for (int i = 0; i < this.Count; i++)
+            for (int i = 1; i <= this.Count; i++)
             {
                 int af = this[(i + 1) % this.Count];
                 int selected = this[i % this.Count];
                 if (value == selected)
                 {
                     after = af;
+                    break;
                 }
             }
             return after;
@@ -76,8 +79,8 @@ namespace Plugin
         public int GetAfterSecondValue(int value)
         {
             int after = -1;
-            bool first = true;
-            for (int i = 0; i < this.Count; i++)
+            bool first = false;
+            for (int i = 1; i <= this.Count; i++)
             {
                 int af = this[(i + 1) % this.Count];
                 int selected = this[i % this.Count];
@@ -86,6 +89,7 @@ namespace Plugin
                     if (first)
                     {
                         after = af;
+                        break;
                     }
                     else
                     {

@@ -16,18 +16,23 @@ namespace Plugin
         
         public override GraphDefinition Pozitioning(GraphDefinition sourceDefinition)
         {
-            Embedding embeding = new Embedding(sourceDefinition);
-            switch (sourceDefinition.suraceType)
-            {
-                case SurfaceTypeEnum.Sphere:
-                    embeding = GetSphereEmbeding(embeding);
-                    break;
-                case SurfaceTypeEnum.Torus:
-                    embeding = GetTorusEmbeding(embeding);
-                    break;
-                default:
-                    throw new ArgumentException();
-            }
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.Start();
+            
+                Embedding embeding = new Embedding(sourceDefinition);
+                switch (sourceDefinition.suraceType)
+                {
+                    case SurfaceTypeEnum.Sphere:
+                        embeding = GetSphereEmbeding(embeding);
+                        break;
+                    case SurfaceTypeEnum.Torus:
+                        embeding = GetTorusEmbeding(embeding);
+                        break;
+                    default:
+                        throw new ArgumentException();
+                }
+                stopwatch.Stop();
+                MessageBox.Show(("Time elapsed:" + stopwatch.Elapsed.ToString()));
             if (embeding == null)
             {
                 MessageBox.Show("unable to draw given graph on selected surface!");
@@ -54,44 +59,51 @@ namespace Plugin
                 // planar embedding is also torus embedding
                 return sphereEmbeding;
             }
-            Embedding h = SubgrafHomoomorphicToK5K3_3(embeding);
+            Embedding h = SubgrafHomeomorphicToK5K3_3(embeding);
             if (h.IsK5())
             {
-                List<int> k5Vertices = h.GetK5Vertices();
-                Permutations permutations = new Permutations(k5Vertices.ToArray());
-                foreach (int[] permutation in permutations.CalcPermutation())
+                int[] k5Vertices = h.GetK5Vertices().ToArray();
+                
+                PermutationFinder<int> permutations = new PermutationFinder<int>();
+                Embedding tmp = null;
+                permutations.Evaluate(k5Vertices, (permutation) =>
                 {
                     foreach (Embedding e in Embedding.GetK5Embedings(permutation))
                     {
-                        var tmp = ExtedEmgeddingTorus(embeding, e);
+                        tmp = ExtedEmgeddingTorus(embeding, e);
                         if (tmp != null)
                         {
-                            return tmp;
+                            return true;
                         }
                     }
-                 
-                }
-                // no embedding found
-                return null;
+                    return false;
+                });
+                return tmp;
             }
             if (h.IsK3_3())
             {
-                List<int> k33Vertexes = h.GetK33Vertices();
-                foreach (Embedding e in Embedding.GetK3_3Embedings())
+                PermutationFinder<int> permutations = new PermutationFinder<int>();
+                int[] k33Vertexes = h.GetK33Vertices().ToArray();
+                Embedding tmp = null;
+                permutations.Evaluate(k33Vertexes, (permutation) =>
                 {
-                    var tmp = ExtedEmgeddingTorus(embeding, e);
-                    if (tmp != null)
+                    foreach (Embedding e in Embedding.GetK3_3Embedings(permutation))
                     {
-                        return tmp;
+                        tmp = ExtedEmgeddingTorus(embeding, e);
+                        if (tmp != null)
+                        {
+                            return true;
+                        }
+
                     }
-                }
-                // no embedding found
-                return null;
+                    return false;
+                });
+                return tmp;
             }
             throw new EmbeddingException("there should be k5 or k3_3");
         }
                 
-        private Embedding SubgrafHomoomorphicToK5K3_3(Embedding embeding)
+        private Embedding SubgrafHomeomorphicToK5K3_3(Embedding embeding)
         {
             Embedding h = new Embedding(embeding);            
             foreach (Tuple<int, int> edge in embeding)
@@ -173,9 +185,15 @@ namespace Plugin
 
         private Embedding ExtedEmgeddingPlanar(Embedding g, Embedding h, Embedding i)
         {
-             if (h.Count() == g.Count())
+            //TODO caching count...
+            if (h.Count() == g.Count())
             {
                 return h;
+            }
+            if (h.Count() > g.Count())
+            {
+                //problem
+                throw new NotImplementedException();
             }
             List<BridgeWithRespectTo> brigdesWithRespect = GerBridgesWithRespect(g, h, i);
             List<CircularListInt> faces = h.GetFaces();
@@ -286,24 +304,33 @@ namespace Plugin
 
             h.AddPath(path, brigdesWithRespectBest.Faces[0],VertexState.FIRST,VertexState.FIRST);
             Embedding emgeddingTorus = ExtedEmgeddingTorus(g, h);
-            if (emgeddingTorus != null) return emgeddingTorus;
-            h.RemovePath(path);
-
-            h.AddPath(path, brigdesWithRespectBest.Faces[0], VertexState.FIRST, VertexState.SECOND);
-            emgeddingTorus = ExtedEmgeddingTorus(g, h);
-            if (emgeddingTorus != null) return emgeddingTorus;
-            h.RemovePath(path);
-
-            h.AddPath(path, brigdesWithRespectBest.Faces[0], VertexState.SECOND, VertexState.FIRST);
-            emgeddingTorus = ExtedEmgeddingTorus(g, h);
-            if (emgeddingTorus != null) return emgeddingTorus;
-            h.RemovePath(path);
-
-            h.AddPath(path, brigdesWithRespectBest.Faces[0], VertexState.SECOND, VertexState.SECOND);
-            emgeddingTorus = ExtedEmgeddingTorus(g, h);
-            if (emgeddingTorus != null) return emgeddingTorus;
-            h.RemovePath(path);
-
+            if (emgeddingTorus == null)
+            {
+                h.RemovePath(path);
+                if (h.AddPath(path, brigdesWithRespectBest.Faces[0], VertexState.FIRST, VertexState.SECOND))
+                {
+                    emgeddingTorus = ExtedEmgeddingTorus(g, h);
+                    h.RemovePath(path);
+                }
+                if (emgeddingTorus == null)               {
+                    
+                    if (h.AddPath(path, brigdesWithRespectBest.Faces[0], VertexState.SECOND, VertexState.FIRST))
+                    {
+                        emgeddingTorus = ExtedEmgeddingTorus(g, h);
+                        h.RemovePath(path);
+                    }
+                    if (emgeddingTorus == null)
+                    {
+                        
+                        if(h.AddPath(path, brigdesWithRespectBest.Faces[0], VertexState.SECOND, VertexState.SECOND))
+                        {
+                            emgeddingTorus = ExtedEmgeddingTorus(g, h);
+                            h.RemovePath(path);
+                        }
+                    }
+                }
+                
+            }
             return emgeddingTorus;
         }
 

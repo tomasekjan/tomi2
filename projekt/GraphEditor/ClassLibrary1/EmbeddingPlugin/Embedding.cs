@@ -227,7 +227,33 @@ namespace Plugin
         /// enumerates all possible non-isomorphic embedding of K{3,3} on torus
         /// </summary>
         /// <returns></returns>
-        public static List<Embedding> GetK3_3Embedings()
+        public static List<Embedding> GetK3_3Embedings(int[] vertexNames)
+        {
+            List<Embedding> list = new List<Embedding>();
+            Embedding embedingA = new Embedding();
+            embedingA.neighbors.Add(vertexNames[0], new CircularListInt(new int[] { vertexNames[5], vertexNames[3], vertexNames[4] }));
+            embedingA.neighbors.Add(vertexNames[1], new CircularListInt(new int[] { vertexNames[4], vertexNames[5], vertexNames[3] }));
+            embedingA.neighbors.Add(vertexNames[2], new CircularListInt(new int[] { vertexNames[5], vertexNames[4], vertexNames[3] }));
+            embedingA.neighbors.Add(vertexNames[3], new CircularListInt(new int[] { vertexNames[1], vertexNames[2], vertexNames[0] }));
+            embedingA.neighbors.Add(vertexNames[4], new CircularListInt(new int[] { vertexNames[2], vertexNames[1], vertexNames[0] }));
+            embedingA.neighbors.Add(vertexNames[5], new CircularListInt(new int[] { vertexNames[0], vertexNames[2], vertexNames[1] }));
+            list.Add(embedingA);
+            Embedding embedingB = new Embedding();
+            embedingB.neighbors.Add(vertexNames[0], new CircularListInt(new int[] { vertexNames[3], vertexNames[5], vertexNames[4] }));
+            embedingB.neighbors.Add(vertexNames[1], new CircularListInt(new int[] { vertexNames[3], vertexNames[5], vertexNames[4] }));
+            embedingB.neighbors.Add(vertexNames[2], new CircularListInt(new int[] { vertexNames[4], vertexNames[3], vertexNames[5] }));
+            embedingB.neighbors.Add(vertexNames[3], new CircularListInt(new int[] { vertexNames[2], vertexNames[1], vertexNames[0] }));
+            embedingB.neighbors.Add(vertexNames[4], new CircularListInt(new int[] { vertexNames[1], vertexNames[0], vertexNames[2] }));
+            embedingB.neighbors.Add(vertexNames[5], new CircularListInt(new int[] { vertexNames[0], vertexNames[2], vertexNames[1] }));
+            list.Add(embedingB);
+            return list;
+        }
+
+        /// <summary>
+        /// enumerates all possible non-isomorphic embedding of K{3,3} on torus
+        /// </summary>
+        /// <returns></returns>
+        public static List<Embedding> GetK3_3EmbedingsConstant()
         {
             List<Embedding> list = new List<Embedding>();
             Embedding embeding1 = new Embedding();
@@ -364,6 +390,7 @@ namespace Plugin
         /// <param name="edge"></param>
         internal void RemoveEdgeSym(Tuple<int, int> edge)
         {
+
             neighbors[edge.Item1].Remove(edge.Item2);
             neighbors[edge.Item2].Remove(edge.Item1);
             if (neighbors[edge.Item1].Count == 0)
@@ -372,7 +399,7 @@ namespace Plugin
             }
             if (neighbors[edge.Item2].Count == 0)
             {
-                neighbors.Remove(edge.Item1);
+                neighbors.Remove(edge.Item2);
             }
         }
 
@@ -637,7 +664,7 @@ namespace Plugin
             List<int> list = new List<int>();
             foreach (var v in neighbors.Keys)
             {
-                if (neighbors[v].Count == 4)
+                if (neighbors[v].Count == 3)
                 {
                     list.Add(v);
                 }
