@@ -144,19 +144,30 @@ namespace Plugin
             {
                 case BridgType.Type1:
                     path = new List<int>();
-                    
-                    int start = attachmentVertexes.First();
                     queue = new Queue<int>();
-                    path.Add(start);
-                    visited.Add(start);
-                    visited = new HashSet<int>();
-                    visited.Add(start);
+                    parrent = new Dictionary<int, int>();
+                    enqueued = new HashSet<int>();
+
+                    int start = attachmentVertexes.First();                    
+                    enqueued.Add(start);
+                    
+                    enqueued.Add(start);
                     foreach (int v in bridge.neighbors[start])
                     {
                         queue.Enqueue(v);
-                        visited.Add(v);
+                        enqueued.Add(v);
+                        parrent.Add(v, start);
                     }
-                    search(queue);
+                    int end = search();
+                    if (end == -1)
+                    {
+                        path.Add(start);
+                        path.Add(bridge.neighbors[start][0]);
+                    }
+                    else
+                    {
+                        extractPath(start, end);
+                    }
                     break;                    
                 case BridgType.Type2:
                     path = new List<int>();
@@ -168,27 +179,47 @@ namespace Plugin
 
         }
 
-        private void search(Queue<int> queue)
+        private void extractPath(int start, int end)
         {
+            int v = end;
             while (true)
             {
-                int v = queue.Dequeue();                
-                if (attachmentVertexes.Contains(v))
+                path.Add(v);
+                if (v == start)
                 {
                     break;
                 }
-                foreach (int u in bridge.neighbors[v])
-                {
-                    if (!visited.Contains(u))
-                    {
-                        queue.Enqueue(u);
-                        visited.Add(u);
-                    }
-                }
+                v = parrent[v];
             }
         }
+
+        private int search()
+        {
+            while (true)
+            {
+                if (queue.Count == 0)
+                {
+                    return -1;
+                }
+                int v = queue.Dequeue();                
+                if (attachmentVertexes.Contains(v))
+                {
+                    return v;
+                }
+                foreach (int u in bridge.neighbors[v])
+                {
+                    if (!enqueued.Contains(u))
+                    {
+                        queue.Enqueue(u);
+                        enqueued.Add(u);
+                        parrent.Add(u, v);
+                    }
+                }
+            }            
+        }
         List<int> path;
-        HashSet<int> visited;
+        HashSet<int> enqueued;
+        Dictionary<int, int> parrent;
         Queue<int> queue;
     }
 }
