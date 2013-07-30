@@ -18,7 +18,7 @@ namespace Plugin
         /// adding vertex back to embedding
         /// </summary>
         /// <param name="embedding">embedding to add vertex to</param>
-        public override void Add(EmbedingMultiGraph embedding)
+        public override void Add(EmbeddingMultiGraph embedding)
         {
             PointF position = GetPosition(embedding.incidenceEdges[v][indexV], embedding);
             embedding.incidenceEdges.Add(u, new CircularListEdge());
@@ -53,7 +53,7 @@ namespace Plugin
         /// </summary>
         /// <param name="embedding">embedding to remove vertex from</param>
         /// <param name="vertex">index of vertex to remove</param>
-        public override void Remove(EmbedingMultiGraph embedding, int u)
+        public override void Remove(EmbeddingMultiGraph embedding, int u)
         {
             copyFromU = new List<EdgeMultiGraph>();
             this.u = u;
@@ -65,11 +65,11 @@ namespace Plugin
             indexW = embedding.incidenceEdges[w].IndexOf(embedding.incidenceEdges[u][1].SymetricEdge);
             indexX = embedding.incidenceEdges[x].IndexOf(embedding.incidenceEdges[u][2].SymetricEdge);
 
-            foreach (var edge in embedding.incidenceEdges[u])
+            foreach (EdgeMultiGraph edge in embedding.incidenceEdges[u])
             {
                 copyFromU.Add(edge);                
             }
-            foreach (var edge in copyFromU)
+            foreach (EdgeMultiGraph edge in copyFromU)
             {
                 embedding.RemoveEdgeSym(edge);
             }

@@ -45,7 +45,7 @@ namespace Plugin
         /// </summary>
         /// <param name="embedding">embedding to remove vertex from</param>
         /// <param name="vertex">index of vertex to remove</param>
-        public abstract void Remove(EmbedingMultiGraph embedding, int vertex);
+        public abstract void Remove(EmbeddingMultiGraph embedding, int vertex);
 
         /// <summary>
         /// get position of middle of triangle drawn on torus
@@ -53,7 +53,7 @@ namespace Plugin
         /// <param name="selectingEdge"></param>
         /// <param name="embedding"></param>
         /// <returns></returns>
-        protected PointF GetPosition(EdgeMultiGraph selectingEdge, EmbedingMultiGraph embedding)
+        protected PointF GetPosition(EdgeMultiGraph selectingEdge, EmbeddingMultiGraph embedding)
         {
             CircularListEdge selectedFace = null ;
             foreach (CircularListEdge face in embedding.GetFaces())
@@ -80,6 +80,6 @@ namespace Plugin
         /// adding vertex back to embedding
         /// </summary>
         /// <param name="embedding">embedding to add vertex to</param>
-        public abstract void Add(EmbedingMultiGraph embedding);
+        public abstract void Add(EmbeddingMultiGraph embedding);
     }
 }

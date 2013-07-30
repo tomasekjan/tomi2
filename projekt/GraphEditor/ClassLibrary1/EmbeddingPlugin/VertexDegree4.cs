@@ -20,7 +20,7 @@ namespace Plugin
         /// adding vertex back to embedding
         /// </summary>
         /// <param name="embedding">embedding to add vertex to</param>
-        public override void Add(EmbedingMultiGraph embedding)
+        public override void Add(EmbeddingMultiGraph embedding)
         {
             
             EdgeMultiGraph e = addedEdges[0];
@@ -47,7 +47,7 @@ namespace Plugin
             embedding.incidenceEdges[v].Insert(iv, ev);
         }
 
-        private PointF GetPositionQuadrangular(EmbedingMultiGraph embedding, params PointF[] points)
+        private PointF GetPositionQuadrangular(EmbeddingMultiGraph embedding, params PointF[] points)
         {
             LineSegment[] lines = new LineSegment[4];
             LineSegment[] quadrangular = new LineSegment[4];
@@ -83,7 +83,7 @@ namespace Plugin
         /// </summary>
         /// <param name="embedding">embedding to remove vertex from</param>
         /// <param name="vertex">index of vertex to remove</param>
-        public override void Remove(EmbedingMultiGraph embedding, int vertex)
+        public override void Remove(EmbeddingMultiGraph embedding, int vertex)
         {
             u = vertex;
             v = embedding.incidenceEdges[vertex][0].V;

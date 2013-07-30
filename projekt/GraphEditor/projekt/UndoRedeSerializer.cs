@@ -69,7 +69,7 @@ namespace GraphEditor.GraphDeclaration
                 currentIndex++;
                 if (ActionCout % AUTO_SAVE_COUNT == 0 && ActionCout != 0)
                 {
-                    AutoSaveToFile(graphDeclaration);
+                    //AutoSaveToFile(graphDeclaration);
                 }
             }
         }

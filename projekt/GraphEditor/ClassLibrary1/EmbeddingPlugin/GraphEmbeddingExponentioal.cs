@@ -13,34 +13,41 @@ namespace Plugin
 {
     public class GraphEmbeddingExponentioal : IPozitioning
     {
-        
+        /// <summary>
+        /// sets new positions of vertices in given graph definition
+        /// </summary>
+        /// <param name="sourceDefinition"></param>
+        /// <returns></returns>
         public override GraphDefinition Pozitioning(GraphDefinition sourceDefinition)
         {
-            Stopwatch stopwatch = new Stopwatch();
-            stopwatch.Start();
-            
-                Embedding embeding = new Embedding(sourceDefinition);
-                switch (sourceDefinition.suraceType)
-                {
-                    case SurfaceTypeEnum.Sphere:
-                        embeding = GetSphereEmbeding(embeding);
-                        break;
-                    case SurfaceTypeEnum.Torus:
-                        embeding = GetTorusEmbeding(embeding);
-                        break;
-                    default:
-                        throw new ArgumentException();
-                }
-                stopwatch.Stop();
-                MessageBox.Show(("Time elapsed:" + stopwatch.Elapsed.ToString()));
-            if (embeding == null)
+            if (sourceDefinition.edges.Count < 2) return sourceDefinition;
+            Embedding embdeding = new Embedding(sourceDefinition);
+            ConnectedComponentGetter components = new ConnectedComponentGetter(embdeding);
+            if (components.GetComponents().Count > 1)
+            {
+                MessageBox.Show("only connected graphs are supported");
+                return sourceDefinition;
+            }
+            switch (sourceDefinition.suraceType)
+            {
+                case SurfaceTypeEnum.Sphere:
+                    embdeding = GetSphereEmbedding(embdeding);
+                    break;
+                case SurfaceTypeEnum.Torus:
+                    embdeding = GetTorusEmbedding(embdeding);
+                    break;
+                default:
+                    throw new ArgumentException();
+            }
+
+            if (embdeding == null)
             {
                 MessageBox.Show("unable to draw given graph on selected surface!");
                 return sourceDefinition;
             }
-            EmbedingMultiGraph multiGraphEmbeding = new EmbedingMultiGraph(embeding);
-            Dictionary<int, PointF> positions = multiGraphEmbeding.GetPositions();            
-            foreach (var item in positions)
+            EmbeddingMultiGraph multiGraphEmbedding = new EmbeddingMultiGraph(embdeding);
+            Dictionary<int, PointF> positions = multiGraphEmbedding.GetPositions();
+            foreach (KeyValuePair<int, PointF> item in positions)
             {
                 sourceDefinition.vertices[item.Key].Pozition = item.Value;
             }
@@ -48,29 +55,35 @@ namespace Plugin
             {
                 edge.RemoveAllSubPoints();
             }
-            return sourceDefinition;            
+            return sourceDefinition;
         }
 
-        private Embedding GetTorusEmbeding(Embedding embeding)
+        /// <summary>
+        /// gets combinatoric embedding of graph on torus
+        /// </summary>
+        /// <param name="embedding"></param>
+        /// <returns></returns>
+        private Embedding GetTorusEmbedding(Embedding embedding)
         {
-            Embedding sphereEmbeding = GetSphereEmbeding(embeding);
-            if (sphereEmbeding != null)
+            Embedding sphereEmbedding = GetSphereEmbedding(embedding);
+            if (sphereEmbedding != null)
             {
                 // planar embedding is also torus embedding
-                return sphereEmbeding;
+                return sphereEmbedding;
             }
-            Embedding h = SubgrafHomeomorphicToK5K3_3(embeding);
+            Embedding h = SubgrafHomeomorphicToK5K3_3(embedding);
             if (h.IsK5())
             {
-                int[] k5Vertices = h.GetK5Vertices().ToArray();
-                
-                PermutationFinder<int> permutations = new PermutationFinder<int>();
+                Stack<Vertex2Record> subpoints = h.getSubPoints();
+                int[] k5Vertices = h.GetK5Vertices().ToArray();                
+                Permutations<int> permutations = new Permutations<int>();
                 Embedding tmp = null;
-                permutations.Evaluate(k5Vertices, (permutation) =>
+                permutations.Eval(k5Vertices, (permutation) =>
                 {
-                    foreach (Embedding e in Embedding.GetK5Embedings(permutation))
+                    foreach (Embedding e in Embedding.GetK5Embeddings(permutation))
                     {
-                        tmp = ExtedEmgeddingTorus(embeding, e);
+                        e.InsertSubPoints(subpoints);
+                        tmp = ExtedEmgeddingTorus(embedding, e);
                         if (tmp != null)
                         {
                             return true;
@@ -82,36 +95,55 @@ namespace Plugin
             }
             if (h.IsK3_3())
             {
-                PermutationFinder<int> permutations = new PermutationFinder<int>();
-                int[] k33Vertexes = h.GetK33Vertices().ToArray();
+                
+                Permutations<int> permutations = new Permutations<int>();
+                Stack<Vertex2Record> subpoints = h.getSubPoints();
+                int[][] k33Vertexes = h.GetK33Vertices();
+                int[] k33Vertexes1 = k33Vertexes[0];
+                int[] k33Vertexes2 = k33Vertexes[1];                
                 Embedding tmp = null;
-                permutations.Evaluate(k33Vertexes, (permutation) =>
+                permutations.Eval(k33Vertexes1, (permutation1) =>
                 {
-                    foreach (Embedding e in Embedding.GetK3_3Embedings(permutation))
-                    {
-                        tmp = ExtedEmgeddingTorus(embeding, e);
-                        if (tmp != null)
+                    bool reult = false;
+                    permutations.Eval(k33Vertexes2, (permutation2) =>
                         {
-                            return true;
-                        }
+                            int[] permutationFinal = new int[6];
+                            Array.Copy(permutation1, permutationFinal, 3);
+                            Array.Copy(permutation2, 0, permutationFinal, 3, 3);
+                            foreach (Embedding e in Embedding.GetK3_3Embeddings(permutationFinal))
+                            {
+                                e.InsertSubPoints(subpoints);
+                                tmp = ExtedEmgeddingTorus(embedding, e);
+                                if (tmp != null)
+                                {
+                                    reult = true;
+                                    return true;
+                                }
 
-                    }
-                    return false;
+                            }
+                            return false;
+                        });
+                    return reult;
                 });
                 return tmp;
             }
             throw new EmbeddingException("there should be k5 or k3_3");
         }
                 
-        private Embedding SubgrafHomeomorphicToK5K3_3(Embedding embeding)
+        /// <summary>
+        /// finds graph homeomorphic to k5 or k3_3
+        /// </summary>
+        /// <param name="embedding"></param>
+        /// <returns></returns>
+        private Embedding SubgrafHomeomorphicToK5K3_3(Embedding embedding)
         {
-            Embedding h = new Embedding(embeding);            
-            foreach (Tuple<int, int> edge in embeding)
+            Embedding h = new Embedding(embedding);            
+            foreach (Tuple<int, int> edge in embedding)
             {
                 if (edge.Item1 < edge.Item2)
                 {
                     h.RemoveEdgeSym(edge);
-                    if (GetSphereEmbeding(h) != null)
+                    if (GetSphereEmbedding(h) != null)
                     {
                         h.AddEdgeSym(edge);
                     }
@@ -120,8 +152,12 @@ namespace Plugin
             return h;
         }
 
-        //returns null if not planar
-        private Embedding GetSphereEmbeding(Embedding g)
+        /// <summary>
+        /// gets combinatoric embedding of graph on sphere
+        /// </summary>
+        /// <param name="g"></param>
+        /// <returns></returns>
+        private Embedding GetSphereEmbedding(Embedding g)
         {
             List<int> cycle = GetCycle(g);
             if (cycle == null)
@@ -140,15 +176,21 @@ namespace Plugin
         Stack<int> cycleTmp;
         Embedding cycleG;
         bool end = false;
-        private List<int> GetCycle(Embedding g)
+
+        /// <summary>
+        /// finds cycle in given embedding
+        /// </summary>
+        /// <param name="embedding"></param>
+        /// <returns>list of vertexes</returns>
+        private List<int> GetCycle(Embedding embedding)
         {
-            cycleG = g;
-            foreach (int vertex in g.neighbors.Keys)
+            cycleG = embedding;
+            foreach (int vertex in embedding.neighbors.Keys)
             {
                 start = vertex;
                 end = false;
                 visited = new Dictionary<int, bool>();
-                foreach (var v in g.neighbors.Keys)
+                foreach (int v in embedding.neighbors.Keys)
                 {
                     visited.Add(v, false);
                 }
@@ -166,7 +208,7 @@ namespace Plugin
         {
             if (end) return;
             visited[u] = true;
-            foreach (var v in cycleG.neighbors[u])
+            foreach (int v in cycleG.neighbors[u])
             {
                 if (v == start && cycleTmp.Count >2)
                 {
@@ -183,6 +225,13 @@ namespace Plugin
             }
         }
 
+        /// <summary>
+        /// iteratively extends embedding of graph h in sphere until it is equal to graph g
+        /// </summary>
+        /// <param name="g">final graph</param>
+        /// <param name="h">already embedded graph</param>
+        /// <param name="i">rest of graph ( g \ h )</param>
+        /// <returns></returns>
         private Embedding ExtedEmgeddingPlanar(Embedding g, Embedding h, Embedding i)
         {
             //TODO caching count...
@@ -195,8 +244,58 @@ namespace Plugin
                 //problem
                 throw new NotImplementedException();
             }
-            List<BridgeWithRespectTo> brigdesWithRespect = GerBridgesWithRespect(g, h, i);
+            List<BridgeWithRespectTo> brigdesWithRespect = GetBridgesWithRespect(g, h, i);
             List<CircularListInt> faces = h.GetFaces();
+            foreach (BridgeWithRespectTo bridge in brigdesWithRespect)
+            {
+                foreach (CircularListInt face in faces)
+                {
+                    bool isValid = true;
+                    foreach (int v in bridge.AttachmentVertexes)
+                    {
+                        if (!face.Contains(v))
+                        {
+                            isValid = false;
+                        }
+                    }
+                    if (isValid)
+                    {
+                        bridge.Faces.Add(face);
+                    }
+                }                
+            }
+            brigdesWithRespect.Sort();
+            BridgeWithRespectTo brigdesWithRespectBest = brigdesWithRespect[0];
+            if (brigdesWithRespectBest.NumberOfAdmisibleFaces == 0)
+            {
+                //this graph cannot be embedded.
+                return null;
+            }
+            if (brigdesWithRespectBest.BridgeType == BridgType.Type1)
+            {
+                List<int> path = brigdesWithRespectBest.GetPath();                
+                h.AddPath(path, brigdesWithRespectBest.Faces[0]);
+            }
+            if (brigdesWithRespectBest.BridgeType == BridgType.Type2)
+            {
+                List<int> path = new List<int>();
+                path.Add(brigdesWithRespectBest.Embedding.First().Item1);
+                path.Add(brigdesWithRespectBest.Embedding.First().Item2);
+                h.AddPath(path, brigdesWithRespectBest.Faces[0]);
+            }
+            //TODO this can be done better
+            i = new Embedding(g);
+            i.Minus(h);            
+            return ExtedEmgeddingPlanar(g, h, i);
+        }
+
+        /// <summary>
+        /// finds faces where can the bridge be embedded
+        /// </summary>
+        /// <param name="faces">list of faces</param>
+        /// <param name="brigdesWithRespect">bridge definition</param>
+        private static void FindAddmisibleFaces(List<CircularListInt> faces, List<BridgeWithRespectTo> brigdesWithRespect)
+        {
             foreach (BridgeWithRespectTo bridge in brigdesWithRespect)
             {
                 foreach (CircularListInt face in faces)
@@ -215,58 +314,13 @@ namespace Plugin
                     }
                 }
             }
-            brigdesWithRespect.Sort();
-            BridgeWithRespectTo brigdesWithRespectBest = brigdesWithRespect[0];
-            if (brigdesWithRespectBest.NumberOfAdmisibleFaces == 0)
-            {
-                //this graph cannot be embedded.
-                return null;
-            }
-            if (brigdesWithRespectBest.BridgeType == BridgType.Type1)
-            {
-                List<int> path = brigdesWithRespectBest.GetPath();
-                if (path == null)
-                {
-                    // TODO can it occur ?
-                    return null;
-                }
-                h.AddPath(path, brigdesWithRespectBest.Faces[0]);
-            }
-            if (brigdesWithRespectBest.BridgeType == BridgType.Type2)
-            {
-                List<int> path = new List<int>();
-                path.Add(brigdesWithRespectBest.Embeding.First().Item1);
-                path.Add(brigdesWithRespectBest.Embeding.First().Item2);
-                h.AddPath(path, brigdesWithRespectBest.Faces[0]);
-            }
-            //TODO this can be done better
-            i = new Embedding(g);
-            i.Minus(h);            
-            return ExtedEmgeddingPlanar(g, h, i);
         }
 
-        private static void FindAddmisibleFaces(List<CircularListInt> faces, List<BridgeWithRespectTo> brigdesWithRespect)
-        {
-            foreach (BridgeWithRespectTo bridge in brigdesWithRespect)
-            {
-                foreach (CircularListInt face in faces)
-                {
-                    bool isValid = true;
-                    foreach (var v in bridge.AttachmentVertexes)
-                    {
-                        if (!face.Contains(v))
-                        {
-                            isValid = false;
-                        }
-                    }
-                    if (isValid)
-                    {
-                        bridge.Faces.Add(face);
-                    }
-                }
-            }
-        }
-
+        /// <summary>
+        /// finds path of bridge which will be embedded
+        /// </summary>
+        /// <param name="brigdesWithRespectBest"></param>
+        /// <returns></returns>
         private static List<int> GetPath(BridgeWithRespectTo brigdesWithRespectBest)
         {
             List<int> path = null;
@@ -277,14 +331,19 @@ namespace Plugin
             if (brigdesWithRespectBest.BridgeType == BridgType.Type2)
             {
                 path = new List<int>();
-                path.Add(brigdesWithRespectBest.Embeding.First().Item1);
-                path.Add(brigdesWithRespectBest.Embeding.First().Item2);
+                path.Add(brigdesWithRespectBest.Embedding.First().Item1);
+                path.Add(brigdesWithRespectBest.Embedding.First().Item2);
             }
             return path;
         }
 
+        /// <summary>
+        /// iteratively extends embedding of graph h until it is equal to graph g
+        /// </summary>
+        /// <param name="g">final graph</param>
+        /// <param name="h">already embedded graph</param>
         private Embedding ExtedEmgeddingTorus(Embedding g, Embedding h)
-        {
+        {            
             if (g.Count() == h.Count())
             {
                 return h;
@@ -292,7 +351,7 @@ namespace Plugin
             Embedding i = new Embedding(g);
             i.Minus(h);
             List<CircularListInt> faces = h.GetFaces();
-            List<BridgeWithRespectTo> brigdesWithRespect = GerBridgesWithRespect(g, h, i);
+            List<BridgeWithRespectTo> brigdesWithRespect = GetBridgesWithRespect(g, h, i);
             FindAddmisibleFaces(faces, brigdesWithRespect);
             brigdesWithRespect.Sort();
             BridgeWithRespectTo brigdesWithRespectBest = brigdesWithRespect[0];
@@ -310,14 +369,20 @@ namespace Plugin
                 if (h.AddPath(path, brigdesWithRespectBest.Faces[0], VertexState.FIRST, VertexState.SECOND))
                 {
                     emgeddingTorus = ExtedEmgeddingTorus(g, h);
-                    h.RemovePath(path);
+                    if (emgeddingTorus == null)
+                    {
+                        h.RemovePath(path);
+                    }
                 }
                 if (emgeddingTorus == null)               {
                     
                     if (h.AddPath(path, brigdesWithRespectBest.Faces[0], VertexState.SECOND, VertexState.FIRST))
                     {
                         emgeddingTorus = ExtedEmgeddingTorus(g, h);
-                        h.RemovePath(path);
+                        if (emgeddingTorus == null)
+                        {
+                            h.RemovePath(path);
+                        }
                     }
                     if (emgeddingTorus == null)
                     {
@@ -325,7 +390,10 @@ namespace Plugin
                         if(h.AddPath(path, brigdesWithRespectBest.Faces[0], VertexState.SECOND, VertexState.SECOND))
                         {
                             emgeddingTorus = ExtedEmgeddingTorus(g, h);
-                            h.RemovePath(path);
+                            if (emgeddingTorus == null)
+                            {
+                                h.RemovePath(path);
+                            }
                         }
                     }
                 }
@@ -334,7 +402,14 @@ namespace Plugin
             return emgeddingTorus;
         }
 
-        private static List<BridgeWithRespectTo> GerBridgesWithRespect(Embedding g, Embedding h, Embedding i)
+        /// <summary>
+        /// gets bridges of i with respect to h
+        /// </summary>
+        /// <param name="g">entire graph</param>
+        /// <param name="h">already embedded graph</param>
+        /// <param name="i">est of graph ( g \ h )</param>
+        /// <returns></returns>
+        private static List<BridgeWithRespectTo> GetBridgesWithRespect(Embedding g, Embedding h, Embedding i)
         {
             ConnectedComponentGetter compenetGetter = new ConnectedComponentGetter(i);
             List<Embedding> components = compenetGetter.GetComponents();
@@ -342,12 +417,12 @@ namespace Plugin
             components.ForEach(x => bridgesWithRespectTo.Add(new BridgeWithRespectTo(x)));
 
 
-            foreach (var bridge in bridgesWithRespectTo)
+            foreach (BridgeWithRespectTo bridge in bridgesWithRespectTo)
             {
                 List<Tuple<int, int>> tmp = new List<Tuple<int, int>>();
                 foreach (Tuple<int, int> edge in g)
                 {
-                    if (bridge.Embeding.ConteintsVertex(edge.Item1) && h.ConteintsVertex(edge.Item2))
+                    if (bridge.Embedding.ConteintsVertex(edge.Item1) && h.ConteintsVertex(edge.Item2))
                     {
                         tmp.Add(edge);
                     }
@@ -357,14 +432,14 @@ namespace Plugin
                     bridge.AddEdgeSym(edge);
                     bridge.AttachmentVertexes.Add(edge.Item2);
                 }
-                bridge.BridgeType = BridgType.Type1;
+                bridge.BridgeType = BridgType.Type1;                
             }
             foreach (Tuple<int, int> edge in g)
             {                
                 if (h.ConteintsVertex(edge.Item1) && h.ConteintsVertex(edge.Item2) && !h.ContaintsEdgeAsym(edge) && edge.Item1 < edge.Item2)
                 {
                     
-                    BridgeWithRespectTo tmp = new BridgeWithRespectTo(new Embedding(edge), edge);
+                    BridgeWithRespectTo tmp = new BridgeWithRespectTo(new Embedding(edge), edge);                    
                     bridgesWithRespectTo.Add(tmp);
                 }
             }

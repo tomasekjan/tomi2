@@ -105,7 +105,7 @@ namespace GraphEditor.Drawing
 
         void changeColorMenuItem_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new System.Windows.Forms.ColorDialog();
+            System.Windows.Forms.ColorDialog dialog = new System.Windows.Forms.ColorDialog();
             dialog.ShowDialog();
             line2D.ChangeColor(dialog.Color);
             invalidateFunction();

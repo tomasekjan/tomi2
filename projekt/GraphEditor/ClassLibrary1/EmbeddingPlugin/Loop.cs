@@ -22,7 +22,7 @@ namespace Plugin
         /// </summary>
         /// <param name="embedding">embedding to remove vertex from</param>
         /// <param name="vertex">index of vertex to remove</param>
-        public override void Remove(EmbedingMultiGraph embedding, int v)
+        public override void Remove(EmbeddingMultiGraph embedding, int v)
         {
             this.v = v;
             EdgeMultiGraph edgeReflexive = null ;
@@ -51,7 +51,7 @@ namespace Plugin
             embedding.incidenceEdges[z].Add(edge2.SymetricEdge);                        
         }
 
-        public override void Add(EmbedingMultiGraph embedding)
+        public override void Add(EmbeddingMultiGraph embedding)
         {
             //don't set asix
             embedding.RemoveEdgeSym(edge1);

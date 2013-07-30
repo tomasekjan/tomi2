@@ -230,6 +230,12 @@ namespace GraphEditor.GraphDeclaration
             return -1;
         }
 
+        public override bool Equals(object obj)
+        {
+            Edge edge = obj as Edge;
+            return ((Begin.Equals(edge.Begin)) && End.Equals(edge.End)) || ((Begin.Equals(edge.End)) && End.Equals(edge.Begin));
+        }
+
         public void RemoveAllSubPoints()
         {
             List<SubPoint> toRemove = new List<SubPoint>();
@@ -237,7 +243,7 @@ namespace GraphEditor.GraphDeclaration
             {
                 toRemove.Add(points[i]);
             }
-            foreach (var point in toRemove)
+            foreach (SubPoint point in toRemove)
             {
                 points.Remove(point);
             }

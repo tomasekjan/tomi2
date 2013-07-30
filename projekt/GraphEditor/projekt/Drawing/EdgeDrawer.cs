@@ -74,7 +74,7 @@ namespace GraphEditor.Drawing
         /// <param name="invalidateFunction"></param>
         public void Draw2D(Canvas canvas, ContextMenu vertexContextMenu, DependencyProperty dependencyPropertyVertex, DependencyProperty dependencyPropertyLine2D, Action<object, RoutedEventArgs> AddPointFunction, Action<object, RoutedEventArgs> DelleteEdgeFunction, Func<bool> invalidateFunction)
         {
-            foreach (var line in edge.lines)
+            foreach (Line2D line in edge.lines)
             {                
                 GetLineDrawer(line).Draw2D(canvas, AddPointFunction, dependencyPropertyLine2D, invalidateFunction, DelleteEdgeFunction);
             }

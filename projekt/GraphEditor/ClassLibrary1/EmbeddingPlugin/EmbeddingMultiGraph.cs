@@ -9,7 +9,7 @@ using System.Windows.Forms;
 
 namespace Plugin
 {
-    class EmbedingMultiGraph : IEnumerable<EdgeMultiGraph>
+    class EmbeddingMultiGraph : IEnumerable<EdgeMultiGraph>
     {
         int newEdgeid = 0;
         public int newVertexid = 9999;
@@ -27,24 +27,28 @@ namespace Plugin
             }
         }
                 
-        public EmbedingMultiGraph(Embedding embeding)
+        /// <summary>
+        /// creates multi graph embeding from basic embedding
+        /// </summary>
+        /// <param name="embedding"></param>
+        public EmbeddingMultiGraph(Embedding embedding)
         {
             incidenceEdges = new Dictionary<int, CircularListEdge>();
-            foreach (int u in embeding.neighbors.Keys)
+            foreach (int u in embedding.neighbors.Keys)
             {
                 incidenceEdges.Add(u, new CircularListEdge());
-                foreach (int v in embeding.neighbors[u])
+                foreach (int v in embedding.neighbors[u])
                 {
                     incidenceEdges[u].Add(new EdgeMultiGraph(u, v, newEdgeid));
                     newEdgeid++;
                 }
             }
-            foreach (int u in embeding.neighbors.Keys)
+            foreach (int u in embedding.neighbors.Keys)
             {                
-                foreach (int v in embeding.neighbors[u])
+                foreach (int v in embedding.neighbors[u])
                 {
-                    int indexuv = embeding.neighbors[u].IndexOf(v);
-                    int indexvu = embeding.neighbors[v].IndexOf(u);
+                    int indexuv = embedding.neighbors[u].IndexOf(v);
+                    int indexvu = embedding.neighbors[v].IndexOf(u);
                     incidenceEdges[u][indexuv].SymetricEdge = incidenceEdges[v][indexvu];
                 }
             }
@@ -55,6 +59,10 @@ namespace Plugin
             return GetEnumerator();
         }
 
+        /// <summary>
+        /// to string method - just for debugging
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
@@ -66,6 +74,10 @@ namespace Plugin
             return sb.ToString();
         }
 
+        /// <summary>
+        /// gets all faces of curren embedding
+        /// </summary>
+        /// <returns>list of faces</returns>
         public List<CircularListEdge> GetFaces()
         {
             Dictionary<EdgeMultiGraph, bool> record = new Dictionary<EdgeMultiGraph, bool>();
@@ -99,6 +111,10 @@ namespace Plugin
             return faces;
         }
 
+        /// <summary>
+        /// Read's algorithm updated for torus
+        /// </summary>
+        /// <returns>positions of given vertexes</returns>
         public Dictionary<int, PointF> GetPositions()
         {            
             Triangulate();
@@ -111,6 +127,10 @@ namespace Plugin
             return pozition;
         }
 
+        /// <summary>
+        /// reinsert vertexes deleted in reduction
+        /// </summary>
+        /// <param name="stack">stack of reduced vertexes</param>
         private void Reinsert(Stack<VertexDegree> stack)
         {
             while (stack.Count != 0)
@@ -137,7 +157,7 @@ namespace Plugin
                     if (face.Count > 3)
                     {
                         run = true;
-                        var vertexes = from t in face where incidenceEdges[t.U].Count == 2 select face.IndexOf(t);
+                        IEnumerable<int> vertexes = from t in face where incidenceEdges[t.U].Count == 2 select face.IndexOf(t);
                         
                         int startIndex = 0;
                         if (vertexes.Count() != 0)
@@ -171,24 +191,40 @@ namespace Plugin
 
         }
 
-        public EdgeMultiGraph GetNewEdgeAsym(int u, int v)
+        /// <summary>
+        /// adding new edge in current embedding
+        /// </summary>
+        /// <param name="u">first vertex</param>
+        /// <param name="v">second vertex</param>
+        /// <returns></returns>
+        private EdgeMultiGraph GetNewEdgeAsym(int u, int v)
         {
-            var tmp = new EdgeMultiGraph(u, v, newEdgeid);
+            EdgeMultiGraph tmp = new EdgeMultiGraph(u, v, newEdgeid);
             newEdgeid++;
             return tmp;
         }
 
-        public EdgeMultiGraph GetNewEdgeSym(int u, int v)
+        /// <summary>
+        /// adding new edge in current embedding with symmetric edge
+        /// </summary>
+        /// <param name="u">first vertex</param>
+        /// <param name="v">second vertex</param>
+        /// <returns></returns>
+        internal EdgeMultiGraph GetNewEdgeSym(int u, int v)
         {
-            var e1 = new EdgeMultiGraph(u, v, newEdgeid);
+            EdgeMultiGraph e1 = new EdgeMultiGraph(u, v, newEdgeid);
             newEdgeid++;
-            var e2 = new EdgeMultiGraph(v, u, newEdgeid);
+            EdgeMultiGraph e2 = new EdgeMultiGraph(v, u, newEdgeid);
             newEdgeid++;
             e1.SymetricEdge = e2;
             e2.SymetricEdge = e1;
             return e1;
         }
         
+        /// <summary>
+        /// remove edge from embedding
+        /// </summary>
+        /// <param name="edge"></param>
         public void RemoveEdgeSym(EdgeMultiGraph edge)
         {
             incidenceEdges[edge.U].Remove(edge);
@@ -203,6 +239,10 @@ namespace Plugin
             }
         }
         
+        /// <summary>
+        /// removes loop of multi graph and calls triangulation again
+        /// </summary>
+        /// <param name="stack"></param>
         private void RemoveLoops(Stack<VertexDegree> stack)
         {
             bool run = true;
@@ -241,6 +281,10 @@ namespace Plugin
             }
         }
 
+        /// <summary>
+        /// reducin graph according to read's algorithm
+        /// </summary>
+        /// <param name="stack"></param>
         private void Reduce(Stack<VertexDegree> stack)
         {            
             bool run = true;
@@ -294,10 +338,13 @@ namespace Plugin
             
         }
 
+        /// <summary>
+        /// set positons of basic cases after reduction
+        /// </summary>
         private void SetPosition()
         {
             IEnumerable<int> degrees = from a in incidenceEdges.Keys select incidenceEdges[a].Count;
-            var degree2 = from a in degrees where a == 2 select a;
+            IEnumerable<int> degree2 = from a in degrees where a == 2 select a;
             if (degree2.Count() == incidenceEdges.Count())
             {
                 PointF Midle = new PointF(0.5f, 0.5f);
@@ -318,13 +365,14 @@ namespace Plugin
                 }
                 return;
             }
-            var degree6 = from a in degrees where a == 6 select a;
+            IEnumerable<int> degree6 = from a in degrees where a == 6 select a;
             if (degree6.Count() != incidenceEdges.Count())
             {
                 throw new NotImplementedException();
             }
             if (degree6.Count() == 4)
             {
+                //t4
                 int i = 0;
                 int j = 0;
                 foreach (int key in incidenceEdges.Keys)
@@ -362,9 +410,43 @@ namespace Plugin
             {
                 //t3
             }
-            //6-relar
+            // 6 -regular
+            List<int> v = new List<int>();
+            int v0 = incidenceEdges.Keys.First();
+            v.Add(v0);
+            v.Add(incidenceEdges[v0][0].V);
+            for (int i = 1; i < incidenceEdges.Count; i++)
+            {
+                int vi = v[i];
+                int viLast = v[i - 1];
+                int viNew = -1;
+                for (int j = 0; j < incidenceEdges[vi].Count; j++)
+                {
+                    EdgeMultiGraph edge = incidenceEdges[vi][j];
+                    if (edge.U == vi && edge.V == viLast)
+                    {
+                        int index = incidenceEdges[vi].IndexOf(edge);
+                        viNew = incidenceEdges[vi][(index + 3) % 6].V;
+                        break;
+                    }
+                }
+                if (v.Contains(viNew))
+                {
+                    break;
+                }
+                v.Add(viNew);
+            }
+            List<int> w = new List<int>();
+            for (int i = 0; i < v.Count-1; i++)
+            {
+
+            }
+            int m = v.Count;
         }
-                
+
+        /// <summary>
+        /// removing edges added during triangulation
+        /// </summary>
         private void RemoveTriangulation()
         {
             List<EdgeMultiGraph> list = new List<EdgeMultiGraph>();

@@ -14,34 +14,34 @@ namespace Plugin
         /// <summary>
         /// fist vertex
         /// </summary>
-        public Vector2 A
+        public Vector2 U
         {
             get 
             {
-                return a;            
+                return u;            
             }
             set 
             { 
-                a = value; 
+                u = value; 
             }
         }
 
-        Vector2 a;
+        Vector2 u;
         /// <summary>
         /// second vertex
         /// </summary>
-        public Vector2 B
+        public Vector2 V
         {
             get 
             { 
-                return b; 
+                return v; 
             }
             set 
             { 
-                b = value; 
+                v = value; 
             }
         }
-        Vector2 b;
+        Vector2 v;
         /// <summary>
         /// creates new line
         /// </summary>
@@ -49,8 +49,8 @@ namespace Plugin
         /// <param name="b">end vertex</param>
         public LineSegment(Vector2 a, Vector2 b)
         {
-            this.a = a;
-            this.b = b;
+            this.u = a;
+            this.v = b;
         }
 
         /// <summary>
@@ -62,7 +62,7 @@ namespace Plugin
         {
             Vector2 i;
             bool result = IsCrossing(lineSegment, out i);
-            if (i == A || i == B)
+            if (i == U || i == V)
             {
                 return false;
             }
@@ -84,9 +84,9 @@ namespace Plugin
             bool crossing;
             const float epsilon = 0.00001f;
 
-            float ua = (lineSegment.B.X - lineSegment.A.X) * (A.Y - lineSegment.A.Y) - (lineSegment.B.Y - lineSegment.A.Y) * (A.X - lineSegment.A.X);
-            float ub = (B.X - A.X) * (A.Y - lineSegment.A.Y) - (B.Y - A.Y) * (A.X - lineSegment.A.X);
-            float denominator = (lineSegment.B.Y - lineSegment.A.Y) * (B.X - A.X) - (lineSegment.B.X - lineSegment.A.X) * (B.Y - A.Y);
+            float ua = (lineSegment.V.X - lineSegment.U.X) * (U.Y - lineSegment.U.Y) - (lineSegment.V.Y - lineSegment.U.Y) * (U.X - lineSegment.U.X);
+            float ub = (V.X - U.X) * (U.Y - lineSegment.U.Y) - (V.Y - U.Y) * (U.X - lineSegment.U.X);
+            float denominator = (lineSegment.V.Y - lineSegment.U.Y) * (V.X - U.X) - (lineSegment.V.X - lineSegment.U.X) * (V.Y - U.Y);
 
             crossing = false;
 
@@ -95,7 +95,7 @@ namespace Plugin
                 if (Math.Abs(ua) <= 0.00001f && Math.Abs(ub) <= 0.00001f)
                 {
                     crossing = true;
-                    intersection = (A + B) / 2;
+                    intersection = (U + V) / 2;
                 }
             }
             else
@@ -106,8 +106,8 @@ namespace Plugin
                 if (ua >= 0 && ua <= 1 && ub >= 0 && ub <= 1)
                 {
                     crossing = true;
-                    intersection.X = A.X + ua * (B.X - A.X);
-                    intersection.Y = A.Y + ua * (B.Y - A.Y);
+                    intersection.X = U.X + ua * (V.X - U.X);
+                    intersection.Y = U.Y + ua * (V.Y - U.Y);
                 }
             }
 

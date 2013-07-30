@@ -111,6 +111,12 @@ namespace Plugin
             }
         }
 
+        /// <summary>
+        /// creates new instance of edge in multi graph
+        /// </summary>
+        /// <param name="u">first vertex of new edge</param>
+        /// <param name="v">second vertex of new edge</param>
+        /// <param name="index">index of new edge (two edges with same vertexes need to be unique)</param>
         public EdgeMultiGraph(int u, int v, int index)            
         {
             this.u = u;
@@ -129,6 +135,10 @@ namespace Plugin
             return index;
         }
 
+        /// <summary>
+        /// To sting function just for debbuging reasons
+        /// </summary>
+        /// <returns></returns>
         public override string ToString()
         {
             return String.Format("({0},{1},{2})", u, v, index);

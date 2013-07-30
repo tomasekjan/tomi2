@@ -12,19 +12,19 @@ namespace Plugin
 {
     class ConnectedComponentGetter
     {
-        private Embedding embeding;
+        private Embedding embedding;
         private Dictionary<int, bool> visited;
         List<int> comp;
 
         /// <summary>
         /// creates new instance of component getter
         /// </summary>
-        /// <param name="embeding">embedding to search components in</param>
-        public ConnectedComponentGetter(Embedding embeding)
+        /// <param name="embedding">embedding to search components in</param>
+        public ConnectedComponentGetter(Embedding embedding)
         {
-            this.embeding = embeding;
+            this.embedding = embedding;
             visited = new Dictionary<int, bool>();
-            foreach (int v in embeding.neighbors.Keys)
+            foreach (int v in embedding.neighbors.Keys)
             {
                 visited.Add(v, false);
             }
@@ -37,7 +37,7 @@ namespace Plugin
         public List<Embedding> GetComponents()
         {
             List<Embedding> returnList = new List<Embedding>();
-            foreach (var v in embeding.neighbors.Keys)
+            foreach (int v in embedding.neighbors.Keys)
             {
                 comp = new List<int>();                
                 if (visited[v] == false)
@@ -47,7 +47,7 @@ namespace Plugin
                 }
                 if (comp.Count != 0)
                 {
-                    Embedding component = new Embedding(comp, embeding);
+                    Embedding component = new Embedding(comp, embedding);
                     returnList.Add(component);
                 }
             }
@@ -55,13 +55,13 @@ namespace Plugin
         }
 
         /// <summary>
-        /// dfs visit functino
+        /// dfs visit function
         /// </summary>
         /// <param name="u"></param>
         private void visit(int u)
         {
             visited[u] = true;
-            foreach (int v in embeding.neighbors[u])
+            foreach (int v in embedding.neighbors[u])
             {
                 if (visited[v] == false)
                 {

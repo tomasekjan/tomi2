@@ -8,45 +8,45 @@ using System.Drawing;
 
 namespace Plugin
 {
-    public class PermutationFinder<T>
+    public class Permutations<T>
     {
-        private T[] items;
-        private Predicate<T[]> SuccessFunc;
+        private T[] sourceArray;
+        private Predicate<T[]> functionForPermutation;
         private bool success = false;
-        private int itemsCount;
+        private int count;
 
-        public void Evaluate(T[] items, Predicate<T[]> SuccessFunc)
+        public void Eval(T[] items, Predicate<T[]> SuccessFunc)
         {
-            this.items = items;
-            this.SuccessFunc = SuccessFunc;
-            this.itemsCount = items.Count();
-            Recurse(0);
+            this.sourceArray = items;
+            this.functionForPermutation = SuccessFunc;
+            this.count = items.Count();
+            Recursion(0);
         }
 
-        private void Recurse(int index)
+        private void Recursion(int beginIndex)
         {
             T tmp;
 
-            if (index == itemsCount)
+            if (beginIndex == count)
             {
-                success = SuccessFunc(items);
+                success = functionForPermutation(sourceArray);
             }
             else
             {
-                for (int i = index; i < itemsCount; i++)
+                for (int i = beginIndex; i < count; i++)
                 {
-                    tmp = items[index];
-                    items[index] = items[i];
-                    items[i] = tmp;
+                    tmp = sourceArray[beginIndex];
+                    sourceArray[beginIndex] = sourceArray[i];
+                    sourceArray[i] = tmp;
 
-                    Recurse(index + 1);
+                    Recursion(beginIndex + 1);
 
                     if (success)
                         break;
 
-                    tmp = items[index];
-                    items[index] = items[i];
-                    items[i] = tmp;
+                    tmp = sourceArray[beginIndex];
+                    sourceArray[beginIndex] = sourceArray[i];
+                    sourceArray[i] = tmp;
                 }
             }
         }

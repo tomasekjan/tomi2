@@ -16,14 +16,18 @@ namespace Plugin
         Dictionary<int, VertexProperities> vertexs;
         int count = 0;
         Stack<Tuple<int, int>> stack = new Stack<Tuple<int, int>>();
-        Embedding embeding;
+        Embedding embedding;
         List<Embedding> returnList = new List<Embedding>();
 
-        public TwoConnectedComponentGetter(Embedding embeding)
+        /// <summary>
+        /// creates new instance of 2 connected component getter
+        /// </summary>
+        /// <param name="embedding">embedding to search 2 connected components</param>
+        public TwoConnectedComponentGetter(Embedding embedding)
         {
-            this.embeding = embeding;
+            this.embedding = embedding;
             vertexs = new Dictionary<int, VertexProperities>();
-            foreach (int i in embeding.neighbors.Keys)
+            foreach (int i in embedding.neighbors.Keys)
             {
                 vertexs.Add(i, new VertexProperities());
                 vertexs[i].visited = false;
@@ -33,6 +37,10 @@ namespace Plugin
             }
         }
 
+        /// <summary>
+        /// get 2 connected componnts
+        /// </summary>
+        /// <returns>list of commponnets</returns>
         public List<Embedding> GetComponents()
         {
 
@@ -56,7 +64,7 @@ namespace Plugin
             count++;
             vertexs[u].d = count;
             vertexs[u].low = vertexs[u].d;
-            foreach (int v in embeding.neighbors[u])
+            foreach (int v in embedding.neighbors[u])
             {
                 if (!vertexs[v].visited)
                 {

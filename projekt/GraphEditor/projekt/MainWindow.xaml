@@ -172,8 +172,8 @@
                     <MenuItem
                         Header="Embedding"
                         Background="#b0b0c5"
-                        Name="EmbedingPluginButton"
-                        Click="EmbedingPluginButton_Click">
+                        Name="EmbeddingPluginButton"
+                        Click="EmbeddingPluginButton_Click">
                     </MenuItem>
                         
                 </MenuItem>

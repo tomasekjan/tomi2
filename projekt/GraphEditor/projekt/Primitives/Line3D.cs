@@ -72,7 +72,7 @@ namespace GraphEditor.Primitives3D
 
             for (int i = 0; i < tessellation; i++)
             {
-                var vertex = new PointF(startPoint.X - i * (sizeX/tessellation),startPoint.Y - i * (sizeY/tessellation));
+                PointF vertex = new PointF(startPoint.X - i * (sizeX / tessellation), startPoint.Y - i * (sizeY / tessellation));
                 float x = vertex.X * 0.7f;
                 float y = vertex.Y * 0.7f;
                 Vector3 position = new Vector3(0, 0, 1);

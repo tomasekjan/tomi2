@@ -20,7 +20,7 @@ namespace Plugin
         /// adding vertex back to embedding
         /// </summary>
         /// <param name="embedding">embedding to add vertex to</param>
-        public override void Add(EmbedingMultiGraph e)
+        public override void Add(EmbeddingMultiGraph e)
         {
             
             PointF pos = PentagonMidle(e.pozition[v], e.pozition[w], e.pozition[x], e.pozition[y], e.pozition[z]);
@@ -69,7 +69,7 @@ namespace Plugin
                     Vector2 point = new Vector2(x, y);
                     for (int i = 0; i < 5; i++)
                     {
-                        lines[i].B = point;
+                        lines[i].V = point;
                     }
                     for (int i = 0; i < 5; i++)
                     {
@@ -101,7 +101,7 @@ namespace Plugin
         /// </summary>
         /// <param name="embedding">embedding to remove vertex from</param>
         /// <param name="vertex">index of vertex to remove</param>
-        public override void Remove(EmbedingMultiGraph embedding, int vertex)
+        public override void Remove(EmbeddingMultiGraph embedding, int vertex)
         {
             u = vertex;
             v = embedding.incidenceEdges[vertex][0].V;

@@ -136,7 +136,10 @@ namespace GraphEditor.GraphDeclaration
         public void AddEdge (Edge edge)
         {
             Action();
-            graphDeclaration.edges.Add(edge);
+            if (!graphDeclaration.edges.Contains(edge))
+            {
+                graphDeclaration.edges.Add(edge);
+            }
         }
 
         private void AddEdge(Vertex vertex, Vertex ActualVertexAddEdge)
@@ -275,7 +278,7 @@ namespace GraphEditor.GraphDeclaration
         /// <summary>
         /// action which is stored for undo/redo
         /// </summary>
-        private void Action()
+        public void Action()
         {
             serializer.Action(graphDeclaration);
         }

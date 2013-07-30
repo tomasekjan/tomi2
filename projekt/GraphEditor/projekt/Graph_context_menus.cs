@@ -47,7 +47,7 @@ namespace GraphEditor.GraphDeclaration
             MenuItem deleteMenuItem = (MenuItem)sender;
             PointDrawer pointDrawer = deleteMenuItem.GetValue(dependencyPropertyVertex) as PointDrawer;
             SubPoint vertex = pointDrawer.point;
-            var dialog =new System.Windows.Forms.ColorDialog();
+            System.Windows.Forms.ColorDialog dialog = new System.Windows.Forms.ColorDialog();
             dialog.ShowDialog();
             vertex.ChangeColor(dialog.Color);
             invalidateFunction();

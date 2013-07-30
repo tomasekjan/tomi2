@@ -52,9 +52,10 @@
     <Compile Include="EmbeddingPlugin\GraphEmbeddingExponentioal.cs" />
     <Compile Include="EmbeddingPlugin\ConnectedComponentGetter.cs" />
     <Compile Include="EmbeddingPlugin\TwoConnectedComponentGetter2.cs" />
+    <Compile Include="EmbeddingPlugin\Vertex2Record.cs" />
     <Compile Include="EmbeddingPlugin\VertexState.cs" />
     <Compile Include="EmbeddingPlugin\Embedding.cs" />
-    <Compile Include="EmbeddingPlugin\EmbedingMultiGraph.cs" />
+    <Compile Include="EmbeddingPlugin\EmbeddingMultiGraph.cs" />
     <Compile Include="EmbeddingPlugin\LineSegment.cs" />
     <Compile Include="EmbeddingPlugin\Loop.cs" />
     <Compile Include="EmbeddingPlugin\Permutations.cs" />

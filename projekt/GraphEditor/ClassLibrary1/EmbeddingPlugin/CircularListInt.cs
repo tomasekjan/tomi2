@@ -10,6 +10,10 @@ namespace Plugin
 {
     public class CircularListInt : List<int>
     {
+        /// <summary>
+        /// copy constructor
+        /// </summary>
+        /// <param name="circularList">source list</param>
         public CircularListInt(IEnumerable<int> circularList) :base(circularList)
         {
             
@@ -19,6 +23,12 @@ namespace Plugin
         {
 
         }
+
+        /// <summary>
+        /// gets value in circular list which is just before given value
+        /// </summary>
+        /// <param name="value">value to search for</param>
+        /// <returns>value before given value</returns>
         public int GetBeforeValue(int value)
         {
             int before = -1;
@@ -35,6 +45,11 @@ namespace Plugin
             return before;
         }
 
+        /// <summary>
+        /// gets value of circular list which is just before second appearance of given value
+        /// </summary>
+        /// <param name="value">value to search for</param>
+        /// <returns>value before second appearance of given value</returns>
         public int GetBeforeSecondValue(int value)
         {
             int before = -1;
@@ -59,7 +74,11 @@ namespace Plugin
 
             return before;
         }
-
+        /// <summary>
+        /// gets value of circular list which is just after given value
+        /// </summary>
+        /// <param name="value">value to search for</param>
+        /// <returns>value after given value</returns>
         public int GetAfterValue(int value)
         {
             int after = -1;
@@ -76,6 +95,11 @@ namespace Plugin
             return after;
         }
 
+        /// <summary>
+        /// gets value of circular list which is just after second appearance of given value
+        /// </summary>
+        /// <param name="value">value to search for</param>
+        /// <returns>value after second appearance of given value</returns>
         public int GetAfterSecondValue(int value)
         {
             int after = -1;
@@ -100,6 +124,12 @@ namespace Plugin
             return after;
         }
                 
+        /// <summary>
+        /// insert value in circular list between two given values
+        /// </summary>
+        /// <param name="value">value to insert</param>
+        /// <param name="before">insert after this </param>
+        /// <param name="after">insert before this</param>
         public void InserBeintwen(int value, int before, int after)
         {
             for (int i = 0; i < this.Count; i++)

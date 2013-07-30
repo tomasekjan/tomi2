@@ -90,10 +90,11 @@ namespace GraphEditor
         private void xnaControl1_RenderXna(object sender, GraphicsDeviceEventArgs e)
         {
             graph.SetGraphicDevice(e.GraphicsDevice);
-            var wireFrameState = new RasterizerState()
-            {
-                FillMode = FillMode.WireFrame,
-                CullMode = CullMode.None};
+            RasterizerState wireFrameState = new RasterizerState()
+                        {
+                            FillMode = FillMode.WireFrame,
+                            CullMode = CullMode.None
+                        };
 
             if (isWireFrame)
             {
@@ -443,8 +444,9 @@ namespace GraphEditor
             RunPlugin(new RandomPozition());
         }
 
-        private void EmbedingPluginButton_Click(object sender, RoutedEventArgs e)
+        private void EmbeddingPluginButton_Click(object sender, RoutedEventArgs e)
         {
+            //TODO after adding parallelism use this window
             //EmbeddingWindow tmp = new EmbeddingWindow();
             //tmp.Show();
             RunPlugin(new GraphEmbeddingExponentioal());            
@@ -452,7 +454,17 @@ namespace GraphEditor
         
         private void RunPlugin(IPozitioning plugin)
         {
-            graph.graphDeclaration = plugin.Pozitioning(graph.graphDeclaration);
+            //TODO return try-catch in final version 
+            graph.Action();
+            //try
+            //{
+                graph.graphDeclaration = plugin.Pozitioning(graph.graphDeclaration);
+            //}
+            //catch
+            //{
+                System.Windows.Forms.MessageBox.Show("Unknown error occurred during embedding");
+            //    graph.Undo();
+            //}           
             Invalidate();
         }
 

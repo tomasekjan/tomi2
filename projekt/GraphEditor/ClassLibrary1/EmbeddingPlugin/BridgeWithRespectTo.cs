@@ -1,12 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using AddInView;
-using GraphEditor.GraphDeclaration;
-using System.Diagnostics;
-using System.Drawing;
-using System.Collections;
 
 namespace Plugin
 {
@@ -27,7 +21,9 @@ namespace Plugin
         /// vertexes that is bridge attached to in embedding
         /// </summary>
         HashSet<int> attachmentVertexes;
-
+        int heuristic = -1;
+        int start = -1;
+        int end = -1;
         List<CircularListInt> faces;
         
         public BridgType BridgeType
@@ -60,7 +56,7 @@ namespace Plugin
                 return faces.Count;
             }
         }
-        public Embedding Embeding
+        public Embedding Embedding
         {
             get
             {
@@ -95,21 +91,21 @@ namespace Plugin
         /// <summary>
         /// bridge of type 1
         /// </summary>
-        /// <param name="embeding"></param>
-        public BridgeWithRespectTo(Embedding embeding):this()
+        /// <param name="embedding"></param>
+        public BridgeWithRespectTo(Embedding embedding):this()
         {
-            this.bridge = embeding;
+            this.bridge = embedding;
             BridgeType = BridgType.Type1;
         }
 
         /// <summary>
         /// bridge of type 2
         /// </summary>
-        /// <param name="embeding"></param>
+        /// <param name="embedding"></param>
         /// <param name="edge"></param>
-        public BridgeWithRespectTo(Embedding embeding, Tuple<int, int> edge):this()
+        public BridgeWithRespectTo(Embedding embedding, Tuple<int, int> edge):this()
         {
-            this.bridge = embeding;
+            this.bridge = embedding;
             attachmentVertexes.Add(edge.Item1);
             attachmentVertexes.Add(edge.Item2);
             BridgeType = BridgType.Type2;
@@ -134,6 +130,63 @@ namespace Plugin
             return NumberOfAdmisibleFaces.CompareTo(other.NumberOfAdmisibleFaces);
         }
 
+        public int Heuristic
+        {
+            get
+            {                
+                return heuristic;
+            }
+        }
+
+        /// <summary>
+        /// heuristic function for determining with bridge should be embedded first
+        /// </summary>
+        public void CountHeuristic()
+        {
+            if (faces.Count == 0)
+            {
+                heuristic = 0;
+                return;
+            }
+            heuristic = 1;
+            foreach (CircularListInt face in faces)
+            {
+                if (attachmentVertexes.Count == 1)
+                {
+                    start = attachmentVertexes.First();
+                    end = attachmentVertexes.First();
+                    break;
+                }
+                int heuristicFace = 1;
+                foreach (int vertex in attachmentVertexes)
+                {
+                    int count = (from a in face where a == vertex select a).Count();
+                    if (count == 1)
+                    {
+                        if (start == -1)
+                        {
+                            start = vertex;
+                        }
+                        else
+                        {
+                            end = vertex;
+                            break;
+                        }
+                    }
+                }
+                if (start == -1)
+                {
+                    start = attachmentVertexes.First();
+                    heuristicFace *= 2;
+                }
+                if (end == -1)
+                {
+                    end = (from a in attachmentVertexes where a != start select a).First();
+                    heuristicFace *= 2;
+                }
+                heuristic += heuristicFace;
+            }
+        }
         /// <summary>
         /// get path from bridge witch can be embedded
         /// </summary>
@@ -147,11 +200,9 @@ namespace Plugin
                     queue = new Queue<int>();
                     parrent = new Dictionary<int, int>();
                     enqueued = new HashSet<int>();
-
-                    int start = attachmentVertexes.First();                    
-                    enqueued.Add(start);
+                    start = attachmentVertexes.First();                    
+                    enqueued.Add(start);                   
                     
-                    enqueued.Add(start);
                     foreach (int v in bridge.neighbors[start])
                     {
                         queue.Enqueue(v);
@@ -171,8 +222,8 @@ namespace Plugin
                     break;                    
                 case BridgType.Type2:
                     path = new List<int>();
-                    path.Add(Embeding.First().Item1);
-                    path.Add(Embeding.First().Item2);                    
+                    path.Add(Embedding.First().Item1);
+                    path.Add(Embedding.First().Item2);                    
                     break;
             }
             return path;
@@ -202,6 +253,7 @@ namespace Plugin
                     return -1;
                 }
                 int v = queue.Dequeue();                
+                //if (v == end)
                 if (attachmentVertexes.Contains(v))
                 {
                     return v;

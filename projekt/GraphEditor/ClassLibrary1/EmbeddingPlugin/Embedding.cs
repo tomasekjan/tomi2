@@ -2,9 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-//using GraphEditor.GraphDeclaration;
-using System.Collections;
-using System.Drawing;
 using GraphEditor.GraphDeclaration;
 using System.Diagnostics;
 
@@ -102,18 +99,18 @@ namespace Plugin
         /// get sub embedding for selected component
         /// </summary>
         /// <param name="comp"></param>
-        /// <param name="embeding"></param>
-        public Embedding(List<int> comp, Embedding embeding)
+        /// <param name="embedding"></param>
+        public Embedding(List<int> comp, Embedding embedding)
         {
             neighbors = new Dictionary<int, CircularListInt>();
-            foreach (var v in comp)
+            foreach (int v in comp)
             {
-                if (embeding.neighbors[v].Count == 0)
+                if (embedding.neighbors[v].Count == 0)
                 {
                     neighbors.Add(v, new CircularListInt());
                 }
             }
-            foreach (Tuple<int, int> edge in embeding)
+            foreach (Tuple<int, int> edge in embedding)
             {
                 if (comp.Contains(edge.Item1) && comp.Contains(edge.Item2))
                 {
@@ -126,126 +123,100 @@ namespace Plugin
         /// enumerates all possible non-isomorphic embedding of K5 on torus
         /// </summary>
         /// <returns></returns>
-        public static List<Embedding> GetK5Embedings(int[] vertexNames)
+        public static List<Embedding> GetK5Embeddings(int[] vertexNames)
         {
             Debug.Assert(vertexNames.Length == 5);
             List<Embedding> list = new List<Embedding>();
-            Embedding K5Embeding = new Embedding();
-            K5Embeding.neighbors.Add(vertexNames[0], new CircularListInt(new int[] { vertexNames[2], vertexNames[3], vertexNames[1], vertexNames[4] }));
-            K5Embeding.neighbors.Add(vertexNames[1], new CircularListInt(new int[] { vertexNames[0], vertexNames[4], vertexNames[2], vertexNames[3] }));
-            K5Embeding.neighbors.Add(vertexNames[2], new CircularListInt(new int[] { vertexNames[1], vertexNames[4], vertexNames[3], vertexNames[0] }));
-            K5Embeding.neighbors.Add(vertexNames[3], new CircularListInt(new int[] { vertexNames[2], vertexNames[1], vertexNames[4], vertexNames[0] }));
-            K5Embeding.neighbors.Add(vertexNames[4], new CircularListInt(new int[] { vertexNames[3], vertexNames[0], vertexNames[2], vertexNames[1] }));
-            list.Add(K5Embeding);
-            K5Embeding = new Embedding();
-            K5Embeding.neighbors.Add(vertexNames[0], new CircularListInt(new int[] { vertexNames[2], vertexNames[1], vertexNames[4], vertexNames[3] }));
-            K5Embeding.neighbors.Add(vertexNames[1], new CircularListInt(new int[] { vertexNames[0], vertexNames[3], vertexNames[2], vertexNames[4] }));
-            K5Embeding.neighbors.Add(vertexNames[2], new CircularListInt(new int[] { vertexNames[1], vertexNames[4], vertexNames[3], vertexNames[0] }));
-            K5Embeding.neighbors.Add(vertexNames[3], new CircularListInt(new int[] { vertexNames[2], vertexNames[0], vertexNames[4], vertexNames[1] }));
-            K5Embeding.neighbors.Add(vertexNames[4], new CircularListInt(new int[] { vertexNames[3], vertexNames[0], vertexNames[1], vertexNames[2] }));
-            list.Add(K5Embeding);
-            K5Embeding = new Embedding();
-            K5Embeding.neighbors.Add(vertexNames[0], new CircularListInt(new int[] { vertexNames[2], vertexNames[3], vertexNames[1], vertexNames[4] }));
-            K5Embeding.neighbors.Add(vertexNames[1], new CircularListInt(new int[] { vertexNames[2], vertexNames[0], vertexNames[4], vertexNames[3] }));
-            K5Embeding.neighbors.Add(vertexNames[2], new CircularListInt(new int[] { vertexNames[3], vertexNames[4], vertexNames[1], vertexNames[0] }));
-            K5Embeding.neighbors.Add(vertexNames[3], new CircularListInt(new int[] { vertexNames[0], vertexNames[1], vertexNames[2], vertexNames[4] }));
-            K5Embeding.neighbors.Add(vertexNames[4], new CircularListInt(new int[] { vertexNames[1], vertexNames[3], vertexNames[0], vertexNames[2] }));
-            list.Add(K5Embeding);
-            K5Embeding = new Embedding();
-            K5Embeding.neighbors.Add(vertexNames[0], new CircularListInt(new int[] { vertexNames[4], vertexNames[1], vertexNames[2], vertexNames[3] }));
-            K5Embeding.neighbors.Add(vertexNames[1], new CircularListInt(new int[] { vertexNames[3], vertexNames[4], vertexNames[2], vertexNames[0] }));
-            K5Embeding.neighbors.Add(vertexNames[2], new CircularListInt(new int[] { vertexNames[1], vertexNames[4], vertexNames[3], vertexNames[0] }));
-            K5Embeding.neighbors.Add(vertexNames[3], new CircularListInt(new int[] { vertexNames[0], vertexNames[2], vertexNames[4], vertexNames[1] }));
-            K5Embeding.neighbors.Add(vertexNames[4], new CircularListInt(new int[] { vertexNames[0], vertexNames[3], vertexNames[2], vertexNames[1] }));
-            list.Add(K5Embeding);
-            K5Embeding = new Embedding();
-            K5Embeding.neighbors.Add(vertexNames[0], new CircularListInt(new int[] { vertexNames[4], vertexNames[1], vertexNames[2], vertexNames[3] }));
-            K5Embeding.neighbors.Add(vertexNames[1], new CircularListInt(new int[] { vertexNames[3], vertexNames[4], vertexNames[2], vertexNames[0] }));
-            K5Embeding.neighbors.Add(vertexNames[2], new CircularListInt(new int[] { vertexNames[1], vertexNames[4], vertexNames[3], vertexNames[0] }));
-            K5Embeding.neighbors.Add(vertexNames[3], new CircularListInt(new int[] { vertexNames[2], vertexNames[1], vertexNames[4], vertexNames[0] }));
-            K5Embeding.neighbors.Add(vertexNames[4], new CircularListInt(new int[] { vertexNames[3], vertexNames[0], vertexNames[2], vertexNames[1] }));
-            list.Add(K5Embeding);
-            K5Embeding = new Embedding();
-            K5Embeding.neighbors.Add(vertexNames[0], new CircularListInt(new int[] { vertexNames[2], vertexNames[3], vertexNames[4], vertexNames[1] }));
-            K5Embeding.neighbors.Add(vertexNames[1], new CircularListInt(new int[] { vertexNames[0], vertexNames[4], vertexNames[2], vertexNames[3] }));
-            K5Embeding.neighbors.Add(vertexNames[2], new CircularListInt(new int[] { vertexNames[1], vertexNames[4], vertexNames[3], vertexNames[0] }));
-            K5Embeding.neighbors.Add(vertexNames[3], new CircularListInt(new int[] { vertexNames[2], vertexNames[1], vertexNames[4], vertexNames[0] }));
-            K5Embeding.neighbors.Add(vertexNames[4], new CircularListInt(new int[] { vertexNames[0], vertexNames[3], vertexNames[2], vertexNames[1] }));
-            list.Add(K5Embeding);
+            Embedding K5Embedding = new Embedding();
+            K5Embedding.neighbors.Add(vertexNames[0], new CircularListInt(new int[] { vertexNames[2], vertexNames[3], vertexNames[1], vertexNames[4] }));
+            K5Embedding.neighbors.Add(vertexNames[1], new CircularListInt(new int[] { vertexNames[0], vertexNames[4], vertexNames[2], vertexNames[3] }));
+            K5Embedding.neighbors.Add(vertexNames[2], new CircularListInt(new int[] { vertexNames[1], vertexNames[4], vertexNames[3], vertexNames[0] }));
+            K5Embedding.neighbors.Add(vertexNames[3], new CircularListInt(new int[] { vertexNames[2], vertexNames[1], vertexNames[4], vertexNames[0] }));
+            K5Embedding.neighbors.Add(vertexNames[4], new CircularListInt(new int[] { vertexNames[3], vertexNames[0], vertexNames[2], vertexNames[1] }));
+            list.Add(K5Embedding);
+            K5Embedding = new Embedding();
+            K5Embedding.neighbors.Add(vertexNames[0], new CircularListInt(new int[] { vertexNames[2], vertexNames[1], vertexNames[4], vertexNames[3] }));
+            K5Embedding.neighbors.Add(vertexNames[1], new CircularListInt(new int[] { vertexNames[0], vertexNames[3], vertexNames[2], vertexNames[4] }));
+            K5Embedding.neighbors.Add(vertexNames[2], new CircularListInt(new int[] { vertexNames[1], vertexNames[4], vertexNames[3], vertexNames[0] }));
+            K5Embedding.neighbors.Add(vertexNames[3], new CircularListInt(new int[] { vertexNames[2], vertexNames[0], vertexNames[4], vertexNames[1] }));
+            K5Embedding.neighbors.Add(vertexNames[4], new CircularListInt(new int[] { vertexNames[3], vertexNames[0], vertexNames[1], vertexNames[2] }));
+            list.Add(K5Embedding);
+            K5Embedding = new Embedding();
+            K5Embedding.neighbors.Add(vertexNames[0], new CircularListInt(new int[] { vertexNames[2], vertexNames[3], vertexNames[1], vertexNames[4] }));
+            K5Embedding.neighbors.Add(vertexNames[1], new CircularListInt(new int[] { vertexNames[2], vertexNames[0], vertexNames[4], vertexNames[3] }));
+            K5Embedding.neighbors.Add(vertexNames[2], new CircularListInt(new int[] { vertexNames[3], vertexNames[4], vertexNames[1], vertexNames[0] }));
+            K5Embedding.neighbors.Add(vertexNames[3], new CircularListInt(new int[] { vertexNames[0], vertexNames[1], vertexNames[2], vertexNames[4] }));
+            K5Embedding.neighbors.Add(vertexNames[4], new CircularListInt(new int[] { vertexNames[1], vertexNames[3], vertexNames[0], vertexNames[2] }));
+            list.Add(K5Embedding);
+            K5Embedding = new Embedding();
+            K5Embedding.neighbors.Add(vertexNames[0], new CircularListInt(new int[] { vertexNames[4], vertexNames[1], vertexNames[2], vertexNames[3] }));
+            K5Embedding.neighbors.Add(vertexNames[1], new CircularListInt(new int[] { vertexNames[3], vertexNames[4], vertexNames[2], vertexNames[0] }));
+            K5Embedding.neighbors.Add(vertexNames[2], new CircularListInt(new int[] { vertexNames[1], vertexNames[4], vertexNames[3], vertexNames[0] }));
+            K5Embedding.neighbors.Add(vertexNames[3], new CircularListInt(new int[] { vertexNames[0], vertexNames[2], vertexNames[4], vertexNames[1] }));
+            K5Embedding.neighbors.Add(vertexNames[4], new CircularListInt(new int[] { vertexNames[0], vertexNames[3], vertexNames[2], vertexNames[1] }));
+            list.Add(K5Embedding);
+            K5Embedding = new Embedding();
+            K5Embedding.neighbors.Add(vertexNames[0], new CircularListInt(new int[] { vertexNames[4], vertexNames[1], vertexNames[2], vertexNames[3] }));
+            K5Embedding.neighbors.Add(vertexNames[1], new CircularListInt(new int[] { vertexNames[3], vertexNames[4], vertexNames[2], vertexNames[0] }));
+            K5Embedding.neighbors.Add(vertexNames[2], new CircularListInt(new int[] { vertexNames[1], vertexNames[4], vertexNames[3], vertexNames[0] }));
+            K5Embedding.neighbors.Add(vertexNames[3], new CircularListInt(new int[] { vertexNames[2], vertexNames[1], vertexNames[4], vertexNames[0] }));
+            K5Embedding.neighbors.Add(vertexNames[4], new CircularListInt(new int[] { vertexNames[3], vertexNames[0], vertexNames[2], vertexNames[1] }));
+            list.Add(K5Embedding);
+            K5Embedding = new Embedding();
+            K5Embedding.neighbors.Add(vertexNames[0], new CircularListInt(new int[] { vertexNames[2], vertexNames[3], vertexNames[4], vertexNames[1] }));
+            K5Embedding.neighbors.Add(vertexNames[1], new CircularListInt(new int[] { vertexNames[0], vertexNames[4], vertexNames[2], vertexNames[3] }));
+            K5Embedding.neighbors.Add(vertexNames[2], new CircularListInt(new int[] { vertexNames[1], vertexNames[4], vertexNames[3], vertexNames[0] }));
+            K5Embedding.neighbors.Add(vertexNames[3], new CircularListInt(new int[] { vertexNames[2], vertexNames[1], vertexNames[4], vertexNames[0] }));
+            K5Embedding.neighbors.Add(vertexNames[4], new CircularListInt(new int[] { vertexNames[0], vertexNames[3], vertexNames[2], vertexNames[1] }));
+            list.Add(K5Embedding);
             return list;
         }
 
-        public static List<Embedding> GetK5EmbedingsConstant()
+        public static List<Embedding> GetK5EmbeddingsConstant()
         {
             List<Embedding> list = new List<Embedding>();
-            Embedding embeding1 = new Embedding();
-            embeding1.neighbors.Add(0, new CircularListInt(new int[] { 2, 3, 1, 4 }));
-            embeding1.neighbors.Add(1, new CircularListInt(new int[] { 0, 4, 2, 3 }));
-            embeding1.neighbors.Add(2, new CircularListInt(new int[] { 1, 4, 3, 0 }));
-            embeding1.neighbors.Add(3, new CircularListInt(new int[] { 2, 1, 4, 0 }));
-            embeding1.neighbors.Add(4, new CircularListInt(new int[] { 3, 0, 2, 1 }));
-            list.Add(embeding1);
-            Embedding embeding2 = new Embedding();
-            embeding2.neighbors.Add(0, new CircularListInt(new int[] { 2, 1, 4, 3 }));
-            embeding2.neighbors.Add(1, new CircularListInt(new int[] { 0, 3, 2, 4 }));
-            embeding2.neighbors.Add(2, new CircularListInt(new int[] { 1, 4, 3, 0 }));
-            embeding2.neighbors.Add(3, new CircularListInt(new int[] { 2, 0, 4, 1 }));
-            embeding2.neighbors.Add(4, new CircularListInt(new int[] { 3, 0, 1, 2 }));
-            list.Add(embeding2);
-            Embedding embeding3 = new Embedding();
-            embeding3.neighbors.Add(0, new CircularListInt(new int[] { 2, 3, 1, 4 }));
-            embeding3.neighbors.Add(1, new CircularListInt(new int[] { 2, 0, 4, 3 }));
-            embeding3.neighbors.Add(2, new CircularListInt(new int[] { 3, 4, 1, 0 }));
-            embeding3.neighbors.Add(3, new CircularListInt(new int[] { 0, 1, 2, 4 }));
-            embeding3.neighbors.Add(4, new CircularListInt(new int[] { 1, 3, 0, 2 }));
-            list.Add(embeding3);
-            Embedding embeding4 = new Embedding();
-            embeding4.neighbors.Add(0, new CircularListInt(new int[] { 4, 1, 2, 3 }));
-            embeding4.neighbors.Add(1, new CircularListInt(new int[] { 3, 4, 2, 0 }));
-            embeding4.neighbors.Add(2, new CircularListInt(new int[] { 1, 4, 3, 0 }));
-            embeding4.neighbors.Add(3, new CircularListInt(new int[] { 0, 2, 4, 1 }));
-            embeding4.neighbors.Add(4, new CircularListInt(new int[] { 0, 3, 2, 1 }));
-            list.Add(embeding4);
-            Embedding embeding5 = new Embedding();
-            embeding5.neighbors.Add(0, new CircularListInt(new int[] { 4, 1, 2, 3 }));
-            embeding5.neighbors.Add(1, new CircularListInt(new int[] { 3, 4, 2, 0 }));
-            embeding5.neighbors.Add(2, new CircularListInt(new int[] { 1, 4, 3, 0 }));
-            embeding5.neighbors.Add(3, new CircularListInt(new int[] { 2, 1, 4, 0 }));
-            embeding5.neighbors.Add(4, new CircularListInt(new int[] { 3, 0, 2, 1 }));
-            list.Add(embeding5);
-            Embedding embeding6 = new Embedding();
-            embeding6.neighbors.Add(0, new CircularListInt(new int[] { 2, 3, 4, 1 }));
-            embeding6.neighbors.Add(1, new CircularListInt(new int[] { 0, 4, 2, 3 }));
-            embeding6.neighbors.Add(2, new CircularListInt(new int[] { 1, 4, 3, 0 }));
-            embeding6.neighbors.Add(3, new CircularListInt(new int[] { 2, 1, 4, 0 }));
-            embeding6.neighbors.Add(4, new CircularListInt(new int[] { 0, 3, 2, 1 }));
-            list.Add(embeding6);
-            return list;
-        }
-
-        /// <summary>
-        /// enumerates all possible non-isomorphic embedding of K{3,3} on torus
-        /// </summary>
-        /// <returns></returns>
-        public static List<Embedding> GetK3_3Embedings(int[] vertexNames)
-        {
-            List<Embedding> list = new List<Embedding>();
-            Embedding embedingA = new Embedding();
-            embedingA.neighbors.Add(vertexNames[0], new CircularListInt(new int[] { vertexNames[5], vertexNames[3], vertexNames[4] }));
-            embedingA.neighbors.Add(vertexNames[1], new CircularListInt(new int[] { vertexNames[4], vertexNames[5], vertexNames[3] }));
-            embedingA.neighbors.Add(vertexNames[2], new CircularListInt(new int[] { vertexNames[5], vertexNames[4], vertexNames[3] }));
-            embedingA.neighbors.Add(vertexNames[3], new CircularListInt(new int[] { vertexNames[1], vertexNames[2], vertexNames[0] }));
-            embedingA.neighbors.Add(vertexNames[4], new CircularListInt(new int[] { vertexNames[2], vertexNames[1], vertexNames[0] }));
-            embedingA.neighbors.Add(vertexNames[5], new CircularListInt(new int[] { vertexNames[0], vertexNames[2], vertexNames[1] }));
-            list.Add(embedingA);
-            Embedding embedingB = new Embedding();
-            embedingB.neighbors.Add(vertexNames[0], new CircularListInt(new int[] { vertexNames[3], vertexNames[5], vertexNames[4] }));
-            embedingB.neighbors.Add(vertexNames[1], new CircularListInt(new int[] { vertexNames[3], vertexNames[5], vertexNames[4] }));
-            embedingB.neighbors.Add(vertexNames[2], new CircularListInt(new int[] { vertexNames[4], vertexNames[3], vertexNames[5] }));
-            embedingB.neighbors.Add(vertexNames[3], new CircularListInt(new int[] { vertexNames[2], vertexNames[1], vertexNames[0] }));
-            embedingB.neighbors.Add(vertexNames[4], new CircularListInt(new int[] { vertexNames[1], vertexNames[0], vertexNames[2] }));
-            embedingB.neighbors.Add(vertexNames[5], new CircularListInt(new int[] { vertexNames[0], vertexNames[2], vertexNames[1] }));
-            list.Add(embedingB);
+            Embedding embedding1 = new Embedding();
+            embedding1.neighbors.Add(0, new CircularListInt(new int[] { 2, 3, 1, 4 }));
+            embedding1.neighbors.Add(1, new CircularListInt(new int[] { 0, 4, 2, 3 }));
+            embedding1.neighbors.Add(2, new CircularListInt(new int[] { 1, 4, 3, 0 }));
+            embedding1.neighbors.Add(3, new CircularListInt(new int[] { 2, 1, 4, 0 }));
+            embedding1.neighbors.Add(4, new CircularListInt(new int[] { 3, 0, 2, 1 }));
+            list.Add(embedding1);
+            Embedding embedding2 = new Embedding();
+            embedding2.neighbors.Add(0, new CircularListInt(new int[] { 2, 1, 4, 3 }));
+            embedding2.neighbors.Add(1, new CircularListInt(new int[] { 0, 3, 2, 4 }));
+            embedding2.neighbors.Add(2, new CircularListInt(new int[] { 1, 4, 3, 0 }));
+            embedding2.neighbors.Add(3, new CircularListInt(new int[] { 2, 0, 4, 1 }));
+            embedding2.neighbors.Add(4, new CircularListInt(new int[] { 3, 0, 1, 2 }));
+            list.Add(embedding2);
+            Embedding embedding3 = new Embedding();
+            embedding3.neighbors.Add(0, new CircularListInt(new int[] { 2, 3, 1, 4 }));
+            embedding3.neighbors.Add(1, new CircularListInt(new int[] { 2, 0, 4, 3 }));
+            embedding3.neighbors.Add(2, new CircularListInt(new int[] { 3, 4, 1, 0 }));
+            embedding3.neighbors.Add(3, new CircularListInt(new int[] { 0, 1, 2, 4 }));
+            embedding3.neighbors.Add(4, new CircularListInt(new int[] { 1, 3, 0, 2 }));
+            list.Add(embedding3);
+            Embedding embedding4 = new Embedding();
+            embedding4.neighbors.Add(0, new CircularListInt(new int[] { 4, 1, 2, 3 }));
+            embedding4.neighbors.Add(1, new CircularListInt(new int[] { 3, 4, 2, 0 }));
+            embedding4.neighbors.Add(2, new CircularListInt(new int[] { 1, 4, 3, 0 }));
+            embedding4.neighbors.Add(3, new CircularListInt(new int[] { 0, 2, 4, 1 }));
+            embedding4.neighbors.Add(4, new CircularListInt(new int[] { 0, 3, 2, 1 }));
+            list.Add(embedding4);
+            Embedding embedding5 = new Embedding();
+            embedding5.neighbors.Add(0, new CircularListInt(new int[] { 4, 1, 2, 3 }));
+            embedding5.neighbors.Add(1, new CircularListInt(new int[] { 3, 4, 2, 0 }));
+            embedding5.neighbors.Add(2, new CircularListInt(new int[] { 1, 4, 3, 0 }));
+            embedding5.neighbors.Add(3, new CircularListInt(new int[] { 2, 1, 4, 0 }));
+            embedding5.neighbors.Add(4, new CircularListInt(new int[] { 3, 0, 2, 1 }));
+            list.Add(embedding5);
+            Embedding embedding6 = new Embedding();
+            embedding6.neighbors.Add(0, new CircularListInt(new int[] { 2, 3, 4, 1 }));
+            embedding6.neighbors.Add(1, new CircularListInt(new int[] { 0, 4, 2, 3 }));
+            embedding6.neighbors.Add(2, new CircularListInt(new int[] { 1, 4, 3, 0 }));
+            embedding6.neighbors.Add(3, new CircularListInt(new int[] { 2, 1, 4, 0 }));
+            embedding6.neighbors.Add(4, new CircularListInt(new int[] { 0, 3, 2, 1 }));
+            list.Add(embedding6);
             return list;
         }
 
@@ -253,25 +224,51 @@ namespace Plugin
         /// enumerates all possible non-isomorphic embedding of K{3,3} on torus
         /// </summary>
         /// <returns></returns>
-        public static List<Embedding> GetK3_3EmbedingsConstant()
+        public static List<Embedding> GetK3_3Embeddings(int[] vertexNames)
         {
             List<Embedding> list = new List<Embedding>();
-            Embedding embeding1 = new Embedding();
-            embeding1.neighbors.Add(0, new CircularListInt(new int[] { 5, 3, 4 }));
-            embeding1.neighbors.Add(1, new CircularListInt(new int[] { 4, 5, 3 }));
-            embeding1.neighbors.Add(2, new CircularListInt(new int[] { 5, 4, 3 }));
-            embeding1.neighbors.Add(3, new CircularListInt(new int[] { 1, 2, 0 }));
-            embeding1.neighbors.Add(4, new CircularListInt(new int[] { 2, 1, 0 }));
-            embeding1.neighbors.Add(5, new CircularListInt(new int[] { 0, 2, 1 }));
-            list.Add(embeding1);
-            Embedding embeding2 = new Embedding();
-            embeding2.neighbors.Add(0, new CircularListInt(new int[] { 3, 5, 4 }));
-            embeding2.neighbors.Add(1, new CircularListInt(new int[] { 3, 5, 4 }));
-            embeding2.neighbors.Add(2, new CircularListInt(new int[] { 4, 3, 5 }));
-            embeding2.neighbors.Add(3, new CircularListInt(new int[] { 2, 1, 0 }));
-            embeding2.neighbors.Add(4, new CircularListInt(new int[] { 1, 0, 2 }));
-            embeding2.neighbors.Add(5, new CircularListInt(new int[] { 0, 2, 1 }));
-            list.Add(embeding2);
+            Embedding embeddingA = new Embedding();
+            embeddingA.neighbors.Add(vertexNames[0], new CircularListInt(new int[] { vertexNames[5], vertexNames[3], vertexNames[4] }));
+            embeddingA.neighbors.Add(vertexNames[1], new CircularListInt(new int[] { vertexNames[4], vertexNames[5], vertexNames[3] }));
+            embeddingA.neighbors.Add(vertexNames[2], new CircularListInt(new int[] { vertexNames[5], vertexNames[4], vertexNames[3] }));
+            embeddingA.neighbors.Add(vertexNames[3], new CircularListInt(new int[] { vertexNames[1], vertexNames[2], vertexNames[0] }));
+            embeddingA.neighbors.Add(vertexNames[4], new CircularListInt(new int[] { vertexNames[2], vertexNames[1], vertexNames[0] }));
+            embeddingA.neighbors.Add(vertexNames[5], new CircularListInt(new int[] { vertexNames[0], vertexNames[2], vertexNames[1] }));
+            list.Add(embeddingA);
+            Embedding embeddingB = new Embedding();
+            embeddingB.neighbors.Add(vertexNames[0], new CircularListInt(new int[] { vertexNames[3], vertexNames[5], vertexNames[4] }));
+            embeddingB.neighbors.Add(vertexNames[1], new CircularListInt(new int[] { vertexNames[3], vertexNames[5], vertexNames[4] }));
+            embeddingB.neighbors.Add(vertexNames[2], new CircularListInt(new int[] { vertexNames[4], vertexNames[3], vertexNames[5] }));
+            embeddingB.neighbors.Add(vertexNames[3], new CircularListInt(new int[] { vertexNames[2], vertexNames[1], vertexNames[0] }));
+            embeddingB.neighbors.Add(vertexNames[4], new CircularListInt(new int[] { vertexNames[1], vertexNames[0], vertexNames[2] }));
+            embeddingB.neighbors.Add(vertexNames[5], new CircularListInt(new int[] { vertexNames[0], vertexNames[2], vertexNames[1] }));
+            list.Add(embeddingB);
+            return list;
+        }
+
+        /// <summary>
+        /// enumerates all possible non-isomorphic embedding of K{3,3} on torus
+        /// </summary>
+        /// <returns></returns>
+        public static List<Embedding> GetK3_3EmbeddingsConstant()
+        {
+            List<Embedding> list = new List<Embedding>();
+            Embedding embedding1 = new Embedding();
+            embedding1.neighbors.Add(0, new CircularListInt(new int[] { 5, 3, 4 }));
+            embedding1.neighbors.Add(1, new CircularListInt(new int[] { 4, 5, 3 }));
+            embedding1.neighbors.Add(2, new CircularListInt(new int[] { 5, 4, 3 }));
+            embedding1.neighbors.Add(3, new CircularListInt(new int[] { 1, 2, 0 }));
+            embedding1.neighbors.Add(4, new CircularListInt(new int[] { 2, 1, 0 }));
+            embedding1.neighbors.Add(5, new CircularListInt(new int[] { 0, 2, 1 }));
+            list.Add(embedding1);
+            Embedding embedding2 = new Embedding();
+            embedding2.neighbors.Add(0, new CircularListInt(new int[] { 3, 5, 4 }));
+            embedding2.neighbors.Add(1, new CircularListInt(new int[] { 3, 5, 4 }));
+            embedding2.neighbors.Add(2, new CircularListInt(new int[] { 4, 3, 5 }));
+            embedding2.neighbors.Add(3, new CircularListInt(new int[] { 2, 1, 0 }));
+            embedding2.neighbors.Add(4, new CircularListInt(new int[] { 1, 0, 2 }));
+            embedding2.neighbors.Add(5, new CircularListInt(new int[] { 0, 2, 1 }));
+            list.Add(embedding2);
             return list;
         }
                 
@@ -323,7 +320,7 @@ namespace Plugin
         internal bool IsK5()
         {
             int count = 0;
-            foreach (var v in neighbors.Keys)
+            foreach (int v in neighbors.Keys)
             {
                 if (neighbors[v].Count == 4)
                 {
@@ -340,7 +337,7 @@ namespace Plugin
         internal bool IsK3_3()
         {
             int count = 0;
-            foreach (var v in neighbors.Keys)
+            foreach (int v in neighbors.Keys)
             {
                 if (neighbors[v].Count == 3)
                 {
@@ -350,12 +347,6 @@ namespace Plugin
             return count == 6;
         }
         
-
-        internal void RemovePath(List<int> bisectingPath, VertexState vertexStateFirst, VertexState vertexStateSeccond)
-        {
-            throw new NotImplementedException();
-        }
-
         public IEnumerator<Tuple<int, int>> GetEnumerator()
         {
             foreach (int u in neighbors.Keys)
@@ -460,7 +451,7 @@ namespace Plugin
             {
                 RemoveEdgeASym(edge);
             }
-            foreach (var v in h.neighbors.Keys)
+            foreach (int v in h.neighbors.Keys)
             {
                 neighbors.Remove(v);
             }
@@ -492,14 +483,14 @@ namespace Plugin
         private void RemoveEmpty()
         {
             List<int> toRemove = new List<int>();
-            foreach (var v in neighbors.Keys)
+            foreach (int v in neighbors.Keys)
             {
                 if (neighbors[v].Count == 0)
                 {
                     toRemove.Add(v);
                 }
             }
-            foreach (var v in toRemove)
+            foreach (int v in toRemove)
             {
                 neighbors.Remove(v);
             }
@@ -516,12 +507,12 @@ namespace Plugin
         }
 
         /// <summary>
-        /// add path to curren embedding
+        /// add path to current embedding
         /// </summary>
-        /// <param name="path"></param>
-        /// <param name="face"></param>
-        /// <param name="vertexStateFirst"></param>
-        /// <param name="vertexStateSeccond"></param>
+        /// <param name="path">list of integers representing path</param>
+        /// <param name="face">face to insert path into</param>
+        /// <param name="vertexStateFirst">determines whether use first or second copy of vertex on face</param>
+        /// <param name="vertexStateSeccond">determines whether use first or second copy of vertex on face</param>
         /// <returns></returns>
         internal bool AddPath(List<int> path, CircularListInt face, VertexState vertexStateFirst, VertexState vertexStateSeccond)
         {
@@ -601,12 +592,22 @@ namespace Plugin
             return true;
         }
 
+        /// <summary>
+        /// add path to current embedding
+        /// </summary>
+        /// <param name="path">list of integers representing path</param>
+        /// <param name="face">face to insert path into</param>>
         internal void AddPath(List<int> path, CircularListInt face)
         {
             AddPath(path, face, VertexState.FIRST, VertexState.FIRST);
             return;
         }
 
+        /// <summary>
+        /// add edge to current embedding
+        /// </summary>
+        /// <param name="edge">edge to insert</param>
+        /// <param name="face">face to insert edge into</param>
         internal void AddEdge(Tuple<int, int> edge, CircularListInt face)
         {
             List<int> path = new List<int>();
@@ -640,7 +641,7 @@ namespace Plugin
                 sb.Append(", ");
             }
             sb.Append(string.Format("Number of edges : {0}, ",this.Count()));
-            foreach (var edge in this)
+            foreach (Tuple<int, int> edge in this)
             {
                 if (edge.Item1 <= edge.Item2)
                 {                    
@@ -659,17 +660,40 @@ namespace Plugin
         /// returns indexes of vertices witch are isomorphic to K{3,3}
         /// </summary>
         /// <returns></returns>
-        internal List<int> GetK33Vertices()
+        internal int[][] GetK33Vertices()
         {
-            List<int> list = new List<int>();
-            foreach (var v in neighbors.Keys)
+            int[][] returArray = new int[2][];
+            returArray[0] = new int[3];
+            returArray[1] = new int[3];
+            int vertexFirsPartity = -1;
+            int indexFrist = 0;
+            int indexSecond = 0;
+            foreach (int v in neighbors.Keys)
             {
                 if (neighbors[v].Count == 3)
                 {
-                    list.Add(v);
+                    if (vertexFirsPartity == -1)
+                    {
+                        vertexFirsPartity = v;
+                        returArray[0][indexFrist] = v;
+                        indexFrist++;
+                    }
+                    else
+                    {
+                        if (neighbors[vertexFirsPartity].Contains(v))
+                        {
+                            returArray[1][indexSecond] = v;
+                            indexSecond++;
+                        }
+                        else 
+                        {
+                            returArray[0][indexFrist] = v;
+                            indexFrist++;
+                        }
+                    }                    
                 }
             }
-            return list; 
+            return returArray;
         }
 
         /// <summary>
@@ -679,7 +703,7 @@ namespace Plugin
         internal List<int> GetK5Vertices()
         {
             List<int> list = new List<int>();
-            foreach (var v in neighbors.Keys)
+            foreach (int v in neighbors.Keys)
             {
                 if (neighbors[v].Count == 4)
                 {
@@ -687,6 +711,65 @@ namespace Plugin
                 }
             }
             return list; 
-        }        
+        }
+
+        /// <summary>
+        /// removes points of degree 2 from graph isomorphic co k5 or k3_3
+        /// </summary>
+        /// <returns>stack of deleted vertexes</returns>
+        internal Stack<Vertex2Record> getSubPoints()
+        {
+            Stack<Vertex2Record> stack = new Stack<Vertex2Record>();
+            bool run = true;
+            while (run)
+            {
+                run = false;
+                foreach (int v in neighbors.Keys)
+                {
+                    if (neighbors[v].Count == 2)
+                    {
+                        run = true;
+                        stack.Push(removeVertex2(v));
+                        break;
+                    }
+                }
+            }
+            return stack;
+        }
+
+        private Vertex2Record removeVertex2(int v)
+        {
+            Vertex2Record record = new Vertex2Record();
+            record.V = v;
+            record.Before = neighbors[v][0];
+            record.After = neighbors[v][1];
+            record.IndexBefore = neighbors[record.Before].IndexOf(v);
+            record.IndexAfter = neighbors[record.After].IndexOf(v);
+            RemoveEdgeSym(new Tuple<int, int>(v, record.Before));
+            RemoveEdgeSym(new Tuple<int, int>(v, record.After));
+            neighbors[record.Before].Insert(record.IndexBefore, record.After);
+            neighbors[record.After].Insert(record.IndexAfter, record.Before);
+            return record;
+        }
+
+        private void insertVertex2(Vertex2Record record)
+        {
+            RemoveEdgeSym(new Tuple<int, int>(record.Before, record.After));
+            neighbors.Add(record.V, new CircularListInt(new int[] {record.Before, record.After}));
+            neighbors[record.Before].Insert(record.IndexBefore, record.V);
+            neighbors[record.After].Insert(record.IndexAfter, record.V);
+        }
+
+        /// <summary>
+        /// reinserting vertexes of degree 2 back into embedding of k5 or k3_3
+        /// </summary>
+        /// <param name="subpoints">stack of deleted vertexes</param>
+        internal void InsertSubPoints(Stack<Vertex2Record> subpoints)
+        {
+            foreach (Vertex2Record record in subpoints)
+            {
+                insertVertex2(record);
+            }
+        }
     }
 }
